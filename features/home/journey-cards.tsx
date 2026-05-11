@@ -9,7 +9,7 @@ import type {Locale} from "@/i18n/routing";
 import {journeys, localized} from "@/lib/content";
 
 export function JourneyCards({locale}: {locale: Locale}) {
-  const t = useTranslations("Common");
+  const t = useTranslations("Nav");
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
