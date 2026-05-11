@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Người Uống Kể Lại — Sơn La Coffee</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+
+  <!-- Swiper.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --forest:        #3d4d2e;
+      --forest-deep:   #252f1a;
+      --card-active:   #f5ede0;
+      --card-mid:      rgba(78, 98, 58, 0.70);
+      --card-dim:      rgba(58, 74, 42, 0.78);
+      --accent:        #b5733a;
+      --accent-warm:   #d4934a;
+      --cream:         #f0e6d3;
+      --cream-dim:     rgba(240, 230, 211, 0.72);
+      --text-dark:     #1c2712;
+      --text-light:    #e8e2d5;
+      --text-muted:    rgba(232, 226, 213, 0.60);
+      --radius:        10px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--forest-deep);
+    }
+
+    /* ── Section ───────────────────────────────── */
+    .section {
+      position: relative;
+      padding: 96px 0 80px;
+      overflow: hidden;
+    }
+
+    /* ── Background image + overlay ────────────── */
+    .section__bg {
+      position: absolute;
+      inset: 0;
+      /* Replace URL with your own dark coffee image */
+      background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1920&q=80');
+      background-color: var(--forest-deep); /* fallback */
+      background-size: cover;
+      background-position: center 40%;
+      filter: brightness(0.38) saturate(0.7);
+    }
+
+    .section__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        150deg,
+        rgba(38, 52, 22, 0.90) 0%,
+        rgba(45, 62, 26, 0.82) 60%,
+        rgba(22, 32, 12, 0.94) 100%
+      );
+    }
+
+    /* ── Container ──────────────────────────────── */
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 52px;
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    .header {
+      margin-bottom: 52px;
+    }
+
+    .header__label {
+      display: block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.20em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .header__title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(46px, 5.5vw, 70px);
+      font-weight: 400;
+      line-height: 1.04;
+      color: var(--cream);
+      letter-spacing: -0.015em;
+    }
+
+    /* ── Swiper wrapper ─────────────────────────── */
+    .swiper-testimonials {
+      overflow: hidden;
+      padding-bottom: 2px; /* prevents box-shadow clipping */
+    }
+
+    /* ── Card ───────────────────────────────────── */
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 360px;
+      border-radius: var(--radius);
+      padding: 34px 32px 30px;
+      background: var(--card-mid);
+      border: 1px solid rgba(255,255,255,0.07);
+      backdrop-filter: blur(6px);
+      transition: background 0.55s ease, box-shadow 0.55s ease;
+    }
+
+    .swiper-slide-active   .card { background: var(--card-active); box-shadow: 0 20px 60px rgba(0,0,0,0.38), 0 4px 16px rgba(0,0,0,0.22); }
+    .swiper-slide-next     .card { background: var(--card-mid); }
+    .swiper-slide-prev     .card { background: var(--card-dim); }
+
+    /* ── Quote icon ─────────────────────────────── */
+    .card__icon {
+      width: 34px;
+      height: 26px;
+      margin-bottom: 22px;
+      flex-shrink: 0;
+      color: var(--accent);
+      transition: color 0.55s ease;
+    }
+
+    .swiper-slide:not(.swiper-slide-active) .card__icon {
+      color: var(--accent-warm);
+      opacity: 0.8;
+    }
+
+    /* ── Quote text ─────────────────────────────── */
+    .card__quote {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(18px, 1.6vw, 24px);
+      font-weight: 400;
+      line-height: 1.52;
+      color: var(--text-dark);
+      flex: 1;
+      margin-bottom: 30px;
+      transition: color 0.55s ease;
+    }
+
+    .swiper-slide:not(.swiper-slide-active) .card__quote {
+      color: var(--text-light);
+    }
+
+    /* ── Author ─────────────────────────────────── */
+    .card__name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+      transition: color 0.55s ease;
+    }
+
+    .swiper-slide:not(.swiper-slide-active) .card__name {
+      color: var(--cream);
+    }
+
+    .card__role {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 400;
+      color: rgba(28, 39, 18, 0.52);
+      transition: color 0.55s ease;
+    }
+
+    .swiper-slide:not(.swiper-slide-active) .card__role {
+      color: var(--text-muted);
+    }
+
+    /* ── Controls row ───────────────────────────── */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 38px;
+    }
+
+    /* ── Dot pagination ─────────────────────────── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pagination .swiper-pagination-bullet {
+      width: 24px;
+      height: 3.5px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.20);
+      opacity: 1;
+      margin: 0 !important;
+      transition: background 0.35s, width 0.35s;
+    }
+
+    .pagination .swiper-pagination-bullet-active {
+      background: var(--accent);
+      width: 44px;
+    }
+
+    /* ── Nav buttons ────────────────────────────── */
+    .nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav__btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.20);
+      background: rgba(255,255,255,0.05);
+      color: var(--cream);
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.25s, border-color 0.25s, color 0.25s;
+      backdrop-filter: blur(6px);
+      font-family: sans-serif;
+    }
+
+    .nav__btn:hover {
+      background: rgba(181, 115, 58, 0.18);
+      border-color: var(--accent);
+      color: var(--accent-warm);
+    }
+
+    .nav__btn:active {
+      transform: scale(0.96);
+    }
+
+    /* ── Responsive ─────────────────────────────── */
+    @media (max-width: 1024px) {
+      .container { padding: 0 32px; }
+    }
+
+    @media (max-width: 767px) {
+      .section   { padding: 72px 0 64px; }
+      .container { padding: 0 20px; }
+      .header    { margin-bottom: 36px; }
+      .card      { min-height: 300px; padding: 26px 24px 22px; }
+      .card__quote { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<section class="section">
+  <!-- Background -->
+  <div class="section__bg"></div>
+  <div class="section__overlay"></div>
+
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <span class="header__label">NGƯỜI CHIA SẺ</span>
+      <h2 class="header__title">Người uống kể lại</h2>
+    </div>
+
+    <!-- Slider -->
+    <div class="swiper swiper-testimonials">
+      <div class="swiper-wrapper">
+
+        <div class="swiper-slide">
+          <div class="card">
+            <svg class="card__icon" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M0 26V17.333C0 12.741 1.037 8.889 3.111 5.778 5.185 2.667 8.519.741 13.111 0L14.667 3.111C11.852 3.852 9.778 5.37 8.444 7.667 7.111 9.963 6.444 12.37 6.444 14.889H13.778V26H0ZM20.222 26V17.333C20.222 12.741 21.26 8.889 23.333 5.778 25.407 2.667 28.741.741 33.333 0L34.889 3.111C32.074 3.852 30 5.37 28.667 7.667c-1.333 2.296-2 4.703-2 7.222H34.222V26H20.222Z" fill="currentColor"/>
+            </svg>
+            <p class="card__quote">Ly arabica có vị sáng nhưng không lạnh. Nó giống một buổi sáng có nắng đi qua sương.</p>
+            <div>
+              <p class="card__name">Minh Anh</p>
+              <p class="card__role">Nhà rang độc lập, Hà Nội</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="card">
+            <svg class="card__icon" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M0 26V17.333C0 12.741 1.037 8.889 3.111 5.778 5.185 2.667 8.519.741 13.111 0L14.667 3.111C11.852 3.852 9.778 5.37 8.444 7.667 7.111 9.963 6.444 12.37 6.444 14.889H13.778V26H0ZM20.222 26V17.333C20.222 12.741 21.26 8.889 23.333 5.778 25.407 2.667 28.741.741 33.333 0L34.889 3.111C32.074 3.852 30 5.37 28.667 7.667c-1.333 2.296-2 4.703-2 7.222H34.222V26H20.222Z" fill="currentColor"/>
+            </svg>
+            <p class="card__quote">Tôi mua vì bao bì, nhưng quay lại vì hậu vị khói nhẹ rất khó quên.</p>
+            <div>
+              <p class="card__name">Daniel Lee</p>
+              <p class="card__role">Nhiếp ảnh gia du lịch</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="card">
+            <svg class="card__icon" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M0 26V17.333C0 12.741 1.037 8.889 3.111 5.778 5.185 2.667 8.519.741 13.111 0L14.667 3.111C11.852 3.852 9.778 5.37 8.444 7.667 7.111 9.963 6.444 12.37 6.444 14.889H13.778V26H0ZM20.222 26V17.333C20.222 12.741 21.26 8.889 23.333 5.778 25.407 2.667 28.741.741 33.333 0L34.889 3.111C32.074 3.852 30 5.37 28.667 7.667c-1.333 2.296-2 4.703-2 7.222H34.222V26H20.222Z" fill="currentColor"/>
+            </svg>
+            <p class="card__quote">Blend phin đủ đậm cho khách Việt, nhưng vẫn sạch và có câu chuyện riêng.</p>
+            <div>
+              <p class="card__name">Hà Linh</p>
+              <p class="card__role">Chủ quán cà phê, TP.HCM</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="card">
+            <svg class="card__icon" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M0 26V17.333C0 12.741 1.037 8.889 3.111 5.778 5.185 2.667 8.519.741 13.111 0L14.667 3.111C11.852 3.852 9.778 5.37 8.444 7.667 7.111 9.963 6.444 12.37 6.444 14.889H13.778V26H0ZM20.222 26V17.333C20.222 12.741 21.26 8.889 23.333 5.778 25.407 2.667 28.741.741 33.333 0L34.889 3.111C32.074 3.852 30 5.37 28.667 7.667c-1.333 2.296-2 4.703-2 7.222H34.222V26H20.222Z" fill="currentColor"/>
+            </svg>
+            <p class="card__quote">Hạt Sơn La rang medium làm tôi ngạc nhiên — độ chua thanh, không gắt, thích hợp pour-over buổi sáng sớm.</p>
+            <div>
+              <p class="card__name">Trần Quốc Hùng</p>
+              <p class="card__role">Barista 10 năm kinh nghiệm</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="card">
+            <svg class="card__icon" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M0 26V17.333C0 12.741 1.037 8.889 3.111 5.778 5.185 2.667 8.519.741 13.111 0L14.667 3.111C11.852 3.852 9.778 5.37 8.444 7.667 7.111 9.963 6.444 12.37 6.444 14.889H13.778V26H0ZM20.222 26V17.333C20.222 12.741 21.26 8.889 23.333 5.778 25.407 2.667 28.741.741 33.333 0L34.889 3.111C32.074 3.852 30 5.37 28.667 7.667c-1.333 2.296-2 4.703-2 7.222H34.222V26H20.222Z" fill="currentColor"/>
+            </svg>
+            <p class="card__quote">Mỗi túi cà phê là một lần kể chuyện — từ vùng đất đến tách uống. Hiếm thương hiệu nào làm được như vậy.</p>
+            <div>
+              <p class="card__name">Sophia Nguyen</p>
+              <p class="card__role">Food & travel blogger</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="card">
+            <svg class="card__icon" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M0 26V17.333C0 12.741 1.037 8.889 3.111 5.778 5.185 2.667 8.519.741 13.111 0L14.667 3.111C11.852 3.852 9.778 5.37 8.444 7.667 7.111 9.963 6.444 12.37 6.444 14.889H13.778V26H0ZM20.222 26V17.333C20.222 12.741 21.26 8.889 23.333 5.778 25.407 2.667 28.741.741 33.333 0L34.889 3.111C32.074 3.852 30 5.37 28.667 7.667c-1.333 2.296-2 4.703-2 7.222H34.222V26H20.222Z" fill="currentColor"/>
+            </svg>
+            <p class="card__quote">Đặt từ Hà Nội, cà phê đến tay vẫn còn thơm như vừa rang. Đóng gói cẩn thận, chất lượng đồng nhất mỗi lần.</p>
+            <div>
+              <p class="card__name">Nguyễn Văn Bảo</p>
+              <p class="card__role">Nhà thiết kế nội thất</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /swiper -->
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="pagination" id="js-pagination"></div>
+      <div class="nav">
+        <button class="nav__btn" id="js-prev" aria-label="Slide trước">&#8249;</button>
+        <button class="nav__btn" id="js-next" aria-label="Slide tiếp theo">&#8250;</button>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</section>
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  new Swiper('.swiper-testimonials', {
+    loop: true,
+    slidesPerView: 3,
+    spaceBetween: 20,
+    speed: 700,
+
+    autoplay: {
+      delay: 4000,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: true,
+    },
+
+    pagination: {
+      el: '#js-pagination',
+      clickable: true,
+    },
+
+    navigation: {
+      prevEl: '#js-prev',
+      nextEl: '#js-next',
+    },
+
+    breakpoints: {
+      0:   { slidesPerView: 1, spaceBetween: 16 },
+      640: { slidesPerView: 2, spaceBetween: 18 },
+      1024:{ slidesPerView: 3, spaceBetween: 20 },
+    },
+  });
+</script>
+
+</body>
+</html>

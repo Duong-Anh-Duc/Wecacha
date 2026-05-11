@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 47 48% 96%;
+  --foreground: 111 78% 8%;
+  --card: 43 42% 93%;
+  --card-foreground: 111 78% 8%;
+  --popover: 43 42% 93%;
+  --popover-foreground: 111 78% 8%;
+  --primary: 103 100% 15%;
+  --primary-foreground: 44 55% 95%;
+  --secondary: 88 100% 24%;
+  --secondary-foreground: 44 55% 95%;
+  --muted: 40 28% 84%;
+  --muted-foreground: 33 30% 28%;
+  --accent: 33 100% 36%;
+  --accent-foreground: 44 55% 95%;
+  --destructive: 7 72% 42%;
+  --destructive-foreground: 44 55% 95%;
+  --border: 41 28% 78%;
+  --input: 41 28% 78%;
+  --ring: 33 100% 36%;
+  --radius: 0.5rem;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: auto;
+  background: hsl(var(--background));
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 14% 6%, rgba(181, 101, 0, 0.14), transparent 28rem),
+    linear-gradient(180deg, #fffaf0 0%, #efe2ca 44%, #132d0c 100%);
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+::selection {
+  background: rgba(181, 101, 0, 0.32);
+  color: #061f07;
+}
+
+img,
+video {
+  max-width: 100%;
+}
+
+.cinematic-vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 42%, transparent 0, rgba(6, 31, 7, 0.16) 45%, rgba(6, 31, 7, 0.78) 100%),
+    linear-gradient(180deg, rgba(6, 31, 7, 0.14), rgba(6, 31, 7, 0.62));
+}
+
+.film-grain {
+  pointer-events: none;
+  position: fixed;
+  inset: -12%;
+  z-index: 60;
+  opacity: 0.12;
+  mix-blend-mode: multiply;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  animation: grain 6s steps(6) infinite;
+}
+
+.light-leak {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 72% 14%, rgba(243, 167, 52, 0.3), transparent 18rem),
+    radial-gradient(circle at 18% 84%, rgba(65, 122, 0, 0.22), transparent 20rem);
+  mix-blend-mode: screen;
+}
+
+.mist-layer {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.mist-layer::before,
+.mist-layer::after {
+  content: "";
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 36%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 250, 240, 0.26), transparent);
+  filter: blur(22px);
+  animation: drift 22s ease-out infinite alternate;
+}
+
+.mist-layer::before {
+  top: 18%;
+}
+
+.mist-layer::after {
+  top: 42%;
+  animation-duration: 29s;
+  opacity: 0.68;
+}
+
+.film-strip {
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.cinematic-float {
+  animation: cinematic-float 9s ease-in-out infinite alternate;
+}
+
+.cinematic-float-delayed {
+  animation: cinematic-float 11s ease-in-out 1.5s infinite alternate;
+}
+
+@keyframes cinematic-float {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(0, -18px, 0) scale(1.025);
+  }
+}
+
+@keyframes drift {
+  0% {
+    transform: translate3d(-8%, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(4%, -2%, 0) scale(1.04);
+  }
+
+  100% {
+    transform: translate3d(10%, 1%, 0) scale(1.02);
+  }
+}
+
+@keyframes grain {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+
+  20% {
+    transform: translate(-1%, 1%);
+  }
+
+  40% {
+    transform: translate(1%, -1%);
+  }
+
+  60% {
+    transform: translate(-1%, -0.5%);
+  }
+
+  80% {
+    transform: translate(1%, 0.5%);
+  }
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

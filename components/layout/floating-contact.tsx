@@ -1,0 +1,95 @@
+"use client";
+
+import {useState} from "react";
+import {motion, AnimatePresence} from "framer-motion";
+import {MessageCircle, X} from "lucide-react";
+import {useTranslations} from "next-intl";
+
+const contacts = [
+  {
+    label: "Zalo",
+    href: "https://zalo.me/YOUR_ZALO_NUMBER",
+    bg: "#0068FF",
+    icon: (
+      <svg viewBox="0 0 48 48" fill="none" className="h-5 w-5">
+        <text x="50%" y="56%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="22" fontWeight="bold" fontFamily="Arial">Z</text>
+      </svg>
+    )
+  },
+  {
+    label: "Facebook",
+    href: "https://facebook.com/YOUR_PAGE",
+    bg: "#1877F2",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="white" className="h-5 w-5">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+      </svg>
+    )
+  },
+  {
+    label: "Messenger",
+    href: "https://m.me/YOUR_PAGE",
+    bg: "#0099FF",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="white" className="h-5 w-5">
+        <path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.498 1.744 6.614 4.469 8.652V24l4.088-2.242c1.092.3 2.246.464 3.443.464 6.627 0 12-4.975 12-11.111S18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8l3.131 3.259L19.752 8l-6.561 6.963z"/>
+      </svg>
+    )
+  }
+];
+
+export function FloatingContact() {
+  const t = useTranslations("Nav");
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+      <AnimatePresence>
+        {open && (
+          <>
+            {contacts.map((c, i) => (
+              <motion.a
+                key={c.label}
+                href={c.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{opacity: 0, scale: 0.5, y: 20}}
+                animate={{opacity: 1, scale: 1, y: 0}}
+                exit={{opacity: 0, scale: 0.5, y: 20}}
+                transition={{duration: 0.25, delay: (contacts.length - 1 - i) * 0.06, ease: [0.16, 1, 0.3, 1]}}
+                className="group flex items-center gap-2"
+              >
+                {/* Label */}
+                <span className="hidden rounded-full bg-forest-950/80 px-3 py-1 text-xs font-medium text-white backdrop-blur group-hover:block">
+                  {c.label}
+                </span>
+                {/* Icon button */}
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-full shadow-warm transition hover:scale-110"
+                  style={{backgroundColor: c.bg}}
+                >
+                  {c.icon}
+                </span>
+              </motion.a>
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Main toggle button */}
+      <motion.button
+        onClick={() => setOpen((v) => !v)}
+        whileTap={{scale: 0.92}}
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-earth-600 text-white shadow-cinematic transition hover:bg-earth-700"
+        aria-label={t("contact")}
+      >
+        <motion.span
+          animate={{rotate: open ? 90 : 0}}
+          transition={{duration: 0.3}}
+        >
+          {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+        </motion.span>
+      </motion.button>
+    </div>
+  );
+}

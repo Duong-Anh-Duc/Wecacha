@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="108" fill="#fffaf0"/>
+  <circle cx="256" cy="222" r="156" fill="#134A00"/>
+  <circle cx="256" cy="222" r="126" fill="#fffaf0"/>
+  <path d="M142 246C180 206 218 190 258 199C302 209 337 238 376 210C361 167 324 116 262 104C211 94 168 113 134 158C116 183 112 217 142 246Z" fill="#417A00"/>
+  <path d="M150 285C194 271 238 273 282 292C318 307 351 307 391 284L404 320C358 346 309 348 259 325C221 308 181 308 139 326L150 285Z" fill="#134A00"/>
+  <path d="M135 347C179 316 222 305 263 318C289 326 313 341 340 346C363 351 386 345 409 326L397 368C366 386 334 390 300 380C269 370 242 351 208 351C184 351 163 361 139 378L135 347Z" fill="#B56500"/>
+  <path d="M190 304C174 322 160 343 149 367" stroke="#fffaf0" stroke-width="14" stroke-linecap="round"/>
+  <path d="M259 127C287 149 312 171 335 192" stroke="#82a64d" stroke-width="8" stroke-linecap="round"/>
+  <path d="M276 120C281 151 284 179 283 204" stroke="#82a64d" stroke-width="8" stroke-linecap="round"/>
+  <path d="M304 132C307 157 307 181 304 205" stroke="#82a64d" stroke-width="7" stroke-linecap="round"/>
+  <path d="M239 211L259 188L279 238L256 232L238 253L239 211Z" fill="#134A00"/>
+  <path d="M214 210L196 181L227 194L238 229L214 210Z" fill="#7d9d56"/>
+  <path d="M289 226L329 218L301 250L282 251L289 226Z" fill="#7d9d56"/>
+  <path d="M114 414C160 395 208 398 256 422C304 446 352 445 398 414" stroke="#134A00" stroke-width="18" stroke-linecap="round"/>
+  <path d="M142 430H370" stroke="#B56500" stroke-width="16" stroke-linecap="round"/>
+  <text x="256" y="474" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="54" font-weight="800" fill="#134A00">Wecacha</text>
+</svg>
