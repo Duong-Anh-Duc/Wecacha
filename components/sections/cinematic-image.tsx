@@ -28,6 +28,7 @@ export function CinematicImage({
         alt={alt}
         fill
         priority={priority}
+        loading={priority ? "eager" : "lazy"}
         sizes={sizes}
         className="object-cover transition duration-[1600ms] ease-out group-hover:scale-105"
       />

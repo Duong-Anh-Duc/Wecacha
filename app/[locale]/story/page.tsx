@@ -5,7 +5,9 @@ import {CinematicImage} from "@/components/sections/cinematic-image";
 import {SectionHeading} from "@/components/sections/section-heading";
 import {Reveal} from "@/components/motion/reveal";
 import {Button} from "@/components/ui/button";
+import {ProductJourneyCarousel} from "@/features/story/product-journey-carousel";
 import {GsapRoastSequence} from "@/features/story/gsap-roast-sequence";
+import {StoryChapterSlider} from "@/features/story/story-chapter-slider";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {imageLibrary, localized, storyChapters} from "@/lib/content";
@@ -67,48 +69,18 @@ export default async function StoryPage({params}: Props) {
         </div>
       </section>
 
-      <section className="px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.78fr_1.22fr]">
-          <Reveal>
-            <div className="sticky top-28">
-              <p className="text-xs font-bold uppercase text-earth-600">
-                {t("fieldNotes")}
-              </p>
-              <blockquote className="mt-5 font-serif text-4xl leading-tight text-forest-950 sm:text-5xl">
-                {t("quote")}
-              </blockquote>
-            </div>
-          </Reveal>
-          <div className="grid gap-14">
-            {storyChapters.slice(0, 2).map((chapter, index) => (
-              <Reveal key={chapter.id} delay={index * 0.08}>
-                <article className="grid gap-7 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
-                  <CinematicImage
-                    src={chapter.image}
-                    alt={localized(chapter.alt, locale)}
-                    className="aspect-[4/3]"
-                  />
-                  <div>
-                    <p className="text-xs font-bold uppercase text-earth-600">
-                      {localized(chapter.eyebrow, locale)}
-                    </p>
-                    <h2 className="mt-3 font-serif text-4xl leading-tight text-forest-950 sm:text-5xl">
-                      {localized(chapter.title, locale)}
-                    </h2>
-                    <div className="mt-5 space-y-5 text-base leading-8 text-forest-950/68">
-                      {localized(chapter.body, locale).map((paragraph) => (
-                        <p key={paragraph}>{paragraph}</p>
-                      ))}
-                    </div>
-                  </div>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
+      <StoryChapterSlider
+        locale={locale}
+        fieldNotes={t("fieldNotes")}
+        quote={t("quote")}
+      />
 
-      <section className="relative overflow-hidden bg-forest-950 px-4 py-20 text-white sm:px-6 lg:px-8 lg:py-28">
+      <ProductJourneyCarousel locale={locale} />
+
+      <section
+        id={storyChapters[2].id}
+        className="relative overflow-hidden bg-forest-950 px-4 py-20 text-white sm:px-6 lg:px-8 lg:py-28"
+      >
         <div className="absolute inset-0 grid grid-cols-3 opacity-52">
           {[imageLibrary.brocade, imageLibrary.campfire, imageLibrary.village].map(
             (src) => (
@@ -134,7 +106,7 @@ export default async function StoryPage({params}: Props) {
         </div>
       </section>
 
-      <section className="px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <section id={storyChapters[3].id} className="px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2 lg:items-center">
           <Reveal>
             <SectionHeading

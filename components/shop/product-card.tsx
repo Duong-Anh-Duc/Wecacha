@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import {motion} from "framer-motion";
 import {ArrowRight, ArrowUpRight} from "lucide-react";
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
@@ -18,7 +19,14 @@ export function ProductCard({
   locale: Locale;
 }) {
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-forest-950/10 bg-parchment-50 text-forest-950 shadow-warm transition duration-500 hover:-translate-y-1 hover:shadow-cinematic">
+    <motion.article
+      initial={{opacity: 0, y: 28}}
+      whileInView={{opacity: 1, y: 0}}
+      viewport={{once: true, margin: "-80px"}}
+      whileHover={{y: -8}}
+      transition={{duration: 0.7, ease: [0.16, 1, 0.3, 1]}}
+      className="group flex h-full flex-col overflow-hidden rounded-xl border border-forest-950/10 bg-parchment-50 text-forest-950 shadow-warm transition-shadow duration-500 hover:shadow-cinematic"
+    >
       {/* Image */}
       <Link
         href={`/shop/${product.slug}`}
@@ -28,6 +36,7 @@ export function ProductCard({
           src={product.images[0]}
           alt={localized(product.name, locale)}
           fill
+          loading="lazy"
           className="object-cover transition duration-[1400ms] ease-out group-hover:scale-[1.06]"
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
         />
@@ -97,6 +106,6 @@ export function ProductCard({
           </Link>
         </Button>
       </div>
-    </article>
+    </motion.article>
   );
 }

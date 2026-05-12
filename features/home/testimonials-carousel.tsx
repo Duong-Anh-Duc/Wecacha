@@ -3,6 +3,7 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import Image from "next/image";
 import {motion} from "framer-motion";
+import type {UseEmblaCarouselType} from "embla-carousel-react";
 import useEmblaCarousel from "embla-carousel-react";
 import {useTranslations} from "next-intl";
 import {cn} from "@/lib/utils";
@@ -10,6 +11,7 @@ import {testimonials, localized} from "@/lib/content";
 import type {Locale} from "@/i18n/routing";
 
 const AUTOPLAY_MS = 4500;
+type EmblaApi = NonNullable<UseEmblaCarouselType[1]>;
 
 export function TestimonialsCarousel({locale}: {locale: Locale}) {
   const tCommon = useTranslations("Common");
@@ -17,11 +19,39 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
     align: "center",
     loop: true,
     containScroll: false,
-    slidesToScroll: 1
+    slidesToScroll: 1,
+    duration: 36,
+    skipSnaps: false
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [tweenValues, setTweenValues] = useState<number[]>([]);
   const [progressKey, setProgressKey] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const updateTweenValues = useCallback((api: EmblaApi) => {
+    const engine = api.internalEngine();
+    const scrollProgress = api.scrollProgress();
+    const snaps = api.scrollSnapList();
+
+    const values = snaps.map((snap, index) => {
+      let diffToTarget = snap - scrollProgress;
+
+      if (engine.options.loop) {
+        engine.slideLooper.loopPoints.forEach((loopItem) => {
+          const target = loopItem.target();
+          if (index === loopItem.index && target !== 0) {
+            const sign = Math.sign(target);
+            if (sign === -1) diffToTarget = snap - (1 + scrollProgress);
+            if (sign === 1) diffToTarget = snap + (1 - scrollProgress);
+          }
+        });
+      }
+
+      return Math.max(0, 1 - Math.abs(diffToTarget) * 3.2);
+    });
+
+    setTweenValues(values);
+  }, []);
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
@@ -39,22 +69,29 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
 
   useEffect(() => {
     if (!emblaApi) return;
+    updateTweenValues(emblaApi);
     scheduleNext();
     return clearTimer;
-  }, [emblaApi, scheduleNext, clearTimer]);
+  }, [emblaApi, scheduleNext, clearTimer, updateTweenValues]);
 
   useEffect(() => {
     if (!emblaApi) return;
+    const onScroll = () => updateTweenValues(emblaApi);
     const onSelect = () => {
       setSelectedIndex(emblaApi.selectedScrollSnap());
       setProgressKey((k) => k + 1);
       scheduleNext();
+      updateTweenValues(emblaApi);
     };
+    emblaApi.on("scroll", onScroll);
+    emblaApi.on("reInit", onScroll);
     emblaApi.on("select", onSelect);
     return () => {
+      emblaApi.off("scroll", onScroll);
+      emblaApi.off("reInit", onScroll);
       emblaApi.off("select", onSelect);
     };
-  }, [emblaApi, scheduleNext]);
+  }, [emblaApi, scheduleNext, updateTweenValues]);
 
   return (
     <div
@@ -66,20 +103,25 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
         <div className="-ml-4 flex touch-pan-y items-center">
           {testimonials.map((item, index) => {
             const isActive = index === selectedIndex;
+            const tween = tweenValues[index] ?? (isActive ? 1 : 0);
+            const opacity = 0.34 + tween * 0.66;
+            const scale = 0.88 + tween * 0.12;
+            const translateY = (1 - tween) * 20;
+            const blur = (1 - tween) * 1.8;
             return (
-              <motion.figure
+              <figure
                 key={item.name}
-                animate={{
-                  opacity: isActive ? 1 : 0.55,
-                  scale: isActive ? 1 : 0.9
-                }}
-                transition={{duration: 0.6, ease: [0.16, 1, 0.3, 1]}}
                 onClick={() => emblaApi?.scrollTo(index)}
                 className="min-w-0 flex-[0_0_88%] cursor-pointer pl-4 sm:flex-[0_0_65%] lg:flex-[0_0_46%]"
               >
                 <div
+                  style={{
+                    opacity,
+                    transform: `translate3d(0, ${translateY}px, 0) scale(${scale})`,
+                    filter: `blur(${blur}px)`
+                  }}
                   className={cn(
-                    "flex h-full flex-col rounded-2xl p-8 transition-colors duration-500",
+                    "will-change-transform flex h-full flex-col rounded-2xl p-8 transition-[background-color,box-shadow,filter,opacity,transform] duration-300 ease-out",
                     isActive
                       ? "bg-parchment-50 shadow-cinematic"
                       : "bg-forest-800/70"
@@ -135,7 +177,7 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
                     </div>
                   </figcaption>
                 </div>
-              </motion.figure>
+              </figure>
             );
           })}
         </div>

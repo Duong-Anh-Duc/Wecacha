@@ -1,5 +1,5 @@
 import Image from "next/image";
-import {ArrowUpRight, Flame, Leaf, MapPinned} from "lucide-react";
+import {ArrowUpRight} from "lucide-react";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {CinematicImage} from "@/components/sections/cinematic-image";
 import {SectionHeading} from "@/components/sections/section-heading";
@@ -7,13 +7,12 @@ import {ProductCard} from "@/components/shop/product-card";
 import {Button} from "@/components/ui/button";
 import {Reveal} from "@/components/motion/reveal";
 import {CinematicHero} from "@/features/home/cinematic-hero";
+import {AnimatedStats} from "@/features/home/animated-stats";
 import {JourneyCards} from "@/features/home/journey-cards";
 import {TestimonialsCarousel} from "@/features/home/testimonials-carousel";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {
-  imageLibrary,
-  journeys,
   localized,
   products,
   storyChapters
@@ -67,21 +66,41 @@ export default async function HomePage({params}: Props) {
               title={t("storyTitle")}
               copy={t("storyCopy")}
             />
-            <div className="mt-10 grid gap-6 sm:grid-cols-3">
-              {[
-                {icon: Leaf, label: t("statAltValue"), value: t("statAltLabel")},
-                {icon: Flame, label: t("statRoastValue"), value: t("statRoastLabel")},
-                {icon: MapPinned, label: t("statOriginValue"), value: t("statOriginLabel")}
-              ].map((item) => (
-                <div key={item.label} className="border-t border-forest-950/14 pt-5">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-earth-600/10">
-                    <item.icon className="h-5 w-5 text-earth-600" aria-hidden="true" />
-                  </div>
-                  <p className="mt-4 font-serif text-2xl leading-tight">{item.label}</p>
-                  <p className="mt-1 text-xs uppercase tracking-widest text-forest-950/48">{item.value}</p>
-                </div>
-              ))}
-            </div>
+            <AnimatedStats
+              className="mt-9"
+              stats={[
+                {
+                  icon: "leaf",
+                  value: 1050,
+                  suffix: "m+",
+                  label: t("statAltLabel"),
+                  caption:
+                    locale === "vi"
+                      ? "Nương cà phê trên triền núi mờ sương"
+                      : "Coffee farms on misty mountain slopes"
+                },
+                {
+                  icon: "users",
+                  value: 120,
+                  suffix: "+",
+                  label: locale === "vi" ? "Nông hộ" : "Farmers",
+                  caption:
+                    locale === "vi"
+                      ? "Cùng giữ mùa cà phê Sơn La"
+                      : "Families keeping Son La harvests"
+                },
+                {
+                  icon: "flame",
+                  value: 48,
+                  suffix: "h+",
+                  label: locale === "vi" ? "Rang chậm" : "Slow roast",
+                  caption:
+                    locale === "vi"
+                      ? "Theo dõi từng mẻ nhỏ"
+                      : "Small batches watched closely"
+                }
+              ]}
+            />
           </Reveal>
 
           {/* Arch image */}

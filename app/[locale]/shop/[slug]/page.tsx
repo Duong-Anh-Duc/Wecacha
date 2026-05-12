@@ -1,5 +1,7 @@
+import Image from "next/image";
 import type {Metadata} from "next";
 import {notFound} from "next/navigation";
+import {ArrowDownRight, MapPinned} from "lucide-react";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {Reveal} from "@/components/motion/reveal";
 import {JsonLd} from "@/components/seo/json-ld";
@@ -101,6 +103,65 @@ export default async function ProductDetailPage({params}: Props) {
               </div>
             </Reveal>
           ))}
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden bg-forest-950 px-4 py-20 text-white sm:px-6 lg:px-8 lg:py-28">
+        <Image
+          src={product.images[1] ?? product.images[0]}
+          alt=""
+          fill
+          loading="lazy"
+          sizes="100vw"
+          className="object-cover opacity-28"
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_18%,rgba(181,101,0,0.34),transparent_30%),linear-gradient(90deg,rgba(5,34,8,0.96),rgba(5,34,8,0.76),rgba(5,34,8,0.94))]" />
+        <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+          <Reveal>
+            <div className="sticky top-28">
+              <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-ember">
+                <MapPinned className="h-4 w-4" aria-hidden="true" />
+                {locale === "vi" ? "Hành trình sản phẩm" : "Product journey"}
+              </p>
+              <h2 className="mt-5 max-w-xl font-serif text-5xl leading-[0.98] text-parchment-50 sm:text-6xl">
+                {locale === "vi"
+                  ? "Mỗi túi cà phê có đường đi riêng"
+                  : "Every bag has its own route"}
+              </h2>
+              <p className="mt-6 max-w-md leading-8 text-white/66">
+                {locale === "vi"
+                  ? "Từ vùng trồng, cách sơ chế đến nhịp rang, câu chuyện của sản phẩm này không trùng với bất kỳ dòng nào khác."
+                  : "From origin and processing to roast rhythm, this product carries a story no other lot shares."}
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="grid gap-4">
+            {localized(product.journey, locale).map((step, index) => (
+              <Reveal key={step.title} delay={index * 0.08}>
+                <article className="group relative overflow-hidden rounded-xl border border-white/12 bg-white/[0.07] p-5 shadow-cinematic backdrop-blur-md transition duration-500 hover:-translate-y-1 hover:bg-white/[0.1] sm:p-7">
+                  <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-ember via-earth-600 to-transparent opacity-75" />
+                  <div className="flex gap-5">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/16 bg-parchment-50/10 font-serif text-2xl text-ember transition duration-500 group-hover:scale-110 group-hover:bg-earth-600 group-hover:text-white">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-ember">
+                        {step.stage}
+                      </p>
+                      <h3 className="mt-2 font-serif text-3xl leading-tight text-parchment-50 sm:text-4xl">
+                        {step.title}
+                      </h3>
+                      <p className="mt-4 max-w-2xl leading-8 text-white/68">
+                        {step.body}
+                      </p>
+                    </div>
+                    <ArrowDownRight className="ml-auto hidden h-6 w-6 shrink-0 text-white/28 transition duration-500 group-hover:translate-x-1 group-hover:translate-y-1 group-hover:text-ember sm:block" />
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 

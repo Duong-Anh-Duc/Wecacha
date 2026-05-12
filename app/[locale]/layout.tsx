@@ -1,5 +1,5 @@
 import type {Metadata} from "next";
-import {Inter, Playfair_Display} from "next/font/google";
+import {Be_Vietnam_Pro, Playfair_Display} from "next/font/google";
 import {hasLocale, NextIntlClientProvider} from "next-intl";
 import {getMessages, getTranslations, setRequestLocale} from "next-intl/server";
 import {notFound} from "next/navigation";
@@ -13,10 +13,11 @@ import {organizationJsonLd} from "@/lib/seo";
 import {siteUrl} from "@/lib/site";
 import "@/styles/globals.css";
 
-const inter = Inter({
+const bodyFont = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
   variable: "--font-sans",
-  display: "swap"
+  display: "swap",
+  weight: ["400", "500", "600", "700"]
 });
 
 const serif = Playfair_Display({
@@ -118,7 +119,7 @@ export default async function LocaleLayout({children, params}: Props) {
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.variable} ${serif.variable} font-sans antialiased`}>
+      <body className={`${bodyFont.variable} ${serif.variable} font-sans antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <SmoothScrollProvider>
             <JsonLd data={organizationJsonLd(locale as Locale)} />

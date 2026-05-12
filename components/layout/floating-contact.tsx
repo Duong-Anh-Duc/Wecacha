@@ -80,10 +80,38 @@ export function FloatingContact() {
       <motion.button
         onClick={() => setOpen((v) => !v)}
         whileTap={{scale: 0.92}}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-earth-600 text-white shadow-cinematic transition hover:bg-earth-700"
+        animate={!open ? {scale: [1, 1.055, 1]} : {scale: 1}}
+        transition={!open ? {duration: 1.55, repeat: Infinity, ease: "easeInOut"} : {duration: 0.2}}
+        className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-earth-600 text-white shadow-cinematic transition hover:bg-earth-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-600 focus-visible:ring-offset-4 focus-visible:ring-offset-parchment-50"
         aria-label={t("contact")}
       >
+        {!open ? (
+          <>
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full border-2 border-earth-600/55"
+              animate={{scale: [1, 1.7], opacity: [0.75, 0]}}
+              transition={{duration: 1.45, repeat: Infinity, ease: "easeOut"}}
+            />
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full border border-white/45"
+              animate={{scale: [1, 1.42], opacity: [0.5, 0]}}
+              transition={{duration: 1.45, repeat: Infinity, delay: 0.42, ease: "easeOut"}}
+            />
+            <motion.span
+              aria-hidden="true"
+              className="absolute -inset-2 rounded-full bg-earth-500/30 blur-md"
+              animate={{scale: [0.9, 1.2, 0.9], opacity: [0.38, 0.72, 0.38]}}
+              transition={{duration: 1.55, repeat: Infinity, ease: "easeInOut"}}
+            />
+            <span className="pointer-events-none absolute right-[calc(100%+0.75rem)] top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-full bg-forest-950 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-parchment-50 shadow-warm opacity-0 transition duration-300 group-hover:opacity-100 sm:block">
+              {t("contact")}
+            </span>
+          </>
+        ) : null}
         <motion.span
+          className="relative z-10"
           animate={{rotate: open ? 90 : 0}}
           transition={{duration: 0.3}}
         >
