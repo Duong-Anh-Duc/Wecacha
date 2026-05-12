@@ -17,6 +17,14 @@ export function ProductJourneyCarousel({locale}: {locale: Locale}) {
   });
   const x = useTransform(scrollYProgress, [0, 1], ["0%", "-48%"]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     return scrollYProgress.on("change", (latest) => {
@@ -29,9 +37,11 @@ export function ProductJourneyCarousel({locale}: {locale: Locale}) {
   return (
     <section
       ref={rootRef}
-      className="relative border-y border-forest-950/10 bg-forest-950 px-4 py-20 text-white sm:px-6 lg:h-[300vh] lg:px-8 lg:py-0"
+      style={{ position: "relative" }}
+      className="relative border-y border-forest-950/10 bg-gradient-to-br from-forest-950 via-forest-900 to-[#071305] px-4 py-20 text-white sm:px-6 lg:h-[300vh] lg:px-8 lg:py-0"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(181,101,0,0.2),transparent_28%),radial-gradient(circle_at_80%_76%,rgba(65,122,0,0.22),transparent_32%)]" />
+      <div className="pointer-events-none absolute -left-1/4 -top-1/4 h-[1200px] w-[1200px] rounded-full bg-emerald-600/10 blur-[140px] animate-drift" />
+      <div className="pointer-events-none absolute right-0 top-1/4 h-[1000px] w-[1000px] rounded-full bg-amber-700/10 blur-[150px] animate-drift" style={{ animationDelay: '-12s' }} />
       <div className="relative mx-auto grid max-w-7xl gap-10 lg:sticky lg:top-0 lg:h-screen lg:grid-cols-[0.52fr_1.48fr] lg:items-center lg:overflow-hidden">
         <div>
           <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-ember">
@@ -58,7 +68,7 @@ export function ProductJourneyCarousel({locale}: {locale: Locale}) {
 
         <div className="min-w-0 overflow-visible lg:overflow-hidden">
           <motion.div
-            style={{x}}
+            style={{ x: isDesktop ? x : 0 }}
             className="grid gap-5 lg:flex lg:w-max lg:gap-6 lg:will-change-transform"
           >
             {products.map((product, index) => (

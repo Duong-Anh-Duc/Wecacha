@@ -15,8 +15,9 @@ import {useCartStore, getCartTotals} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {formatCurrency} from "@/lib/content";
+import {cn} from "@/lib/utils";
 
-export function CartDrawer() {
+export function CartDrawer({solid}: {solid?: boolean}) {
   const locale = useLocale() as Locale;
   const tCommon = useTranslations("Common");
   const tNav = useTranslations("Nav");

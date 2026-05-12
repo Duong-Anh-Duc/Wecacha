@@ -61,7 +61,7 @@ export function SiteHeader() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-500",
         solid
-          ? "border-b border-forest-950/10 bg-parchment-50/96 shadow-sm backdrop-blur-xl"
+          ? "border-b border-white/10 bg-forest-950/95 shadow-cinematic backdrop-blur-xl"
           : "bg-gradient-to-b from-forest-950/78 via-forest-950/34 to-transparent"
       )}
     >
@@ -82,10 +82,10 @@ export function SiteHeader() {
             />
           </span>
           <span className="leading-none">
-            <span className={cn("block font-serif text-xl transition-colors duration-500", solid ? "text-forest-950" : "text-white")}>
+            <span className="block font-serif text-xl text-white transition-colors duration-500">
               Wecacha
             </span>
-            <span className={cn("block text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors duration-500", solid ? "text-forest-950/60" : "text-white/78")}>
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-white/80 transition-colors duration-500">
               Sơn La Coffee
             </span>
           </span>
@@ -101,11 +101,8 @@ export function SiteHeader() {
                 href={item.href}
                 className={cn(
                   "rounded-full px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember",
-                  solid
-                    ? "text-forest-950/75 hover:bg-forest-950/6 hover:text-forest-950"
-                    : "text-white/82 hover:bg-white/10 hover:text-white",
-                  active && solid && "bg-forest-950/8 text-earth-600",
-                  active && !solid && "bg-white/10 text-ember shadow-[0_0_28px_rgba(181,101,0,0.22)]"
+                  "text-white/80 hover:bg-white/10 hover:text-white",
+                  active && "bg-white/10 text-ember shadow-[0_0_28px_rgba(181,101,0,0.22)]"
                 )}
               >
                 {t(item.key)}
@@ -116,8 +113,8 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <LocaleSwitcher locale={locale} pathname={pathname} solid={solid} />
-          <CartDrawer />
-          <MobileMenu />
+          <CartDrawer solid={solid} />
+          <MobileMenu solid={solid} />
         </div>
       </div>
     </header>
@@ -140,10 +137,7 @@ function LocaleSwitcher({
       href={pathname}
       locale={nextLocale}
       className={cn(
-        "hidden h-10 min-w-14 items-center justify-center rounded-full border px-3 text-xs font-bold uppercase transition sm:inline-flex",
-        solid
-          ? "border-forest-950/20 text-forest-950/70 hover:bg-forest-950/6 hover:text-forest-950"
-          : "border-white/28 bg-white/8 text-white backdrop-blur hover:bg-white/16"
+        "hidden h-10 min-w-14 items-center justify-center rounded-full border border-white/28 bg-white/8 px-3 text-xs font-bold uppercase text-white backdrop-blur transition hover:bg-white/16 sm:inline-flex"
       )}
       aria-label={localeNames[nextLocale]}
     >
@@ -152,7 +146,7 @@ function LocaleSwitcher({
   );
 }
 
-function MobileMenu() {
+function MobileMenu({solid}: {solid?: boolean}) {
   const t = useTranslations("Nav");
   const pathname = usePathname();
   const locale = useLocale() as Locale;

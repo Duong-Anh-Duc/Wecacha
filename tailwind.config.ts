@@ -53,6 +53,11 @@ const config: Config = {
           "50%": {transform: "translate3d(4%, -2%, 0) scale(1.04)"},
           "100%": {transform: "translate3d(10%, 1%, 0) scale(1.02)"}
         },
+        "drift-image": {
+          "0%": {transform: "translate3d(-3%, 0, 0) scale(1.1)"},
+          "50%": {transform: "translate3d(2%, -1%, 0) scale(1.14)"},
+          "100%": {transform: "translate3d(4%, 1%, 0) scale(1.12)"}
+        },
         grain: {
           "0%, 100%": {transform: "translate(0, 0)"},
           "20%": {transform: "translate(-1%, 1%)"},
@@ -63,6 +68,7 @@ const config: Config = {
       },
       animation: {
         drift: "drift 18s ease-out infinite alternate",
+        "drift-image": "drift-image 24s ease-in-out infinite alternate",
         grain: "grain 6s steps(6) infinite"
       }
     }

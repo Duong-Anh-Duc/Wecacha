@@ -26,6 +26,14 @@ export function StoryChapterSlider({
   });
   const x = useTransform(scrollYProgress, [0, 1], ["0%", "-54%"]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(true); // default true to match SSR mostly, but x is 0 at top anyway
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     return scrollYProgress.on("change", (latest) => {
@@ -47,10 +55,11 @@ export function StoryChapterSlider({
   return (
     <section
       ref={rootRef}
+      style={{ position: "relative" }}
       className="relative bg-parchment-50 px-4 py-20 sm:px-6 lg:h-[320vh] lg:px-8 lg:py-0"
     >
-      <div className="pointer-events-none absolute -left-32 top-16 h-72 w-72 rounded-full bg-fresh-600/10 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-1/3 h-96 w-96 rounded-full bg-earth-600/10 blur-3xl" />
+      <div className="pointer-events-none absolute -left-32 top-16 h-96 w-96 rounded-full bg-forest-600/20 blur-[100px] animate-drift" />
+      <div className="pointer-events-none absolute right-0 top-1/3 h-[500px] w-[500px] rounded-full bg-earth-600/15 blur-[120px] animate-drift" style={{ animationDelay: '-8s' }} />
 
       <div className="relative mx-auto grid max-w-7xl gap-10 lg:sticky lg:top-0 lg:h-screen lg:grid-cols-[0.58fr_1.42fr] lg:items-center lg:overflow-hidden">
         <aside>
@@ -102,12 +111,12 @@ export function StoryChapterSlider({
 
         <div className="min-w-0 overflow-visible lg:overflow-hidden">
           <motion.div
-            style={{x}}
+            style={{ x: isDesktop ? x : 0 }}
             className="grid gap-5 lg:flex lg:w-max lg:gap-6 lg:will-change-transform"
           >
             {storyChapters.map((chapter, index) => (
-              <article id={chapter.id} key={chapter.id} className="lg:w-[min(72vw,850px)]">
-                <div className="group grid min-h-[620px] overflow-hidden rounded-2xl border border-forest-950/10 bg-parchment-50/74 shadow-[0_24px_80px_rgba(19,74,0,0.08)] transition duration-500 hover:-translate-y-1 hover:shadow-warm lg:grid-rows-[320px_1fr]">
+              <article id={chapter.id} key={chapter.id} className="flex flex-col lg:w-[min(72vw,850px)]">
+                <div className="group grid w-full flex-1 min-h-[620px] overflow-hidden rounded-2xl border border-forest-950/10 bg-parchment-50/74 shadow-[0_24px_80px_rgba(19,74,0,0.08)] transition duration-500 hover:-translate-y-1 hover:shadow-warm lg:grid-rows-[320px_1fr]">
                   <div className="relative overflow-hidden">
                     <Image
                       src={chapter.image}

@@ -55,7 +55,7 @@ export type Journey = {
 
 export const imageLibrary = {
   hero:
-    "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=2400&q=86",
+    "/son_la_bg.png",
   heroPoster:
     "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2400&q=86",
   farmer:
@@ -63,11 +63,11 @@ export const imageLibrary = {
   harvest:
     "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1400&q=82",
   village:
-    "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=84",
+    "/sonla_stilt_village.png",
   brocade:
-    "https://images.unsplash.com/photo-1602471615287-d733c59b79c4?auto=format&fit=crop&w=1400&q=82",
+    "/sonla_brocade.png",
   campfire:
-    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=82",
+    "/sonla_village_night.png",
   roasted:
     "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1400&q=82",
   cup:
@@ -425,7 +425,7 @@ export const storyChapters: StoryChapter[] = [
         "Altitude and climate make cherries ripen with patience. That slowness becomes deep sweetness, gentle acidity and a clean finish."
       ]
     },
-    image: imageLibrary.mountains,
+    image: "/sonla_mist_season.png",
     alt: {
       vi: "Đồi núi mờ sương lúc bình minh",
       en: "Misty mountain hills at dawn"
@@ -451,7 +451,7 @@ export const storyChapters: StoryChapter[] = [
         "It is slow work, but it decides the clarity of the final cup."
       ]
     },
-    image: imageLibrary.harvest,
+    image: "/sonla_harvest.png",
     alt: {
       vi: "Cành cà phê chín được hái bằng tay",
       en: "Ripe coffee cherries picked by hand"
@@ -477,7 +477,7 @@ export const storyChapters: StoryChapter[] = [
         "We do not separate coffee from the culture that raised it. Every bag carries traces of place."
       ]
     },
-    image: imageLibrary.campfire,
+    image: "/sonla_village_night.png",
     alt: {
       vi: "Ánh lửa trong một đêm bản vùng núi",
       en: "Firelight in a mountain village night"
@@ -503,7 +503,7 @@ export const storyChapters: StoryChapter[] = [
         "We choose roast curves that keep depth while letting the drinker recognize Son La in every sip."
       ]
     },
-    image: imageLibrary.roasted,
+    image: "/sonla_roastery.png",
     alt: {
       vi: "Hạt cà phê vừa rang trong ánh sáng ấm",
       en: "Freshly roasted coffee beans in warm light"

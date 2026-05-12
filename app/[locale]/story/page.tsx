@@ -6,7 +6,7 @@ import {SectionHeading} from "@/components/sections/section-heading";
 import {Reveal} from "@/components/motion/reveal";
 import {Button} from "@/components/ui/button";
 import {ProductJourneyCarousel} from "@/features/story/product-journey-carousel";
-import {GsapRoastSequence} from "@/features/story/gsap-roast-sequence";
+import {GsapStoryConclusion} from "@/features/story/gsap-story-conclusion";
 import {StoryChapterSlider} from "@/features/story/story-chapter-slider";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
@@ -43,17 +43,17 @@ export default async function StoryPage({params}: Props) {
   return (
     <main className="bg-parchment-50">
       <section className="relative min-h-[92vh] overflow-hidden bg-forest-950 text-white">
-        <Image
-          src={imageLibrary.hero}
-          alt=""
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="cinematic-vignette" />
-        <div className="mist-layer" />
-        <div className="light-leak" />
+        <div className="absolute inset-0 animate-drift-image will-change-transform">
+          <Image
+            src={imageLibrary.hero}
+            alt=""
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-forest-950/90 via-forest-950/20 to-transparent" />
         <div className="relative z-10 mx-auto flex min-h-[92vh] max-w-7xl items-end px-4 pb-20 pt-32 sm:px-6 lg:px-8">
           <Reveal>
             <p className="mb-5 text-xs font-bold uppercase text-ember">
@@ -106,7 +106,7 @@ export default async function StoryPage({params}: Props) {
         </div>
       </section>
 
-      <section id={storyChapters[3].id} className="px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+      <section id={storyChapters[3].id} className="relative px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2 lg:items-center">
           <Reveal>
             <SectionHeading
@@ -122,33 +122,31 @@ export default async function StoryPage({params}: Props) {
             </Button>
           </Reveal>
           <Reveal delay={0.12}>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="relative mx-auto mt-12 max-w-lg lg:mt-0 lg:max-w-none">
               <CinematicImage
-                src={imageLibrary.roasted}
+                src={storyChapters[3].image}
                 alt={localized(storyChapters[3].alt, locale)}
-                className="aspect-[4/5]"
+                className="aspect-[4/5] w-4/5 rounded-2xl shadow-[0_20px_60px_rgba(76,52,20,0.15)]"
               />
-              <div className="grid gap-3">
-                <CinematicImage
-                  src={imageLibrary.cup}
-                  alt={t("coffeeCupAlt")}
-                  className="aspect-square"
-                />
-                <CinematicImage
-                  src={imageLibrary.brocade}
-                  alt={t("brocadeAlt")}
-                  className="aspect-square"
-                />
+              <div className="absolute -bottom-12 -right-4 w-[60%] sm:-right-8">
+                <div className="rounded-2xl bg-parchment-50 p-2 shadow-[0_30px_90px_rgba(76,52,20,0.22)]">
+                  <CinematicImage
+                    src={imageLibrary.beansBowl}
+                    alt="Freshly roasted coffee beans"
+                    className="aspect-[4/3] rounded-xl"
+                  />
+                </div>
               </div>
             </div>
           </Reveal>
         </div>
       </section>
 
-      <GsapRoastSequence
-        title={localized(storyChapters[3].title, locale)}
-        copy={localized(storyChapters[3].body, locale)[1]}
-        kicker={t("slowRoastKicker")}
+      <GsapStoryConclusion
+        title={locale === "vi" ? "Uống cạn một mùa sương" : "Drink a season of mist"}
+        copy={locale === "vi" ? "Từ nương cao Mộc Châu đến xưởng rang Mường La, câu chuyện của Sơn La giờ đây nằm trọn trong chiếc cốc của bạn." : "From Moc Chau high farms to Muong La roastery, the story of Son La now rests in your cup."}
+        kicker={locale === "vi" ? "Trải nghiệm" : "Experience"}
+        locale={locale}
       />
     </main>
   );
