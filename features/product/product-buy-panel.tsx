@@ -57,10 +57,15 @@ export function ProductBuyPanel({product}: {product: Product}) {
           product={product}
           locale={locale}
           quantity={quantity}
-          variant="default"
-          className="w-full"
+          variant="light"
+          className="w-full h-12 text-sm font-bold border-forest-950/20"
         />
-        <BuyNowButton product={product} quantity={quantity} className="w-full" />
+        <BuyNowButton 
+          product={product} 
+          quantity={quantity} 
+          variant="default"
+          className="w-full h-12 text-sm font-bold bg-[#b5703a] hover:bg-[#9a5d2e] border-none text-white shadow-md" 
+        />
       </div>
 
       <div className="mt-7 grid gap-3 border-t border-forest-950/12 pt-5 text-sm text-forest-950/68">

@@ -120,7 +120,7 @@ export function ShopGrid({
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Tìm hương vị cà phê bạn yêu thích..."
+              placeholder={t("search")}
               className="pl-12 pr-10 h-12 rounded-xl bg-transparent border-[#e5e0d8] focus-visible:ring-[#b5703a] placeholder:text-forest-950/40 text-base"
             />
             {query && (

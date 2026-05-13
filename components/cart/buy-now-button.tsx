@@ -12,10 +12,12 @@ import {localized} from "@/lib/content";
 export function BuyNowButton({
   product,
   quantity = 1,
+  variant = "forest",
   className
 }: {
   product: Product;
   quantity?: number;
+  variant?: "default" | "forest" | "outline" | "light" | "ghost";
   className?: string;
 }) {
   const locale = useLocale() as Locale;
@@ -26,7 +28,7 @@ export function BuyNowButton({
   return (
     <Button
       className={className}
-      variant="forest"
+      variant={variant}
       onClick={() => {
         addItem(
           {

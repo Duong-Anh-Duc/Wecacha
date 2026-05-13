@@ -71,43 +71,43 @@ export function CheckoutForm() {
             <div className="w-12 h-12 rounded-full bg-[#f4f2ea] flex items-center justify-center text-[#b5703a]">
               <Truck className="w-5 h-5" />
             </div>
-            <h2 className="font-serif text-3xl text-[#142918]">Thông tin giao hàng</h2>
+            <h2 className="font-serif text-3xl text-[#142918]">{t("details")}</h2>
           </div>
-          
+
           <div className="grid gap-6 sm:grid-cols-2">
-            <Field label="Họ tên" error={errors.fullName && errorText}>
+            <Field label={t("fullName")} error={errors.fullName && errorText}>
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input placeholder="Nhập họ và tên" className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("fullName")} />
+              <Input placeholder={t("fullNamePlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("fullName")} />
             </Field>
-            
-            <Field label="Số điện thoại" error={errors.phone && errorText}>
+
+            <Field label={t("phone")} error={errors.phone && errorText}>
               <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input placeholder="Nhập số điện thoại" className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("phone")} />
+              <Input placeholder={t("phonePlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("phone")} />
             </Field>
-            
-            <Field label="Địa chỉ" error={errors.address && errorText} className="sm:col-span-1">
+
+            <Field label={t("address")} error={errors.address && errorText} className="sm:col-span-1">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input placeholder="Nhập địa chỉ" className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("address")} />
+              <Input placeholder={t("addressPlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("address")} />
             </Field>
-            
-            <Field label="Tỉnh, thành phố" error={errors.city && errorText}>
+
+            <Field label={t("city")} error={errors.city && errorText}>
               <Map className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input placeholder="Chọn tỉnh, thành phố" className="pl-11 pr-10 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] cursor-pointer text-[14px]" {...register("city")} />
+              <Input placeholder={t("cityPlaceholder")} className="pl-11 pr-10 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] cursor-pointer text-[14px]" {...register("city")} />
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
             </Field>
-            
+
             <Field
               className="sm:col-span-2"
-              label="Ghi chú (tùy chọn)"
+              label={t("noteOptional")}
               error={errors.note && errorText}
             >
               <FileText className="absolute left-4 top-4 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Textarea placeholder="Nhập ghi chú cho đơn hàng (ví dụ: giao hàng giờ hành chính, để trước cửa...)" className="pl-11 pt-4 min-h-[120px] rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] resize-none text-[14px]" {...register("note")} />
+              <Textarea placeholder={t("notePlaceholder")} className="pl-11 pt-4 min-h-[120px] rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] resize-none text-[14px]" {...register("note")} />
             </Field>
           </div>
-          
+
           <Button className="mt-10 bg-[#1a3020] hover:bg-[#142918] text-white rounded-xl h-14 px-8 font-medium transition-all shadow-md hover:-translate-y-0.5 w-fit" disabled={isSubmitting}>
-            <ShoppingBag className="w-4 h-4 mr-2" /> Đặt hàng
+            <ShoppingBag className="w-4 h-4 mr-2" /> {t("placeOrder")}
           </Button>
         </form>
 
@@ -116,22 +116,22 @@ export function CheckoutForm() {
           <div className="flex items-center gap-3">
             <Truck className="w-5 h-5 text-gray-400 shrink-0" />
             <div>
-              <p className="text-[11px] font-bold text-[#142918] uppercase">Giao hàng nhanh chóng</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">Giao hàng toàn quốc</p>
+              <p className="text-[11px] font-bold text-[#142918] uppercase">{t("deliveryPerk")}</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">{t("deliveryPerkSub")}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <ShieldCheck className="w-5 h-5 text-gray-400 shrink-0" />
             <div>
-              <p className="text-[11px] font-bold text-[#142918] uppercase">Thanh toán an toàn</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">Bảo mật thông tin tuyệt đối</p>
+              <p className="text-[11px] font-bold text-[#142918] uppercase">{t("securityPerk")}</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">{t("securityPerkSub")}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Headset className="w-5 h-5 text-gray-400 shrink-0" />
             <div>
-              <p className="text-[11px] font-bold text-[#142918] uppercase">Hỗ trợ 24/7</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">Luôn sẵn sàng hỗ trợ</p>
+              <p className="text-[11px] font-bold text-[#142918] uppercase">{t("supportPerk")}</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">{t("supportPerkSub")}</p>
             </div>
           </div>
         </div>
@@ -140,7 +140,7 @@ export function CheckoutForm() {
       {/* Right Column: Order Summary */}
       <aside className="h-fit rounded-[1.5rem] bg-[#1a3020] p-8 text-white shadow-[0_20px_50px_rgba(20,41,24,0.1)] relative overflow-hidden">
         <div className="flex items-center justify-between mb-10 relative z-10">
-          <h2 className="font-serif text-3xl">Tổng cộng</h2>
+          <h2 className="font-serif text-3xl">{t("orderSummary")}</h2>
           <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
             <ShoppingBag className="w-4 h-4 text-white" />
           </div>
@@ -170,16 +170,16 @@ export function CheckoutForm() {
 
           <div className="pt-6 border-t border-dashed border-white/10 space-y-5">
             <div className="flex justify-between text-[13px] text-white/80">
-              <span>Tạm tính</span>
+              <span>{common("subtotal")}</span>
               <span>{formatCurrency(totals.subtotal, locale)}</span>
             </div>
             <div className="flex justify-between text-[13px] text-white/80">
-              <span>Phí vận chuyển</span>
+              <span>{t("shippingFee")}</span>
               <span>{formatCurrency(totals.shipping, locale)}</span>
             </div>
-            
+
             <div className="pt-5 border-t border-dashed border-white/10 flex justify-between items-center">
-              <span className="text-base text-[#b5703a] font-semibold">Tổng cộng</span>
+              <span className="text-base text-[#b5703a] font-semibold">{common("total")}</span>
               <span className="text-xl text-[#b5703a] font-bold">{formatCurrency(totals.total, locale)}</span>
             </div>
           </div>
@@ -188,8 +188,8 @@ export function CheckoutForm() {
         <div className="mt-8 rounded-[0.8rem] bg-[#eef4ea] p-4 flex gap-3 relative z-10 border border-[#e5f0df]">
           <ShieldCheck className="w-5 h-5 text-[#2a5a31] shrink-0" />
           <div>
-            <p className="text-[13px] font-bold text-[#142918]">Bạn sẽ thanh toán khi nhận hàng</p>
-            <p className="text-[11px] text-[#142918]/60 mt-1">Thanh toán an toàn - Kiểm tra hàng trước khi thanh toán</p>
+            <p className="text-[13px] font-bold text-[#142918]">{t("codLabel")}</p>
+            <p className="text-[11px] text-[#142918]/60 mt-1">{t("codSubtext")}</p>
           </div>
         </div>
       </aside>

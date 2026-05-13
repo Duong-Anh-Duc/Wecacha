@@ -158,8 +158,8 @@ export function ProductCard({
           <div
             className={
               product.category === "gifts"
-                ? "mt-6 grid gap-2 rounded-xl border border-earth-500/48 bg-earth-900/34 p-3 sm:grid-cols-3"
-                : "mt-6 grid gap-2 rounded-xl border border-forest-600/42 bg-forest-950/48 p-3 sm:grid-cols-3"
+                ? "mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-earth-500/48 bg-earth-900/34 p-3"
+                : "mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-forest-600/42 bg-forest-950/48 p-3"
             }
           >
             {productHighlights(product, locale).map(({icon: Icon, label}) => (

@@ -62,7 +62,7 @@ export default async function CheckoutPage({params}: Props) {
             </h1>
             <div className="flex items-center gap-2 text-[#1a3020]/70 text-[14px]">
               <ShieldCheck className="w-4 h-4 text-[#2a5a31]" />
-              {locale === 'vi' ? 'Thông tin của bạn được bảo mật và chỉ sử dụng để xử lý đơn hàng.' : 'Your information is secure and only used to process your order.'}
+              {t("securityNote")}
             </div>
           </div>
         </Reveal>
