@@ -112,9 +112,6 @@ export function ProductCard({
             )}
             {product.weight.toUpperCase()}
           </span>
-          <span className="grid h-12 w-12 place-items-center rounded-full border border-parchment-50/24 bg-forest-950/42 text-parchment-50 backdrop-blur transition duration-300 group-hover:scale-110 group-hover:border-ember/80 group-hover:bg-ember/18 group-hover:text-ember">
-            <Heart className="h-5 w-5" aria-hidden="true" />
-          </span>
         </div>
 
         {product.category === "gifts" ? (
@@ -124,7 +121,7 @@ export function ProductCard({
         ) : null}
 
         <div className="mt-auto">
-          <div className="mb-5 flex flex-wrap gap-2">
+          <div className="mb-5 flex min-h-[32px] flex-wrap items-start gap-2">
             {localized(product.notes, locale)
               .slice(0, 3)
               .map((note) => (
@@ -137,8 +134,8 @@ export function ProductCard({
               ))}
           </div>
 
-          <div className="flex items-start justify-between gap-4">
-            <h3 className="font-serif text-3xl leading-tight text-parchment-50 sm:text-[2rem]">
+          <div className="flex min-h-[76px] items-start justify-between gap-4 sm:min-h-[80px]">
+            <h3 className="line-clamp-2 font-serif text-3xl leading-tight text-parchment-50 sm:text-[2rem]">
               <Link
                 href={`/shop/${product.slug}`}
                 className="transition-colors hover:text-ember"
@@ -146,20 +143,30 @@ export function ProductCard({
                 {localized(product.name, locale)}
               </Link>
             </h3>
-            <p className="shrink-0 pt-2 text-lg font-black text-ember">
-              {formatCurrency(product.price, locale)}
-            </p>
+            <div className="flex shrink-0 flex-col items-end gap-1.5">
+              {product.originalPrice && product.originalPrice > product.price ? (
+                <div className="flex items-center gap-1.5 pt-1">
+                  <span className="text-[11px] font-semibold text-white/50 line-through">
+                    {formatCurrency(product.originalPrice, locale)}
+                  </span>
+                  <span className="rounded-md bg-red-500/20 px-1.5 py-0.5 text-[10px] font-extrabold text-red-400">
+                    -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+                  </span>
+                </div>
+              ) : null}
+              <div className="animate-pulse rounded-xl border border-ember/60 bg-ember/10 px-3 py-1.5 shadow-[0_0_16px_rgba(243,167,52,0.4)] backdrop-blur-md">
+                <p className="text-[17px] font-black text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.8)]">
+                  {formatCurrency(product.price, locale)}
+                </p>
+              </div>
+            </div>
           </div>
-
-          <p className="mt-4 line-clamp-2 text-base font-medium leading-7 text-parchment-50/78">
-            {localized(product.short, locale)}
-          </p>
 
           <div
             className={
               product.category === "gifts"
-                ? "mt-6 flex min-h-[52px] flex-wrap items-center gap-3 rounded-xl border border-earth-500/48 bg-earth-900/34 p-3"
-                : "mt-6 flex min-h-[52px] flex-wrap items-center gap-3 rounded-xl border border-forest-600/42 bg-forest-950/48 p-3"
+                ? "mt-6 flex min-h-[76px] flex-wrap items-center gap-3 rounded-xl border border-earth-500/48 bg-earth-900/34 p-3 sm:min-h-[84px]"
+                : "mt-6 flex min-h-[76px] flex-wrap items-center gap-3 rounded-xl border border-forest-600/42 bg-forest-950/48 p-3 sm:min-h-[84px]"
             }
           >
             {productHighlights(product, locale).map(({icon: Icon, label}) => (
@@ -188,13 +195,13 @@ export function ProductCard({
 
           <Link
             href={`/shop/${product.slug}`}
-            className="mt-3 flex h-11 items-center justify-between rounded-xl px-2 text-sm font-bold text-parchment-100/80 transition duration-300 hover:bg-parchment-50/8 hover:text-ember"
+            className="mt-3 flex h-11 items-center justify-between rounded-xl px-2 text-sm font-bold text-ember animate-pulse drop-shadow-[0_0_6px_rgba(243,167,52,0.4)] transition duration-300 hover:bg-parchment-50/8 hover:text-amber-400 group/explore"
           >
             <span className="inline-flex items-center gap-2">
-              <Leaf className="h-4 w-4 text-forest-600 transition duration-300 group-hover:text-ember" aria-hidden="true" />
+              <Sparkles className="h-4 w-4 text-ember transition duration-300 group-hover/explore:scale-125" aria-hidden="true" />
               {locale === "vi" ? "Khám phá ngay" : "Explore"} {localized(product.name, locale)}
             </span>
-            <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-1" aria-hidden="true" />
+            <ArrowRight className="h-4 w-4 transition duration-300 group-hover/explore:translate-x-2" aria-hidden="true" />
           </Link>
         </div>
       </div>

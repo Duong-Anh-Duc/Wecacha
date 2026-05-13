@@ -20,6 +20,7 @@ export type Product = {
   >;
   brewGuide: Localized<string[]>;
   price: number;
+  originalPrice?: number;
   weight: string;
   altitude: string;
   roast: Localized;
@@ -151,10 +152,11 @@ export const products: Product[] = [
       ]
     },
     brewGuide: {
-      vi: ["V60 1:16 ở 92 độ C", "Xay vừa, ủ nở 40 giây", "Kết thúc trong 2 phút 45 giây"],
-      en: ["V60 1:16 at 92 C", "Medium grind, 40 second bloom", "Finish around 2 minutes 45 seconds"]
+      vi: ["15g cà phê", "250ml nước 92°C", "Thời gian pha: 2.5 phút"],
+      en: ["15g coffee", "250ml water at 92°C", "Brew time: 2.5 mins"]
     },
     price: 285000,
+    originalPrice: 350000,
     weight: "250g",
     altitude: "1.050m - 1.250m",
     roast: {
@@ -232,6 +234,7 @@ export const products: Product[] = [
       en: ["Use 25g coffee for a 120ml phin", "Bloom 25 seconds with hot water", "Drip slowly and serve with ice or milk"]
     },
     price: 195000,
+    originalPrice: 250000,
     weight: "250g",
     altitude: "900m - 1.100m",
     roast: {
@@ -309,6 +312,7 @@ export const products: Product[] = [
       en: ["Brew the bold blend with a phin", "Brew arabica as pour-over", "Use within 30 days after opening"]
     },
     price: 620000,
+    originalPrice: 800000,
     weight: "2 x 250g",
     altitude: "900m - 1.250m",
     roast: {
@@ -386,6 +390,7 @@ export const products: Product[] = [
       en: ["Seal tightly after opening", "Use 18g for 250ml water", "Good for hot brew and cold brew"]
     },
     price: 215000,
+    originalPrice: 280000,
     weight: "250g",
     altitude: "950m - 1.150m",
     roast: {

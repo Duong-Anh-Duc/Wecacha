@@ -50,12 +50,12 @@ export function CinematicHero({
       <div className="mist-layer" />
       <div className="light-leak" />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-center px-4 pb-24 pt-28 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto flex min-h-[100dvh] max-w-7xl flex-col px-4 pb-28 pt-32 sm:px-6 sm:pt-40 lg:px-8">
         <motion.div
           initial={{opacity: 0, y: 38}}
           animate={{opacity: 1, y: 0}}
           transition={{duration: 1.1, ease: [0.16, 1, 0.3, 1]}}
-          className="max-w-4xl"
+          className="my-auto max-w-4xl py-12"
         >
           <p className="mb-5 text-xs font-bold uppercase text-ember">
             {kicker}
@@ -83,7 +83,7 @@ export function CinematicHero({
         </motion.div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-3 text-xs uppercase text-white/56">
+      <div className="absolute bottom-8 left-1/2 z-10 flex w-full max-w-[280px] -translate-x-1/2 flex-col items-center gap-3 text-center text-xs uppercase text-white/56">
         <span>{scrollLabel}</span>
         <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/22">
           <ArrowDown className="h-4 w-4 animate-bounce" aria-hidden="true" />
