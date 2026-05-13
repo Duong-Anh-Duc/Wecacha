@@ -49,7 +49,21 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
     openGraph: {
       title: localized(product.name, locale),
       description: localized(product.description, locale),
-      images: [{url: product.images[0], width: 1200, height: 900}]
+      type: "website",
+      images: [
+        {
+          url: product.images[0],
+          width: 1200,
+          height: 630,
+          alt: localized(product.name, locale)
+        },
+        {
+          url: `/og/image.png?locale=${locale}&title=${encodeURIComponent(localized(product.name, locale))}&kicker=${encodeURIComponent(product.weight)}`,
+          width: 1200,
+          height: 630,
+          alt: localized(product.name, locale)
+        }
+      ]
     }
   };
 }

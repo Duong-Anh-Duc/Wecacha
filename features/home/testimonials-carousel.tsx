@@ -1,23 +1,20 @@
 "use client";
 
-import {useCallback, useEffect, useRef, useState} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import {motion} from "framer-motion";
-import type {UseEmblaCarouselType} from "embla-carousel-react";
+import type { UseEmblaCarouselType } from "embla-carousel-react";
 import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
-import {useTranslations} from "next-intl";
-import {cn} from "@/lib/utils";
-import {testimonials, localized} from "@/lib/content";
-import type {Locale} from "@/i18n/routing";
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
+import { testimonials, localized } from "@/lib/content";
+import type { Locale } from "@/i18n/routing";
 import { ChevronLeft, ChevronRight, Award, Coffee } from "lucide-react";
 
 const AUTOPLAY_MS = 4000;
 type EmblaApi = NonNullable<UseEmblaCarouselType[1]>;
 
-export function TestimonialsCarousel({locale}: {locale: Locale}) {
+export function TestimonialsCarousel({ locale }: { locale: Locale }) {
   const tCommon = useTranslations("Common");
-  
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
     loop: true,
@@ -25,10 +22,7 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
     slidesToScroll: 1,
     duration: 35,
     skipSnaps: false
-  }, [
-    Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
-  ]);
-  
+  });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [tweenValues, setTweenValues] = useState<number[]>([]);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -59,16 +53,33 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
     setTweenValues(values);
   }, []);
 
+  const clearTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const scheduleNext = useCallback(() => {
+    clearTimer();
+    timerRef.current = setTimeout(() => {
+      emblaApi?.scrollNext();
+    }, AUTOPLAY_MS);
+  }, [emblaApi, clearTimer]);
+
   useEffect(() => {
     if (!emblaApi) return;
     updateTweenValues(emblaApi);
-  }, [emblaApi, updateTweenValues]);
+    scheduleNext();
+    return clearTimer;
+  }, [emblaApi, scheduleNext, clearTimer, updateTweenValues]);
 
   useEffect(() => {
     if (!emblaApi) return;
     const onScroll = () => updateTweenValues(emblaApi);
     const onSelect = () => {
       setSelectedIndex(emblaApi.selectedScrollSnap());
+      scheduleNext();
       updateTweenValues(emblaApi);
     };
     emblaApi.on("scroll", onScroll);
@@ -79,23 +90,27 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
       emblaApi.off("reInit", onScroll);
       emblaApi.off("select", onSelect);
     };
-  }, [emblaApi, updateTweenValues]);
+  }, [emblaApi, scheduleNext, updateTweenValues]);
 
   return (
-    <div className="relative max-w-[1200px] mx-auto">
+    <div
+      className="relative max-w-[1200px] mx-auto"
+      onMouseEnter={clearTimer}
+      onMouseLeave={scheduleNext}
+    >
       <div className="overflow-hidden py-10" ref={emblaRef}>
         <div className="-ml-4 flex touch-pan-y items-center">
           {testimonials.map((item, index) => {
             const isActive = index === selectedIndex;
             // Provide a fallback value if tweenValues isn't ready
             const tween = tweenValues[index] ?? (isActive ? 1 : 0);
-            
+
             // For active: scale 1, blur 0, opacity 1
             // For inactive: scale 0.85, blur 4px, opacity 0.5
             const scale = 0.85 + tween * 0.15;
             const blur = (1 - tween) * 4;
             const opacity = 0.4 + tween * 0.6;
-            
+
             return (
               <div
                 key={`${item.name}-${index}`}
@@ -120,9 +135,9 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
                     "absolute -right-10 -top-10 w-64 h-64 opacity-[0.03] transition-opacity duration-500 pointer-events-none",
                     isActive ? "opacity-[0.06]" : "opacity-[0.02]"
                   )}>
-                     <svg viewBox="0 0 100 100" fill="currentColor" className={isActive ? "text-[#142918]" : "text-white"}>
-                        <path d="M50 0 C70 30 90 40 100 60 C80 60 70 80 50 100 C30 80 20 60 0 60 C10 40 30 30 50 0 Z" />
-                     </svg>
+                    <svg viewBox="0 0 100 100" fill="currentColor" className={isActive ? "text-[#142918]" : "text-white"}>
+                      <path d="M50 0 C70 30 90 40 100 60 C80 60 70 80 50 100 C30 80 20 60 0 60 C10 40 30 30 50 0 Z" />
+                    </svg>
                   </div>
 
                   {/* Large Quote Mark */}
@@ -169,7 +184,7 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
                         </span>
                       </div>
                     </div>
-                    
+
                     {/* Badge */}
                     <div className={cn(
                       "flex items-center gap-2 px-4 py-2 rounded-full shadow-sm whitespace-nowrap",
@@ -198,11 +213,11 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
               <button
                 key={index}
                 onClick={() => emblaApi?.scrollTo(index)}
-                aria-label={tCommon("goToSlide", {index: index + 1})}
+                aria-label={tCommon("goToSlide", { index: index + 1 })}
                 className={cn(
                   "w-2.5 h-2.5 rounded-full transition-all duration-300",
-                  isActive 
-                    ? "bg-[#b5703a] scale-125 shadow-[0_0_10px_rgba(181,112,58,0.5)]" 
+                  isActive
+                    ? "bg-[#b5703a] scale-125 shadow-[0_0_10px_rgba(181,112,58,0.5)]"
                     : "bg-transparent border border-white/30 hover:border-white/60"
                 )}
               />
