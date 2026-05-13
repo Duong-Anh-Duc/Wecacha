@@ -1,4 +1,4 @@
-import type {Metadata} from "next";
+import type {Metadata, Viewport} from "next";
 import {Be_Vietnam_Pro, Playfair_Display} from "next/font/google";
 import {hasLocale, NextIntlClientProvider} from "next-intl";
 import {getMessages, getTranslations, setRequestLocale} from "next-intl/server";
@@ -9,7 +9,7 @@ import {SiteHeader} from "@/components/layout/site-header";
 import {SmoothScrollProvider} from "@/components/motion/smooth-scroll-provider";
 import {JsonLd} from "@/components/seo/json-ld";
 import {routing, type Locale} from "@/i18n/routing";
-import {organizationJsonLd} from "@/lib/seo";
+import {organizationJsonLd, webSiteJsonLd} from "@/lib/seo";
 import {siteUrl} from "@/lib/site";
 import "@/styles/globals.css";
 
@@ -31,6 +31,15 @@ const serif = Playfair_Display({
 type Props = {
   children: React.ReactNode;
   params: Promise<{locale: string}>;
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    {media: "(prefers-color-scheme: light)", color: "#fffaf0"},
+    {media: "(prefers-color-scheme: dark)", color: "#061f07"}
+  ],
+  width: "device-width",
+  initialScale: 1
 };
 
 export function generateStaticParams() {
@@ -128,6 +137,7 @@ export default async function LocaleLayout({children, params}: Props) {
         <NextIntlClientProvider messages={messages}>
           <SmoothScrollProvider>
             <JsonLd data={organizationJsonLd(locale as Locale)} />
+            <JsonLd data={webSiteJsonLd(locale as Locale)} />
             <SiteHeader />
             {children}
             <FloatingContact />

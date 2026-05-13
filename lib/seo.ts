@@ -3,6 +3,38 @@ import type {Product} from "@/lib/content";
 import {formatCurrency, localized} from "@/lib/content";
 import {siteConfig, siteUrl} from "@/lib/site";
 
+export function webSiteJsonLd(locale: Locale) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteUrl}/#website`,
+    name: "Sơn La Coffee",
+    url: siteUrl,
+    inLanguage: ["vi", "en"],
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteUrl}/${locale}/shop?q={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    }
+  };
+}
+
+export function breadcrumbJsonLd(items: {name: string; url: string}[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.url
+    }))
+  };
+}
+
 export function organizationJsonLd(locale: Locale) {
   return {
     "@context": "https://schema.org",

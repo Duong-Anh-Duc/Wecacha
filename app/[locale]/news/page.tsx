@@ -13,8 +13,47 @@ type Props = {
 
 export async function generateMetadata({params}: Props): Promise<Metadata> {
   const {locale} = await params;
+  const isVi = locale === "vi";
+  const title = isVi ? "Tin Tức Cà Phê Sơn La · Wecacha" : "Son La Coffee News · Wecacha";
+  const description = isVi
+    ? "Cập nhật những câu chuyện mới nhất về cà phê, sự kiện và công thức pha chế đặc biệt từ vùng núi Sơn La Tây Bắc."
+    : "Latest stories about coffee, events and special brewing recipes from the mountains of Son La, northwest Vietnam.";
+
   return {
-    title: locale === "vi" ? "Tin tức · Wecacha" : "News · Wecacha",
+    title,
+    description,
+    keywords: isVi
+      ? "tin tức cà phê, sự kiện cà phê Sơn La, công thức pha cà phê, văn hóa cà phê Việt Nam"
+      : "coffee news, Son La coffee events, coffee brewing recipes, Vietnamese coffee culture",
+    alternates: {
+      canonical: `/${locale}/news`,
+      languages: {
+        vi: "/vi/news",
+        en: "/en/news",
+        "x-default": "/vi/news"
+      }
+    },
+    openGraph: {
+      title,
+      description,
+      url: `/${locale}/news`,
+      siteName: "Sơn La Coffee",
+      locale: isVi ? "vi_VN" : "en_US",
+      type: "website",
+      images: [
+        {
+          url: `/og?locale=${locale}`,
+          width: 1200,
+          height: 630,
+          alt: isVi ? "Tin tức Wecacha" : "Wecacha News"
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description
+    }
   };
 }
 

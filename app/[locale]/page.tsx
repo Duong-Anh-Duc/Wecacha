@@ -11,6 +11,7 @@ import {AnimatedStats} from "@/features/home/animated-stats";
 import {JourneyCards} from "@/features/home/journey-cards";
 import {TestimonialsCarousel} from "@/features/home/testimonials-carousel";
 import {Link} from "@/i18n/navigation";
+import type {Metadata} from "next";
 import type {Locale} from "@/i18n/routing";
 import {
   localized,
@@ -21,6 +22,55 @@ import {
 type Props = {
   params: Promise<{locale: Locale}>;
 };
+
+export async function generateMetadata({params}: Props): Promise<Metadata> {
+  const {locale} = await params;
+  const isVi = locale === "vi";
+  const title = isVi
+    ? "Wecacha · Cà Phê Sơn La Rang Chậm Thủ Công"
+    : "Wecacha · Handcrafted Slow Roast Son La Coffee";
+  const description = isVi
+    ? "Cà phê Sơn La rang thủ công, sinh trưởng giữa sương núi Tây Bắc 1.050m. Arabica nguyên chất, phin núi rừng và bộ quà thổ cẩm độc đáo. Giao hàng toàn quốc."
+    : "Handcrafted Son La coffee from Vietnam's northwest highlands at 1,050m. Pure arabica, forest phin blends and unique brocade gift sets. Nationwide delivery.";
+  const keywords = isVi
+    ? "cà phê Sơn La, Wecacha, cà phê arabica Tây Bắc, cà phê rang thủ công, cà phê Mộc Châu, mua cà phê online Việt Nam"
+    : "Son La coffee, Wecacha, arabica northwest Vietnam, slow roast coffee, Moc Chau coffee, buy Vietnamese coffee";
+
+  return {
+    title,
+    description,
+    keywords,
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        vi: "/vi",
+        en: "/en",
+        "x-default": "/vi"
+      }
+    },
+    openGraph: {
+      title,
+      description,
+      url: `/${locale}`,
+      siteName: "Sơn La Coffee",
+      locale: locale === "vi" ? "vi_VN" : "en_US",
+      type: "website",
+      images: [
+        {
+          url: `/og?locale=${locale}`,
+          width: 1200,
+          height: 630,
+          alt: isVi ? "Wecacha · Cà Phê Sơn La" : "Wecacha · Son La Coffee"
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description
+    }
+  };
+}
 
 export default async function HomePage({params}: Props) {
   const {locale} = await params;
