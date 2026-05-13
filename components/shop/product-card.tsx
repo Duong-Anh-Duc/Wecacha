@@ -77,7 +77,7 @@ export function ProductCard({
       viewport={{once: true, margin: "-80px"}}
       whileHover={{y: -12}}
       transition={{duration: 0.62, ease: [0.16, 1, 0.3, 1]}}
-      className="group relative flex min-h-[560px] overflow-hidden rounded-[26px] border border-ember/18 bg-[#0a1808] text-parchment-50 shadow-[0_26px_80px_rgba(0,0,0,0.28)] transition duration-500 hover:border-ember/45 hover:shadow-[0_34px_110px_rgba(243,167,52,0.18)]"
+      className="group relative flex min-h-[490px] overflow-hidden rounded-[26px] border border-ember/18 bg-[#0a1808] text-parchment-50 shadow-[0_26px_80px_rgba(0,0,0,0.28)] transition duration-500 hover:border-ember/45 hover:shadow-[0_34px_110px_rgba(243,167,52,0.18)]"
     >
       <div className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
         <div className="absolute -inset-px rounded-[26px] bg-[radial-gradient(circle_at_50%_0%,rgba(243,167,52,0.22),transparent_42%),radial-gradient(circle_at_18%_80%,rgba(65,122,0,0.22),transparent_42%)]" />
