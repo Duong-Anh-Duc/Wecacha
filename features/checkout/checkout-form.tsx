@@ -2,7 +2,7 @@
 
 import {useState} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {CheckCircle2} from "lucide-react";
+import {CheckCircle2, User, Phone, MapPin, Map, FileText, ShoppingBag, Truck, ShieldCheck, Headset, ChevronDown} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
@@ -14,6 +14,7 @@ import {getCartTotals, useCartStore} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {formatCurrency} from "@/lib/content";
+import Image from "next/image";
 
 const checkoutSchema = z.object({
   fullName: z.string().min(2),
@@ -49,76 +50,148 @@ export function CheckoutForm() {
 
   if (success) {
     return (
-      <div className="rounded-md border border-forest-950/10 bg-parchment-100 p-10 text-center shadow-warm">
-        <CheckCircle2 className="mx-auto h-12 w-12 text-earth-600" aria-hidden="true" />
-        <h2 className="mt-4 font-serif text-4xl text-forest-950">
+      <div className="rounded-[2rem] border border-[#142918]/10 bg-white p-12 text-center shadow-[0_20px_50px_rgba(20,41,24,0.05)]">
+        <CheckCircle2 className="mx-auto h-16 w-16 text-[#2a5a31]" aria-hidden="true" />
+        <h2 className="mt-6 font-serif text-4xl text-[#142918]">
           {t("success")}
         </h2>
-        <Button asChild className="mt-6" variant="forest">
-          <Link href="/shop">{common("continueShopping")}</Link>
+        <Button asChild className="mt-8 bg-[#142918] text-white hover:bg-[#2a5a31] rounded-xl px-8 py-6" variant="default">
+          <Link href="/">{common("continueShopping")}</Link>
         </Button>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="rounded-md border border-forest-950/10 bg-parchment-100 p-6 shadow-warm"
-      >
-        <h2 className="font-serif text-4xl text-forest-950">{t("details")}</h2>
-        <div className="mt-6 grid gap-5 sm:grid-cols-2">
-          <Field label={t("fullName")} error={errors.fullName && errorText}>
-            <Input {...register("fullName")} />
-          </Field>
-          <Field label={t("phone")} error={errors.phone && errorText}>
-            <Input {...register("phone")} />
-          </Field>
-          <Field label={t("address")} error={errors.address && errorText}>
-            <Input {...register("address")} />
-          </Field>
-          <Field label={t("city")} error={errors.city && errorText}>
-            <Input {...register("city")} />
-          </Field>
-          <Field
-            className="sm:col-span-2"
-            label={t("note")}
-            error={errors.note && errorText}
-          >
-            <Textarea {...register("note")} />
-          </Field>
-        </div>
-        <Button className="mt-7 w-full sm:w-auto" disabled={isSubmitting}>
-          {t("placeOrder")}
-        </Button>
-      </form>
+    <div className="grid gap-8 lg:gap-16 lg:grid-cols-[1fr_400px] items-start">
+      {/* Left Column: Form */}
+      <div className="rounded-[1.5rem] bg-white p-8 sm:p-10 shadow-[0_15px_40px_rgba(0,0,0,0.04)] relative overflow-hidden flex flex-col border border-[#e5e0d8]">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex-1">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 rounded-full bg-[#f4f2ea] flex items-center justify-center text-[#b5703a]">
+              <Truck className="w-5 h-5" />
+            </div>
+            <h2 className="font-serif text-3xl text-[#142918]">Thông tin giao hàng</h2>
+          </div>
+          
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Field label="Họ tên" error={errors.fullName && errorText}>
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              <Input placeholder="Nhập họ và tên" className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("fullName")} />
+            </Field>
+            
+            <Field label="Số điện thoại" error={errors.phone && errorText}>
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              <Input placeholder="Nhập số điện thoại" className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("phone")} />
+            </Field>
+            
+            <Field label="Địa chỉ" error={errors.address && errorText} className="sm:col-span-1">
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              <Input placeholder="Nhập địa chỉ" className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("address")} />
+            </Field>
+            
+            <Field label="Tỉnh, thành phố" error={errors.city && errorText}>
+              <Map className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              <Input placeholder="Chọn tỉnh, thành phố" className="pl-11 pr-10 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] cursor-pointer text-[14px]" {...register("city")} />
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+            </Field>
+            
+            <Field
+              className="sm:col-span-2"
+              label="Ghi chú (tùy chọn)"
+              error={errors.note && errorText}
+            >
+              <FileText className="absolute left-4 top-4 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              <Textarea placeholder="Nhập ghi chú cho đơn hàng (ví dụ: giao hàng giờ hành chính, để trước cửa...)" className="pl-11 pt-4 min-h-[120px] rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] resize-none text-[14px]" {...register("note")} />
+            </Field>
+          </div>
+          
+          <Button className="mt-10 bg-[#1a3020] hover:bg-[#142918] text-white rounded-xl h-14 px-8 font-medium transition-all shadow-md hover:-translate-y-0.5 w-fit" disabled={isSubmitting}>
+            <ShoppingBag className="w-4 h-4 mr-2" /> Đặt hàng
+          </Button>
+        </form>
 
-      <aside className="h-fit rounded-md border border-forest-950/10 bg-forest-950 p-6 text-white shadow-cinematic">
-        <h2 className="font-serif text-4xl">{common("total")}</h2>
-        <div className="mt-6 space-y-4 text-sm text-white/68">
-          {items.length === 0 ? (
-            <p>{common("emptyCart")}</p>
-          ) : (
-            items.map((item) => (
-              <div className="flex justify-between gap-4" key={item.slug}>
-                <span>
-                  {item.name} x {item.quantity}
-                </span>
-                <span>{formatCurrency(item.price * item.quantity, locale)}</span>
-              </div>
-            ))
-          )}
-          <div className="border-t border-white/14 pt-4 text-lg font-bold text-ember">
-            <div className="flex justify-between">
-              <span>{common("total")}</span>
-              <span>{formatCurrency(totals.total, locale)}</span>
+        {/* Footer Perks */}
+        <div className="mt-12 pt-6 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="flex items-center gap-3">
+            <Truck className="w-5 h-5 text-gray-400 shrink-0" />
+            <div>
+              <p className="text-[11px] font-bold text-[#142918] uppercase">Giao hàng nhanh chóng</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">Giao hàng toàn quốc</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="w-5 h-5 text-gray-400 shrink-0" />
+            <div>
+              <p className="text-[11px] font-bold text-[#142918] uppercase">Thanh toán an toàn</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">Bảo mật thông tin tuyệt đối</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Headset className="w-5 h-5 text-gray-400 shrink-0" />
+            <div>
+              <p className="text-[11px] font-bold text-[#142918] uppercase">Hỗ trợ 24/7</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">Luôn sẵn sàng hỗ trợ</p>
             </div>
           </div>
         </div>
-        <p className="mt-5 rounded-md bg-white/8 p-4 text-sm text-white/64">
-          {t("payment")}
-        </p>
+      </div>
+
+      {/* Right Column: Order Summary */}
+      <aside className="h-fit rounded-[1.5rem] bg-[#1a3020] p-8 text-white shadow-[0_20px_50px_rgba(20,41,24,0.1)] relative overflow-hidden">
+        <div className="flex items-center justify-between mb-10 relative z-10">
+          <h2 className="font-serif text-3xl">Tổng cộng</h2>
+          <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+            <ShoppingBag className="w-4 h-4 text-white" />
+          </div>
+        </div>
+        
+        <div className="space-y-6 relative z-10">
+          {items.length === 0 ? (
+            <p className="text-white/60 py-4">{common("emptyCart")}</p>
+          ) : (
+            <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+              {items.map((item) => (
+                <div className="flex items-center gap-4 w-full" key={item.slug}>
+                  <div className="relative w-14 h-14 rounded-[0.6rem] overflow-hidden bg-white/10 shrink-0 border border-white/5">
+                    <Image src={item.image} alt={item.name} fill className="object-cover" />
+                  </div>
+                  <div className="flex-1 flex items-center justify-between min-w-0 gap-4">
+                    <div className="flex flex-wrap items-center gap-x-2">
+                      <h4 className="text-[13px] font-medium text-white">{item.name}</h4>
+                      <span className="text-[13px] text-white/50">x {item.quantity}</span>
+                    </div>
+                    <span className="font-medium text-[13px] whitespace-nowrap shrink-0">{formatCurrency(item.price * item.quantity, locale)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="pt-6 border-t border-dashed border-white/10 space-y-5">
+            <div className="flex justify-between text-[13px] text-white/80">
+              <span>Tạm tính</span>
+              <span>{formatCurrency(totals.subtotal, locale)}</span>
+            </div>
+            <div className="flex justify-between text-[13px] text-white/80">
+              <span>Phí vận chuyển</span>
+              <span>{formatCurrency(totals.shipping, locale)}</span>
+            </div>
+            
+            <div className="pt-5 border-t border-dashed border-white/10 flex justify-between items-center">
+              <span className="text-base text-[#b5703a] font-semibold">Tổng cộng</span>
+              <span className="text-xl text-[#b5703a] font-bold">{formatCurrency(totals.total, locale)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 rounded-[0.8rem] bg-[#eef4ea] p-4 flex gap-3 relative z-10 border border-[#e5f0df]">
+          <ShieldCheck className="w-5 h-5 text-[#2a5a31] shrink-0" />
+          <div>
+            <p className="text-[13px] font-bold text-[#142918]">Bạn sẽ thanh toán khi nhận hàng</p>
+            <p className="text-[11px] text-[#142918]/60 mt-1">Thanh toán an toàn - Kiểm tra hàng trước khi thanh toán</p>
+          </div>
+        </div>
       </aside>
     </div>
   );
@@ -137,9 +210,11 @@ function Field({
 }) {
   return (
     <div className={className}>
-      <Label>{label}</Label>
-      <div className="mt-2">{children}</div>
-      {error ? <p className="mt-2 text-xs text-earth-700">{error}</p> : null}
+      <Label className="text-[13px] font-semibold text-[#1a3020] mb-2.5 inline-block">{label}</Label>
+      <div className="relative">
+        {children}
+      </div>
+      {error ? <p className="mt-1.5 text-[11px] text-red-500">{error}</p> : null}
     </div>
   );
 }

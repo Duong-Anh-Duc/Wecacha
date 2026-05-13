@@ -5,27 +5,32 @@ import Image from "next/image";
 import {motion} from "framer-motion";
 import type {UseEmblaCarouselType} from "embla-carousel-react";
 import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import {useTranslations} from "next-intl";
 import {cn} from "@/lib/utils";
 import {testimonials, localized} from "@/lib/content";
 import type {Locale} from "@/i18n/routing";
+import { ChevronLeft, ChevronRight, Award, Coffee } from "lucide-react";
 
-const AUTOPLAY_MS = 4500;
+const AUTOPLAY_MS = 4000;
 type EmblaApi = NonNullable<UseEmblaCarouselType[1]>;
 
 export function TestimonialsCarousel({locale}: {locale: Locale}) {
   const tCommon = useTranslations("Common");
+  
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
     loop: true,
     containScroll: false,
     slidesToScroll: 1,
-    duration: 36,
+    duration: 35,
     skipSnaps: false
-  });
+  }, [
+    Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
+  ]);
+  
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [tweenValues, setTweenValues] = useState<number[]>([]);
-  const [progressKey, setProgressKey] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const updateTweenValues = useCallback((api: EmblaApi) => {
@@ -47,40 +52,23 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
         });
       }
 
-      return Math.max(0, 1 - Math.abs(diffToTarget) * 3.2);
+      // Tweak multiplier to adjust how fast cards fade out on sides
+      return Math.max(0, 1 - Math.abs(diffToTarget) * 1.8);
     });
 
     setTweenValues(values);
   }, []);
 
-  const clearTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
-
-  const scheduleNext = useCallback(() => {
-    clearTimer();
-    timerRef.current = setTimeout(() => {
-      emblaApi?.scrollNext();
-    }, AUTOPLAY_MS);
-  }, [emblaApi, clearTimer]);
-
   useEffect(() => {
     if (!emblaApi) return;
     updateTweenValues(emblaApi);
-    scheduleNext();
-    return clearTimer;
-  }, [emblaApi, scheduleNext, clearTimer, updateTweenValues]);
+  }, [emblaApi, updateTweenValues]);
 
   useEffect(() => {
     if (!emblaApi) return;
     const onScroll = () => updateTweenValues(emblaApi);
     const onSelect = () => {
       setSelectedIndex(emblaApi.selectedScrollSnap());
-      setProgressKey((k) => k + 1);
-      scheduleNext();
       updateTweenValues(emblaApi);
     };
     emblaApi.on("scroll", onScroll);
@@ -91,119 +79,136 @@ export function TestimonialsCarousel({locale}: {locale: Locale}) {
       emblaApi.off("reInit", onScroll);
       emblaApi.off("select", onSelect);
     };
-  }, [emblaApi, scheduleNext, updateTweenValues]);
+  }, [emblaApi, updateTweenValues]);
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={clearTimer}
-      onMouseLeave={scheduleNext}
-    >
-      <div className="overflow-hidden" ref={emblaRef}>
+    <div className="relative max-w-[1200px] mx-auto">
+      <div className="overflow-hidden py-10" ref={emblaRef}>
         <div className="-ml-4 flex touch-pan-y items-center">
           {testimonials.map((item, index) => {
             const isActive = index === selectedIndex;
+            // Provide a fallback value if tweenValues isn't ready
             const tween = tweenValues[index] ?? (isActive ? 1 : 0);
-            const opacity = 0.34 + tween * 0.66;
-            const scale = 0.88 + tween * 0.12;
-            const translateY = (1 - tween) * 20;
-            const blur = (1 - tween) * 1.8;
+            
+            // For active: scale 1, blur 0, opacity 1
+            // For inactive: scale 0.85, blur 4px, opacity 0.5
+            const scale = 0.85 + tween * 0.15;
+            const blur = (1 - tween) * 4;
+            const opacity = 0.4 + tween * 0.6;
+            
             return (
-              <figure
-                key={item.name}
+              <div
+                key={`${item.name}-${index}`}
                 onClick={() => emblaApi?.scrollTo(index)}
-                className="min-w-0 flex-[0_0_88%] cursor-pointer pl-4 sm:flex-[0_0_65%] lg:flex-[0_0_46%]"
+                className="min-w-0 flex-[0_0_85%] sm:flex-[0_0_65%] md:flex-[0_0_60%] lg:flex-[0_0_55%] pl-4 cursor-pointer"
+                style={{
+                  opacity,
+                  transform: `scale(${scale})`,
+                  filter: `blur(${blur}px)`
+                }}
               >
                 <div
-                  style={{
-                    opacity,
-                    transform: `translate3d(0, ${translateY}px, 0) scale(${scale})`,
-                    filter: `blur(${blur}px)`
-                  }}
                   className={cn(
-                    "will-change-transform flex h-full flex-col rounded-2xl p-8 transition-[background-color,box-shadow,filter,opacity,transform] duration-300 ease-out",
+                    "relative flex flex-col h-full rounded-[2rem] p-8 sm:p-12 transition-colors duration-500 overflow-hidden border",
                     isActive
-                      ? "bg-parchment-50 shadow-cinematic"
-                      : "bg-forest-800/70"
+                      ? "bg-[#fcfbfa] shadow-2xl border-white/50"
+                      : "bg-[#142918] border-white/10"
                   )}
                 >
-                  {/* Quote mark */}
-                  <span
-                    className={cn(
-                      "font-serif text-5xl leading-none",
-                      isActive ? "text-earth-600" : "text-earth-700/50"
-                    )}
-                    aria-hidden="true"
-                  >
-                    "
-                  </span>
+                  {/* Subtle watermarked graphic on top right */}
+                  <div className={cn(
+                    "absolute -right-10 -top-10 w-64 h-64 opacity-[0.03] transition-opacity duration-500 pointer-events-none",
+                    isActive ? "opacity-[0.06]" : "opacity-[0.02]"
+                  )}>
+                     <svg viewBox="0 0 100 100" fill="currentColor" className={isActive ? "text-[#142918]" : "text-white"}>
+                        <path d="M50 0 C70 30 90 40 100 60 C80 60 70 80 50 100 C30 80 20 60 0 60 C10 40 30 30 50 0 Z" />
+                     </svg>
+                  </div>
+
+                  {/* Large Quote Mark */}
+                  <div className="font-serif text-6xl leading-none text-[#b5703a] mb-6">
+                    “
+                  </div>
 
                   <blockquote
                     className={cn(
-                      "mt-5 flex-1 font-serif text-2xl leading-snug",
-                      isActive ? "text-forest-950" : "text-parchment-50/65"
+                      "flex-1 font-serif text-[1.4rem] sm:text-[1.7rem] leading-[1.6] mb-12",
+                      isActive ? "text-[#142918]" : "text-white/80"
                     )}
                   >
                     {localized(item.quote, locale)}
                   </blockquote>
 
-                  <figcaption className="mt-8 flex items-center gap-3">
-                    <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
-                      <Image
-                        src={item.avatar}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                        sizes="48px"
-                      />
+                  <div className="mt-auto flex items-end justify-between gap-4 flex-wrap">
+                    <div className="flex items-center gap-4">
+                      <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-white/20">
+                        <Image
+                          src={item.avatar}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                          sizes="56px"
+                        />
+                      </div>
+                      <div>
+                        <strong
+                          className={cn(
+                            "block text-base font-bold",
+                            isActive ? "text-[#142918]" : "text-white"
+                          )}
+                        >
+                          {item.name}
+                        </strong>
+                        <span
+                          className={cn(
+                            "text-sm font-medium",
+                            isActive ? "text-[#142918]/60" : "text-white/50"
+                          )}
+                        >
+                          {localized(item.role, locale)}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <strong
-                        className={cn(
-                          "block text-sm font-bold",
-                          isActive ? "text-forest-950" : "text-parchment-50/85"
-                        )}
-                      >
-                        {item.name}
-                      </strong>
-                      <span
-                        className={cn(
-                          "text-xs",
-                          isActive ? "text-forest-950/55" : "text-parchment-50/50"
-                        )}
-                      >
-                        {localized(item.role, locale)}
-                      </span>
+                    
+                    {/* Badge */}
+                    <div className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-full shadow-sm whitespace-nowrap",
+                      isActive ? "bg-white border border-[#142918]/5 text-[#142918]" : "bg-black/20 border border-white/5 text-white/80"
+                    )}>
+                      <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", isActive ? "bg-[#142918] text-white" : "bg-white/10 text-white")}>
+                        <Award className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-[11px] font-bold uppercase tracking-wider">Khách hàng thân thiết</span>
                     </div>
-                  </figcaption>
+                  </div>
                 </div>
-              </figure>
+              </div>
             );
           })}
         </div>
       </div>
 
-      {/* Progress dots */}
-      <div className="mt-8 flex items-center justify-center gap-2">
-        {testimonials.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => emblaApi?.scrollTo(index)}
-            aria-label={tCommon("goToSlide", {index: index + 1})}
-            className="relative h-1 overflow-hidden rounded-full bg-white/25 transition-[width] duration-300"
-            style={{width: index === selectedIndex ? 40 : 8}}
-          >
-            {index === selectedIndex && (
-              <motion.span
-                key={progressKey}
-                className="absolute inset-y-0 left-0 rounded-full bg-white"
-                initial={{width: "0%"}}
-                animate={{width: "100%"}}
-                transition={{duration: AUTOPLAY_MS / 1000, ease: "linear"}}
+      {/* Controls Container */}
+      <div className="flex items-center justify-center mt-8 px-4">
+        {/* Progress dots */}
+        <div className="flex items-center justify-center gap-3">
+          {testimonials.map((_, index) => {
+            const isActive = index === selectedIndex;
+            return (
+              <button
+                key={index}
+                onClick={() => emblaApi?.scrollTo(index)}
+                aria-label={tCommon("goToSlide", {index: index + 1})}
+                className={cn(
+                  "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                  isActive 
+                    ? "bg-[#b5703a] scale-125 shadow-[0_0_10px_rgba(181,112,58,0.5)]" 
+                    : "bg-transparent border border-white/30 hover:border-white/60"
+                )}
               />
-            )}
-          </button>
-        ))}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -207,14 +207,14 @@ export function ProductJourneyCarousel({locale}: {locale: Locale}) {
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-earth-600">
                     {copy.discover}
                   </p>
-                  <h3 className="mt-3 max-w-[10rem] font-serif text-3xl leading-[1.02] text-forest-950 sm:text-4xl">
+                  <h3 className="mt-3 max-w-[10rem] font-serif text-3xl leading-[1.02] text-forest-950 sm:text-4xl break-words hyphens-auto">
                     {card.title}
                   </h3>
                   <p className="mt-4 line-clamp-2 text-base font-semibold leading-7 text-forest-950/56">
                     {card.body}
                   </p>
                 </div>
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-forest-950 text-parchment-50 transition duration-300 group-hover:translate-x-1">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#b5703a] text-parchment-50 transition duration-300 group-hover:scale-110">
                   <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </span>
               </div>
@@ -223,33 +223,8 @@ export function ProductJourneyCarousel({locale}: {locale: Locale}) {
         </aside>
       </div>
 
-      <div className="relative -mt-6 bg-forest-950 px-4 py-24 text-forest-950 sm:px-6 lg:-mt-8 lg:px-8 lg:py-32">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <Image
-            src="/image3.jpeg"
-            alt=""
-            fill
-            className="object-cover opacity-28"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-forest-950/76" />
-          <Image
-            src="/explore_latte.png"
-            alt=""
-            width={280}
-            height={280}
-            className="absolute -left-16 top-28 hidden opacity-95 drop-shadow-2xl lg:block"
-          />
-          <Image
-            src="/explore_v60.png"
-            alt=""
-            width={380}
-            height={380}
-            className="absolute bottom-10 right-10 hidden opacity-82 drop-shadow-2xl lg:block"
-          />
-        </div>
-
-        <div className="relative mx-auto grid max-w-[1720px] overflow-hidden rounded-[28px] bg-[oklch(98.5%_0.01_92)] shadow-cinematic sm:rounded-[34px] lg:grid-cols-3">
+      <div className="relative -mt-6 px-4 py-24 sm:px-6 lg:-mt-8 lg:px-8 lg:py-32">
+        <div className="relative mx-auto grid max-w-[1720px] overflow-hidden rounded-[28px] bg-[oklch(98.5%_0.01_92)] shadow-[0_18px_55px_rgba(6,31,7,0.06)] sm:rounded-[34px] lg:grid-cols-3">
           {copy.newsCards.map((item, index) => {
             const Icon = item.icon === "calendar" ? CalendarDays : Coffee;
 

@@ -323,7 +323,7 @@ export const products: Product[] = [
       vi: ["Mận", "Cacao", "Mật ong", "Khói nhẹ"],
       en: ["Plum", "Cacao", "Honey", "Soft smoke"]
     },
-    images: ["/sp3.jpeg", "/sonla_brocade.png", "/image1.jpeg"],
+    images: ["/gift_box_brocade.png", "/sonla_brocade.png", "/image1.jpeg"],
     featured: true
   },
   {

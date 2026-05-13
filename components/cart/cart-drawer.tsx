@@ -132,7 +132,7 @@ export function CartDrawer({solid}: {solid?: boolean}) {
                   <span>{tCommon("subtotal")}</span>
                   <strong>{formatCurrency(totals.subtotal, locale)}</strong>
                 </div>
-                <Button asChild className="w-full" variant="forest">
+                <Button asChild className="w-full bg-[#142918] hover:bg-[#1a3320] text-white shadow-md border-none hover:-translate-y-0.5 transition-all">
                   <Link href="/checkout">{tCommon("buyNow")}</Link>
                 </Button>
               </div>
