@@ -27,6 +27,13 @@ export function generateStaticParams() {
   return products.map((product) => ({slug: product.slug}));
 }
 
+const ogImageMap: Record<string, string> = {
+  "/sp1.jpeg": "/og/sp1.jpg",
+  "/sp2.jpeg": "/og/sp2.jpg",
+  "/gift_box_brocade.png": "/og/gift.jpg",
+  "/image5.jpeg": "/og/sp4.jpg"
+};
+
 export async function generateMetadata({params}: Props): Promise<Metadata> {
   const {locale, slug} = await params;
   const product = getProductBySlug(slug);
@@ -34,6 +41,8 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
   if (!product) {
     return {};
   }
+
+  const ogImage = ogImageMap[product.images[0]] ?? product.images[0];
 
   return {
     title: localized(product.name, locale),
@@ -52,7 +61,7 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
       type: "website",
       images: [
         {
-          url: `/_next/image?url=${encodeURIComponent(product.images[0])}&w=1200&q=80`,
+          url: ogImage,
           width: 1200,
           height: 630,
           alt: localized(product.name, locale)
