@@ -92,7 +92,7 @@ function StatCard({
       initial={{opacity: 0, y: 18}}
       animate={isInView ? {opacity: 1, y: 0} : {opacity: 0, y: 18}}
       transition={{duration: 0.7, delay: index * 0.1, ease: [0.16, 1, 0.3, 1]}}
-      className="border-forest-950/10 p-5 sm:border-l sm:p-6 first:sm:border-l-0"
+      className="overflow-hidden border-forest-950/10 p-5 sm:border-l sm:p-6 first:sm:border-l-0"
     >
       <div className="mb-5 flex h-12 items-center">
         {Icon ? (
@@ -101,7 +101,7 @@ function StatCard({
           </span>
         ) : null}
       </div>
-      <p className="max-w-full font-serif text-[clamp(2.85rem,3.35vw,3.75rem)] leading-[0.95] text-earth-700">
+      <p className="max-w-full font-serif text-[clamp(2rem,2.6vw,3rem)] leading-[0.95] text-earth-700">
         {isInView ? <CountNumber value={stat.value} suffix={stat.suffix} /> : "0"}
       </p>
       <p className="mt-3 text-sm font-bold uppercase tracking-[0.12em] text-forest-950">
