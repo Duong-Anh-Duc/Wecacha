@@ -52,7 +52,7 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
       type: "website",
       images: [
         {
-          url: `/og/image.png?locale=${locale}&title=${encodeURIComponent(localized(product.name, locale))}&kicker=${encodeURIComponent(product.weight)}`,
+          url: `/_next/image?url=${encodeURIComponent(product.images[0])}&w=1200&q=80`,
           width: 1200,
           height: 630,
           alt: localized(product.name, locale)
