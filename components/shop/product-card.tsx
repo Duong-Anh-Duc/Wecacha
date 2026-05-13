@@ -158,8 +158,8 @@ export function ProductCard({
           <div
             className={
               product.category === "gifts"
-                ? "mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-earth-500/48 bg-earth-900/34 p-3"
-                : "mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-forest-600/42 bg-forest-950/48 p-3"
+                ? "mt-6 flex min-h-[52px] flex-wrap items-center gap-3 rounded-xl border border-earth-500/48 bg-earth-900/34 p-3"
+                : "mt-6 flex min-h-[52px] flex-wrap items-center gap-3 rounded-xl border border-forest-600/42 bg-forest-950/48 p-3"
             }
           >
             {productHighlights(product, locale).map(({icon: Icon, label}) => (
@@ -169,8 +169,10 @@ export function ProductCard({
               </div>
             ))}
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-5">
+        <div className="mt-4">
+          <div className="grid grid-cols-2 gap-3">
             <AddToCartButton
               product={product}
               locale={locale}
@@ -186,7 +188,7 @@ export function ProductCard({
 
           <Link
             href={`/shop/${product.slug}`}
-            className="mt-5 flex h-11 items-center justify-between rounded-xl px-2 text-sm font-bold text-parchment-100/80 transition duration-300 hover:bg-parchment-50/8 hover:text-ember"
+            className="mt-3 flex h-11 items-center justify-between rounded-xl px-2 text-sm font-bold text-parchment-100/80 transition duration-300 hover:bg-parchment-50/8 hover:text-ember"
           >
             <span className="inline-flex items-center gap-2">
               <Leaf className="h-4 w-4 text-forest-600 transition duration-300 group-hover:text-ember" aria-hidden="true" />
