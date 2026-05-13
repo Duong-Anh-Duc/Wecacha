@@ -8,6 +8,7 @@ import {JsonLd} from "@/components/seo/json-ld";
 import {SectionHeading} from "@/components/sections/section-heading";
 import {ProductCard} from "@/components/shop/product-card";
 import {Badge} from "@/components/ui/badge";
+import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {ProductBuyPanel} from "@/features/product/product-buy-panel";
 import {ProductGallery} from "@/features/product/product-gallery";
 import type {Locale} from "@/i18n/routing";
@@ -88,7 +89,16 @@ export default async function ProductDetailPage({params}: Props) {
     <main className="bg-parchment-50">
       <JsonLd data={productJsonLd(product, locale)} />
       <section className="px-4 pb-16 pt-32 sm:px-6 lg:px-8 lg:pb-24">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.12fr_0.88fr]">
+        <div className="mx-auto max-w-7xl">
+          <Breadcrumbs 
+            homeLabel={locale === "vi" ? "Trang chủ" : "Home"} 
+            items={[
+              { label: tShop("title"), href: "/shop" },
+              { label: localized(product.name, locale) }
+            ]} 
+          />
+        </div>
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.12fr_0.88fr] mt-2">
           <Reveal>
             <ProductGallery
               images={product.images}

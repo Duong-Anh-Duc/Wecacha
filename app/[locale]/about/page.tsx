@@ -2,6 +2,7 @@ import Image from "next/image";
 import {CheckCircle2, HeartHandshake, Leaf, ShieldCheck} from "lucide-react";
 import {Reveal} from "@/components/motion/reveal";
 import {SectionHeading} from "@/components/sections/section-heading";
+import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {imageLibrary} from "@/lib/content";
@@ -31,6 +32,14 @@ export default function AboutPage({params: {locale}}: {params: {locale: Locale}}
           />
           <div className="absolute inset-0 bg-forest-950/70" />
           <div className="absolute inset-0 bg-gradient-to-t from-parchment-50 via-forest-950/40 to-transparent" />
+        </div>
+
+        <div className="absolute top-28 left-4 sm:left-6 lg:left-8 z-20 xl:left-12">
+          <Breadcrumbs 
+            homeLabel={isVi ? "Trang chủ" : "Home"} 
+            theme="dark"
+            items={[{ label: isVi ? "Về Wecacha" : "About Us" }]} 
+          />
         </div>
 
         <div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8 mt-20">

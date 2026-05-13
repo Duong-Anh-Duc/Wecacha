@@ -5,6 +5,7 @@ import {Reveal} from "@/components/motion/reveal";
 import type {Locale} from "@/i18n/routing";
 import {imageLibrary} from "@/lib/content";
 import Image from "next/image";
+import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 
 type Props = {
   params: Promise<{locale: Locale; slug: string}>;
@@ -165,6 +166,16 @@ export default async function ExploreCategoryPage({params}: Props) {
         image={data.image}
         imageAlt={content.title}
         scrollLabel={isVi ? "Cuộn xuống" : "Scroll down"}
+        breadcrumbs={
+          <Breadcrumbs 
+            homeLabel={isVi ? "Trang chủ" : "Home"} 
+            theme="dark"
+            items={[
+              { label: isVi ? "Khám phá" : "Explore", href: "/explore" },
+              { label: content.title }
+            ]} 
+          />
+        }
       />
       
       <section className="px-4 py-24 sm:px-6 lg:px-8">

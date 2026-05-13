@@ -3,6 +3,7 @@ import {getTranslations, setRequestLocale} from "next-intl/server";
 import {CinematicImage} from "@/components/sections/cinematic-image";
 import {CinematicPageHero} from "@/components/sections/cinematic-page-hero";
 import {Reveal} from "@/components/motion/reveal";
+import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {ShopGrid} from "@/features/shop/shop-grid";
 import type {Locale} from "@/i18n/routing";
 import {imageLibrary, products} from "@/lib/content";
@@ -46,6 +47,13 @@ export default async function ShopPage({params}: Props) {
         chips={[t("chip1"), t("chip2"), t("chip3")]}
         fieldJournal={common("fieldJournal")}
         scrollLabel={common("scrollDown")}
+        breadcrumbs={
+          <Breadcrumbs 
+            homeLabel={locale === "vi" ? "Trang chủ" : "Home"} 
+            theme="dark"
+            items={[{ label: t("title") }]} 
+          />
+        }
       />
 
       <section className="bg-forest-950 px-4 py-10 text-white sm:px-6 lg:px-8">

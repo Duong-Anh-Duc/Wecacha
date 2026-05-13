@@ -1,6 +1,7 @@
 import type {Metadata} from "next";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {CinematicPageHero} from "@/components/sections/cinematic-page-hero";
+import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {ShopGrid} from "@/features/shop/shop-grid";
 import type {Locale} from "@/i18n/routing";
 import {imageLibrary, products, type ProductCategory} from "@/lib/content";
@@ -62,6 +63,16 @@ export default async function CategoryPage({params}: Props) {
         chips={[t("chip1"), t("chip2"), t("chip3")]}
         fieldJournal={common("fieldJournal")}
         scrollLabel={common("scrollDown")}
+        breadcrumbs={
+          <Breadcrumbs 
+            homeLabel={locale === "vi" ? "Trang chủ" : "Home"} 
+            theme="dark"
+            items={[
+              { label: t("title"), href: "/shop" },
+              { label: categoryTitle }
+            ]} 
+          />
+        }
       />
 
       <section className="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">

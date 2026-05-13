@@ -59,16 +59,7 @@ const navItems: NavItem[] = [
   { 
     href: "/explore", 
     key: "explore", 
-    icon: Globe2,
-    children: [
-      { href: "/about", label: { vi: "Về Wecacha", en: "About Wecacha" } },
-      { href: "/explore/farm", label: { vi: "Vùng trồng nguyên liệu", en: "Our Farms" } },
-      { href: "/explore/processing", label: { vi: "Phương pháp sơ chế", en: "Processing" } },
-      { href: "/explore/culture", label: { vi: "Văn hóa bản địa", en: "Local Culture" } },
-      { href: "/news/coffee-culture", label: { vi: "Văn hóa cà phê", en: "Coffee Culture" } },
-      { href: "/news/events", label: { vi: "Sự kiện & Hoạt động", en: "Events" } },
-      { href: "/news/recipes", label: { vi: "Công thức pha chế", en: "Recipes" } }
-    ]
+    icon: Globe2
   },
   { href: "/contact", key: "contact", icon: Leaf }
 ];

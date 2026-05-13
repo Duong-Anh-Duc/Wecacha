@@ -14,6 +14,7 @@ type CinematicPageHeroProps = {
   scrollLabel?: string;
   align?: "left" | "center";
   className?: string;
+  breadcrumbs?: React.ReactNode;
 };
 
 export function CinematicPageHero({
@@ -26,7 +27,8 @@ export function CinematicPageHero({
   fieldJournal = "Field journal",
   scrollLabel = "Scroll",
   align = "left",
-  className
+  className,
+  breadcrumbs
 }: CinematicPageHeroProps) {
   return (
     <section
@@ -55,6 +57,7 @@ export function CinematicPageHero({
             align === "center" && "mx-auto text-center lg:col-span-2"
           )}
         >
+          {breadcrumbs}
           <p className="mb-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-ember">
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             {kicker}
