@@ -13,14 +13,14 @@ export async function SiteFooter({locale}: {locale: Locale}) {
     <footer className="relative overflow-hidden bg-forest-950 text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(181,101,0,0.28),transparent_24rem)]" />
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-8 lg:py-18">
-        <div>
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-3">
             <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/18 bg-white/8">
               <Mountain className="h-5 w-5 text-ember" aria-hidden="true" />
             </span>
             <div>
               <p className="font-serif text-3xl">Sơn La Coffee</p>
-              <p className="text-xs font-semibold uppercase text-white/56">
+              <p className="mt-1 sm:mt-0 text-[10px] sm:text-xs font-semibold uppercase text-white/56">
                 {footer("tagline")}
               </p>
             </div>
@@ -30,14 +30,14 @@ export async function SiteFooter({locale}: {locale: Locale}) {
           </p>
         </div>
 
-        <div>
-          <h2 className="text-sm font-semibold uppercase text-ember">{footer("pages")}</h2>
-          <div className="mt-5 grid gap-3 text-sm text-white/68">
+        <div className="text-center sm:text-left">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-ember">{footer("pages")}</h2>
+          <nav className="mt-6 grid gap-4 text-sm text-white/68" aria-label="Footer Navigation">
             <Link className="transition hover:text-white" href="/">
               {nav("home")}
             </Link>
-            <Link className="transition hover:text-white" href="/story">
-              {nav("story")}
+            <Link className="transition hover:text-white" href="/about">
+              {nav("about")}
             </Link>
             <Link className="transition hover:text-white" href="/shop">
               {nav("shop")}
@@ -48,27 +48,27 @@ export async function SiteFooter({locale}: {locale: Locale}) {
             <Link className="transition hover:text-white" href="/contact">
               {nav("contact")}
             </Link>
-          </div>
+          </nav>
         </div>
 
-        <div>
-          <h2 className="text-sm font-semibold uppercase text-ember">{footer("contactHeading")}</h2>
-          <div className="mt-5 grid gap-4 text-sm text-white/68">
-            <p className="flex gap-3">
-              <MapPin className="mt-0.5 h-4 w-4 text-ember" aria-hidden="true" />
-              {siteConfig.address[locale]}
+        <div className="text-center sm:text-left">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-ember">{footer("contactHeading")}</h2>
+          <div className="mt-6 grid gap-4 text-sm text-white/68">
+            <p className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3">
+              <MapPin className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
+              <span>{siteConfig.address[locale]}</span>
             </p>
-            <a className="flex gap-3 transition hover:text-white" href={`tel:${siteConfig.phone}`}>
-              <Phone className="mt-0.5 h-4 w-4 text-ember" aria-hidden="true" />
-              {siteConfig.phone}
+            <a className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 transition hover:text-white" href={`tel:${siteConfig.phone}`}>
+              <Phone className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
+              <span>{siteConfig.phone}</span>
             </a>
-            <a className="flex gap-3 transition hover:text-white" href={`mailto:${siteConfig.email}`}>
-              <Mail className="mt-0.5 h-4 w-4 text-ember" aria-hidden="true" />
-              {siteConfig.email}
+            <a className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 transition hover:text-white" href={`mailto:${siteConfig.email}`}>
+              <Mail className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
+              <span>{siteConfig.email}</span>
             </a>
-            <a className="flex gap-3 transition hover:text-white" href={siteConfig.facebook}>
-              <Facebook className="mt-0.5 h-4 w-4 text-ember" aria-hidden="true" />
-              Facebook
+            <a className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 transition hover:text-white" href={siteConfig.facebook}>
+              <Facebook className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
+              <span>Facebook</span>
             </a>
           </div>
         </div>

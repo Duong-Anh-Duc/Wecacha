@@ -169,7 +169,7 @@ export const products: Product[] = [
       vi: ["Mận chín", "Mật ong rừng", "Khói bếp"],
       en: ["Ripe plum", "Forest honey", "Wood smoke"]
     },
-    images: ["/sp1.jpeg", imageLibrary.beansBowl, imageLibrary.cup],
+    images: ["/sp1.jpeg", "/image1.jpeg", "/image5.jpeg"],
     featured: true
   },
   {
@@ -246,7 +246,7 @@ export const products: Product[] = [
       vi: ["Cacao", "Đường nâu", "Thảo mộc khô"],
       en: ["Cacao", "Brown sugar", "Dry herbs"]
     },
-    images: ["/sp2.jpeg", imageLibrary.roasted, imageLibrary.cup],
+    images: ["/sp2.jpeg", "/image2.jpeg", "/image3.jpeg"],
     featured: true
   },
   {
@@ -323,7 +323,7 @@ export const products: Product[] = [
       vi: ["Mận", "Cacao", "Mật ong", "Khói nhẹ"],
       en: ["Plum", "Cacao", "Honey", "Soft smoke"]
     },
-    images: ["/sp3.jpeg", imageLibrary.brocade, imageLibrary.beansBowl],
+    images: ["/sp3.jpeg", "/sonla_brocade.png", "/image1.jpeg"],
     featured: true
   },
   {
@@ -400,7 +400,7 @@ export const products: Product[] = [
       vi: ["Hạt rang", "Caramel", "Gỗ ấm"],
       en: ["Roasted nuts", "Caramel", "Warm wood"]
     },
-    images: ["/sp1.jpeg", imageLibrary.beansBowl, imageLibrary.cup]
+    images: ["/image5.jpeg", "/image2.jpeg", "/image3.jpeg"]
   }
 ];
 
@@ -596,7 +596,7 @@ export const exploreCards: ExploreCard[] = [
 export const testimonials = [
   {
     name: "Minh Anh",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80",
     bgImage: imageLibrary.coffeeRoast,
     role: {vi: "Nhà rang độc lập", en: "Independent roaster"},
     quote: {
@@ -606,7 +606,7 @@ export const testimonials = [
   },
   {
     name: "Daniel Lee",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    avatar: "https://images.unsplash.com/photo-1548372290-8d01b6c8e78c?auto=format&fit=crop&w=200&q=80",
     bgImage: imageLibrary.village,
     role: {vi: "Nhiếp ảnh gia du lịch", en: "Travel photographer"},
     quote: {
@@ -616,7 +616,7 @@ export const testimonials = [
   },
   {
     name: "Hà Linh",
-    avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
     bgImage: imageLibrary.cup,
     role: {vi: "Chủ quán cà phê", en: "Cafe owner"},
     quote: {
@@ -626,7 +626,7 @@ export const testimonials = [
   },
   {
     name: "Trần Quốc Hùng",
-    avatar: "https://randomuser.me/api/portraits/men/54.jpg",
+    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80",
     bgImage: imageLibrary.coffeePour,
     role: {vi: "Barista 10 năm kinh nghiệm", en: "10-year barista"},
     quote: {
@@ -636,7 +636,7 @@ export const testimonials = [
   },
   {
     name: "Sophia Nguyen",
-    avatar: "https://randomuser.me/api/portraits/women/26.jpg",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80",
     bgImage: imageLibrary.farm,
     role: {vi: "Food & travel blogger", en: "Food & travel blogger"},
     quote: {
@@ -646,7 +646,7 @@ export const testimonials = [
   },
   {
     name: "Nguyễn Văn Bảo",
-    avatar: "https://randomuser.me/api/portraits/men/17.jpg",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
     bgImage: imageLibrary.beans,
     role: {vi: "Nhà thiết kế nội thất", en: "Interior designer"},
     quote: {

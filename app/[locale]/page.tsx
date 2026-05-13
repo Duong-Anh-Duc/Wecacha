@@ -1,5 +1,5 @@
 import Image from "next/image";
-import {ArrowUpRight} from "lucide-react";
+import {ArrowUpRight, Flame, Leaf, ShieldCheck, Truck} from "lucide-react";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {CinematicImage} from "@/components/sections/cinematic-image";
 import {SectionHeading} from "@/components/sections/section-heading";
@@ -42,7 +42,7 @@ export default async function HomePage({params}: Props) {
 
       <section className="relative overflow-hidden bg-parchment-50 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         {/* Background image — right half only */}
-        <div className="absolute inset-y-0 right-0 w-1/2">
+        <div className="absolute inset-y-0 right-0 hidden w-1/2 lg:block">
           <Image src="/image1.jpeg" alt="" fill className="object-cover" sizes="50vw" quality={80} />
           <div className="absolute inset-0 bg-parchment-50/60" />
         </div>
@@ -168,6 +168,53 @@ export default async function HomePage({params}: Props) {
           <div className="grid gap-5 md:grid-cols-3">
             {featuredProducts.map((product) => (
               <ProductCard key={product.slug} product={product} locale={locale} />
+            ))}
+          </div>
+          <div className="group/promises relative mt-8 grid overflow-hidden rounded-2xl border border-white/10 bg-forest-950/48 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.18)] sm:grid-cols-2 lg:grid-cols-4 lg:p-6">
+            <span
+              className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 animate-soft-sweep bg-gradient-to-r from-transparent via-parchment-50/16 to-transparent blur-sm"
+              aria-hidden="true"
+            />
+            {[
+              {
+                icon: Leaf,
+                title: locale === "vi" ? "Nguyên chất 100%" : "100% Pure",
+                copy: locale === "vi" ? "Không pha trộn, không chất bảo quản" : "No blends, no preservatives"
+              },
+              {
+                icon: Flame,
+                title: locale === "vi" ? "Rang mộc thủ công" : "Craft roasted",
+                copy: locale === "vi" ? "Giữ trọn hương vị tự nhiên" : "Natural flavor kept intact"
+              },
+              {
+                icon: Truck,
+                title: locale === "vi" ? "Giao hàng toàn quốc" : "Nationwide delivery",
+                copy: locale === "vi" ? "Nhanh chóng, đóng gói cẩn thận" : "Fast and carefully packed"
+              },
+              {
+                icon: ShieldCheck,
+                title: locale === "vi" ? "Cam kết chất lượng" : "Quality promise",
+                copy: locale === "vi" ? "Hoàn tiền nếu không hài lòng" : "Refund if you are not satisfied"
+              }
+            ].map(({icon: Icon, title, copy}, index) => (
+              <div key={title} className="group/promise relative flex items-center gap-4 rounded-xl p-3 transition duration-300 hover:bg-white/6">
+                <span
+                  className="pointer-events-none absolute inset-0 animate-small-sweep rounded-xl bg-gradient-to-r from-transparent via-white/8 to-transparent"
+                  style={{animationDelay: `${index * 0.7}s`}}
+                  aria-hidden="true"
+                />
+                <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/10 bg-forest-800/42 text-ember transition duration-300 group-hover/promise:scale-110 group-hover/promise:bg-ember/12 group-hover/promise:shadow-[0_0_28px_rgba(243,167,52,0.22)]">
+                  <Icon className="h-6 w-6" aria-hidden="true" />
+                </span>
+                <span className="relative">
+                  <span className="block text-sm font-black uppercase tracking-[0.04em] text-parchment-50">
+                    {title}
+                  </span>
+                  <span className="mt-1 block text-xs font-medium text-ember/84">
+                    {copy}
+                  </span>
+                </span>
+              </div>
             ))}
           </div>
         </div>

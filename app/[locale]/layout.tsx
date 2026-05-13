@@ -52,6 +52,11 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
     icons: {
       icon: [
         {
+          url: "/favicon.ico",
+          type: "image/x-icon",
+          sizes: "256x256"
+        },
+        {
           url: "/wecacha-favicon.png",
           type: "image/png",
           sizes: "256x256"
@@ -61,7 +66,7 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
           type: "image/svg+xml"
         }
       ],
-      shortcut: "/wecacha-favicon.png",
+      shortcut: "/favicon.ico",
       apple: "/image.png"
     },
     alternates: {

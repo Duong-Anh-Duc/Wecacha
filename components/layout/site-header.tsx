@@ -6,6 +6,7 @@ import {motion} from "framer-motion";
 import {
   ArrowUpRight,
   BookOpen,
+  ChevronDown,
   Coffee,
   Globe2,
   Leaf,
@@ -30,13 +31,47 @@ import {localeNames} from "@/lib/site";
 import {cn} from "@/lib/utils";
 import type {Locale} from "@/i18n/routing";
 
-const navItems = [
-  {href: "/", key: "home", icon: Coffee},
-  {href: "/story", key: "story", icon: BookOpen},
-  {href: "/shop", key: "shop", icon: Store},
-  {href: "/explore", key: "explore", icon: Search},
-  {href: "/contact", key: "contact", icon: Leaf}
-] as const;
+type DropdownItem = {
+  href: string;
+  label: Record<"vi" | "en", string>;
+};
+
+type NavItem = {
+  href: string;
+  key: string;
+  icon: any;
+  children?: DropdownItem[];
+};
+
+const navItems: NavItem[] = [
+  { href: "/", key: "home", icon: Coffee },
+  { 
+    href: "/shop", 
+    key: "shop", 
+    icon: Store,
+    children: [
+      { href: "/shop", label: { vi: "Tất cả sản phẩm", en: "All Products" } },
+      { href: "/shop/category/beans", label: { vi: "Cà phê hạt", en: "Whole Beans" } },
+      { href: "/shop/category/phin", label: { vi: "Cà phê pha phin", en: "Phin Coffee" } },
+      { href: "/shop/category/gifts", label: { vi: "Bộ quà tặng", en: "Gift Sets" } }
+    ]
+  },
+  { 
+    href: "/explore", 
+    key: "explore", 
+    icon: Globe2,
+    children: [
+      { href: "/about", label: { vi: "Về Wecacha", en: "About Wecacha" } },
+      { href: "/explore/farm", label: { vi: "Vùng trồng nguyên liệu", en: "Our Farms" } },
+      { href: "/explore/processing", label: { vi: "Phương pháp sơ chế", en: "Processing" } },
+      { href: "/explore/culture", label: { vi: "Văn hóa bản địa", en: "Local Culture" } },
+      { href: "/news/coffee-culture", label: { vi: "Văn hóa cà phê", en: "Coffee Culture" } },
+      { href: "/news/events", label: { vi: "Sự kiện & Hoạt động", en: "Events" } },
+      { href: "/news/recipes", label: { vi: "Công thức pha chế", en: "Recipes" } }
+    ]
+  },
+  { href: "/contact", key: "contact", icon: Leaf }
+];
 
 const drawerEase = [0.16, 1, 0.3, 1] as const;
 
@@ -55,17 +90,23 @@ export function SiteHeader() {
   }, []);
 
   const solid = scrolled || !isHome;
+  const lightHeader = false;
 
   return (
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-500",
-        solid
+        lightHeader
+          ? "border-b border-forest-950/0 bg-[#f4f2ea]/92 backdrop-blur-xl"
+          : solid
           ? "border-b border-white/10 bg-forest-950/95 shadow-cinematic backdrop-blur-xl"
           : "bg-gradient-to-b from-forest-950/78 via-forest-950/34 to-transparent"
       )}
     >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className={cn(
+        "mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8",
+        lightHeader ? "max-w-[1720px]" : "max-w-7xl"
+      )}>
         <Link
           href="/"
           className="group flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember"
@@ -82,38 +123,91 @@ export function SiteHeader() {
             />
           </span>
           <span className="leading-none">
-            <span className="block font-serif text-xl text-white transition-colors duration-500">
+            <span className={cn(
+              "block font-serif text-xl transition-colors duration-500",
+              lightHeader ? "text-forest-950" : "text-white"
+            )}>
               Wecacha
             </span>
-            <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-white/80 transition-colors duration-500">
+            <span className={cn(
+              "block text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors duration-500",
+              lightHeader ? "text-forest-950/70" : "text-white/80"
+            )}>
               Sơn La Coffee
             </span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 lg:flex" aria-label="Main">
+        <nav className="hidden h-full items-center gap-8 lg:flex" aria-label="Main">
           {navItems.map((item) => {
             const active =
               item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "rounded-full px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember",
-                  "text-white/80 hover:bg-white/10 hover:text-white",
-                  active && "bg-white/10 text-ember shadow-[0_0_28px_rgba(181,101,0,0.22)]"
+              <div key={item.href} className="group relative flex h-full items-center">
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember",
+                    lightHeader
+                      ? "text-forest-950 hover:bg-forest-950/7 hover:text-forest-950"
+                      : "text-white/80 hover:bg-white/10 hover:text-white",
+                    active &&
+                      (lightHeader
+                        ? "bg-forest-950 text-parchment-50 shadow-warm"
+                        : "bg-white/10 text-ember shadow-[0_0_28px_rgba(181,101,0,0.22)]")
+                  )}
+                >
+                  {t(item.key)}
+                  {item.children && (
+                    <ChevronDown className="h-3.5 w-3.5 opacity-60 transition duration-300 group-hover:rotate-180" aria-hidden="true" />
+                  )}
+                </Link>
+
+                {item.children && (
+                  <div className="invisible absolute left-1/2 top-full -mt-2 w-56 -translate-x-1/2 translate-y-2 opacity-0 transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                    <div className={cn(
+                      "overflow-hidden rounded-2xl p-1.5 shadow-cinematic",
+                      lightHeader
+                        ? "border border-forest-950/12 bg-[#fffaf0]"
+                        : "border border-white/10 bg-forest-950/95 backdrop-blur-xl"
+                    )}>
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className={cn(
+                            "block rounded-xl px-4 py-2.5 text-sm font-medium transition",
+                            lightHeader
+                              ? "text-forest-950/70 hover:bg-forest-950/8 hover:text-forest-950"
+                              : "text-white/70 hover:bg-white/10 hover:text-white"
+                          )}
+                        >
+                          {child.label[locale as "vi" | "en"]}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 )}
-              >
-                {t(item.key)}
-              </Link>
+              </div>
             );
           })}
         </nav>
 
         <div className="flex items-center gap-2">
-          <LocaleSwitcher locale={locale} pathname={pathname} solid={solid} />
-          <CartDrawer solid={solid} />
+          {lightHeader ? (
+            <Link
+              href="/explore"
+              className="hidden h-12 items-center gap-3 rounded-full bg-forest-950 px-7 text-sm font-bold text-parchment-50 shadow-warm transition hover:-translate-y-0.5 hover:bg-forest-900 lg:inline-flex"
+            >
+              <Coffee className="h-4 w-4" aria-hidden="true" />
+              {locale === "vi" ? "Khám phá ngay" : "Explore now"}
+            </Link>
+          ) : (
+            <>
+              <LocaleSwitcher locale={locale} pathname={pathname} solid={solid} />
+              <CartDrawer solid={solid} />
+            </>
+          )}
           <MobileMenu solid={solid} />
         </div>
       </div>
@@ -249,7 +343,8 @@ function MobileMenu({solid}: {solid?: boolean}) {
                     className={cn(
                       "group flex min-h-[86px] items-center gap-5 border-b border-earth-700/14 px-1 text-forest-950 transition duration-500",
                       "hover:bg-forest-950/[0.03]",
-                      active && "my-2 min-h-[78px] rounded-xl border border-earth-700/18 bg-parchment-50/58 px-4 text-earth-700 shadow-[0_18px_45px_rgba(76,52,20,0.08)]"
+                      active && "my-2 min-h-[78px] rounded-xl border border-earth-700/18 bg-parchment-50/58 px-4 text-earth-700 shadow-[0_18px_45px_rgba(76,52,20,0.08)]",
+                      item.children && !active && "border-none min-h-[72px]"
                     )}
                   >
                     <span
@@ -272,6 +367,21 @@ function MobileMenu({solid}: {solid?: boolean}) {
                     />
                   </Link>
                 </SheetClose>
+                
+                {item.children && (
+                  <div className="mb-4 ml-16 mr-4 flex flex-col gap-1 border-b border-earth-700/14 pb-5">
+                    {item.children.map((child) => (
+                      <SheetClose asChild key={child.href}>
+                        <Link 
+                          href={child.href}
+                          className="rounded-lg px-4 py-2.5 text-sm font-semibold text-forest-950/60 transition hover:bg-forest-950/5 hover:text-earth-700"
+                        >
+                          {child.label[locale as "vi" | "en"]}
+                        </Link>
+                      </SheetClose>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             );
           })}

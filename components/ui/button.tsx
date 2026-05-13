@@ -4,16 +4,16 @@ import {cva, type VariantProps} from "class-variance-authority";
 import {cn} from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md px-5 text-sm font-semibold transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-2xl px-6 text-sm font-semibold transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-earth-600 text-white shadow-warm hover:-translate-y-0.5 hover:bg-earth-500",
+          "border border-earth-500/50 bg-earth-600/20 text-white shadow-warm backdrop-blur-md hover:-translate-y-0.5 hover:bg-earth-600/30",
         forest:
-          "bg-forest-800 text-white shadow-cinematic hover:-translate-y-0.5 hover:bg-forest-700",
+          "border border-forest-500/50 bg-forest-800/20 text-white shadow-cinematic backdrop-blur-md hover:-translate-y-0.5 hover:bg-forest-700/30",
         outline:
-          "border border-white/45 bg-white/8 text-white backdrop-blur-sm hover:bg-white/16",
+          "border border-white/30 bg-white/10 text-white backdrop-blur-md hover:bg-white/20",
         ghost: "text-forest-950 hover:bg-forest-800/10",
         light:
           "border border-forest-900/12 bg-parchment-50 text-forest-950 hover:bg-white"

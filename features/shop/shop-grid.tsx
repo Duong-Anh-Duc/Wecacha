@@ -24,10 +24,12 @@ const categories: CategoryMode[] = ["all", "beans", "ground", "phin", "gifts"];
 
 export function ShopGrid({
   products,
-  locale
+  locale,
+  hideCategories = false
 }: {
   products: Product[];
   locale: Locale;
+  hideCategories?: boolean;
 }) {
   const t = useTranslations("Shop");
   const [query, setQuery] = useState("");
@@ -87,20 +89,22 @@ export function ShopGrid({
         </Select>
       </div>
 
-      <div className="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-2">
-        {categories.map((item) => (
-          <button
-            key={item}
-            className={cn(
-              "h-10 shrink-0 rounded-full border border-forest-950/12 px-4 text-sm font-semibold text-forest-950/66 transition hover:border-earth-600 hover:text-forest-950",
-              category === item && "border-earth-600 bg-earth-600 text-white"
-            )}
-            onClick={() => setCategory(item)}
-          >
-            {t(item)}
-          </button>
-        ))}
-      </div>
+      {!hideCategories && (
+        <div className="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-2">
+          {categories.map((item) => (
+            <button
+              key={item}
+              className={cn(
+                "h-10 shrink-0 rounded-full border border-forest-950/12 px-4 text-sm font-semibold text-forest-950/66 transition hover:border-earth-600 hover:text-forest-950",
+                category === item && "border-earth-600 bg-earth-600 text-white"
+              )}
+              onClick={() => setCategory(item)}
+            >
+              {t(item)}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="mt-8 grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-4">
         {filteredProducts.map((product) => (

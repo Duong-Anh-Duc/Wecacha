@@ -60,10 +60,10 @@ export function CinematicHero({
           <p className="mb-5 text-xs font-bold uppercase text-ember">
             {kicker}
           </p>
-          <h1 className="text-balance font-serif text-6xl leading-[0.95] text-parchment-50 sm:text-7xl lg:text-8xl">
+          <h1 className="text-balance font-serif text-5xl leading-[1.05] text-parchment-50 sm:text-7xl lg:text-8xl">
             {title}
           </h1>
-          <p className="mt-7 max-w-2xl text-lg leading-8 text-white/72">
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg sm:leading-8">
             {copy}
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -74,7 +74,7 @@ export function CinematicHero({
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/story">
+              <Link href="/about">
                 <Play className="h-5 w-5" aria-hidden="true" />
                 {secondary}
               </Link>

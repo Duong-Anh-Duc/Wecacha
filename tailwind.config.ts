@@ -64,12 +64,28 @@ const config: Config = {
           "40%": {transform: "translate(1%, -1%)"},
           "60%": {transform: "translate(-1%, -0.5%)"},
           "80%": {transform: "translate(1%, 0.5%)"}
+        },
+        "soft-sweep": {
+          "0%": {transform: "translateX(-140%) skewX(-12deg)", opacity: "0"},
+          "14%": {opacity: "0"},
+          "34%": {opacity: "1"},
+          "62%": {opacity: "0.42"},
+          "100%": {transform: "translateX(520%) skewX(-12deg)", opacity: "0"}
+        },
+        "small-sweep": {
+          "0%": {transform: "translateX(-130%)", opacity: "0"},
+          "22%": {opacity: "0"},
+          "42%": {opacity: "0.52"},
+          "70%": {opacity: "0"},
+          "100%": {transform: "translateX(130%)", opacity: "0"}
         }
       },
       animation: {
         drift: "drift 18s ease-out infinite alternate",
         "drift-image": "drift-image 24s ease-in-out infinite alternate",
-        grain: "grain 6s steps(6) infinite"
+        grain: "grain 6s steps(6) infinite",
+        "soft-sweep": "soft-sweep 6.8s ease-in-out infinite",
+        "small-sweep": "small-sweep 5.6s ease-in-out infinite"
       }
     }
   },

@@ -6,9 +6,10 @@
   },
   "Nav": {
     "home": "Home",
-    "story": "Story",
+    "about": "About Us",
     "shop": "Shop",
     "explore": "Explore",
+    "news": "News",
     "contact": "Contact",
     "cart": "Cart",
     "checkout": "Checkout",

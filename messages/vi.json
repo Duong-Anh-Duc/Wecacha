@@ -6,9 +6,10 @@
   },
   "Nav": {
     "home": "Trang chủ",
-    "story": "Câu chuyện",
+    "about": "Giới thiệu",
     "shop": "Cửa hàng",
     "explore": "Khám phá",
+    "news": "Tin tức",
     "contact": "Liên hệ",
     "cart": "Giỏ hàng",
     "checkout": "Thanh toán",
