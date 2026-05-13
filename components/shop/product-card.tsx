@@ -72,20 +72,18 @@ export function ProductCard({
 }) {
   return (
     <motion.article
-      initial={{opacity: 0, y: 28}}
+      initial={{opacity: 0, y: 30}}
       whileInView={{opacity: 1, y: 0}}
-      viewport={{once: true, margin: "-80px"}}
-      whileHover={{y: -12}}
-      transition={{duration: 0.62, ease: [0.16, 1, 0.3, 1]}}
-      className="group relative flex min-h-[490px] overflow-hidden rounded-[26px] border border-ember/18 bg-[#0a1808] text-parchment-50 shadow-[0_26px_80px_rgba(0,0,0,0.28)] transition duration-500 hover:border-ember/45 hover:shadow-[0_34px_110px_rgba(243,167,52,0.18)]"
+      viewport={{once: true, margin: "-40px"}}
+      transition={{duration: 0.6, ease: [0.22, 1, 0.36, 1]}}
+      className="group relative flex h-full flex-col overflow-hidden rounded-[2rem] bg-[#0a180a] shadow-[0_12px_44px_rgba(4,14,4,0.38)] transition-all duration-700 ease-out hover:-translate-y-2 hover:shadow-[0_24px_88px_rgba(251,191,36,0.22)] border border-[#142918]/60"
     >
-      <div className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
+      <div className="absolute inset-0 z-0 h-full w-full opacity-60 mix-blend-screen transition duration-1000 ease-in-out group-hover:scale-105 group-hover:opacity-100">
         <div className="absolute -inset-px rounded-[26px] bg-[radial-gradient(circle_at_50%_0%,rgba(243,167,52,0.22),transparent_42%),radial-gradient(circle_at_18%_80%,rgba(65,122,0,0.22),transparent_42%)]" />
       </div>
 
-      <Link
-        href={`/shop/${product.slug}`}
-        className="absolute inset-0 block overflow-hidden"
+      <div
+        className="absolute inset-0 z-10 block overflow-hidden"
         aria-label={localized(product.name, locale)}
       >
         <Image
@@ -97,7 +95,7 @@ export function ProductCard({
           className="object-cover object-center contrast-110 saturate-115 transition duration-[1600ms] ease-out group-hover:scale-[1.035]"
           sizes="(min-width: 1536px) 34vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         />
-      </Link>
+      </div>
 
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(4,18,4,0)_0%,rgba(4,18,4,0.04)_34%,rgba(7,12,5,0.68)_62%,rgba(7,10,4,0.96)_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[52%] bg-[radial-gradient(circle_at_50%_12%,rgba(181,101,0,0.16),transparent_44%)]" />
@@ -136,12 +134,9 @@ export function ProductCard({
 
           <div className="flex min-h-[76px] items-start justify-between gap-4 sm:min-h-[80px]">
             <h3 className="line-clamp-2 font-serif text-3xl leading-tight text-parchment-50 sm:text-[2rem]">
-              <Link
-                href={`/shop/${product.slug}`}
-                className="transition-colors hover:text-ember"
-              >
+              <span className="transition-colors group-hover:text-ember">
                 {localized(product.name, locale)}
-              </Link>
+              </span>
             </h3>
             <div className="flex shrink-0 flex-col items-end gap-1.5">
               {product.originalPrice && product.originalPrice > product.price ? (
@@ -165,12 +160,12 @@ export function ProductCard({
           <div
             className={
               product.category === "gifts"
-                ? "mt-6 flex min-h-[76px] flex-wrap items-center gap-3 rounded-xl border border-earth-500/48 bg-earth-900/34 p-3 sm:min-h-[84px]"
-                : "mt-6 flex min-h-[76px] flex-wrap items-center gap-3 rounded-xl border border-forest-600/42 bg-forest-950/48 p-3 sm:min-h-[84px]"
+                ? "mt-6 flex min-h-[76px] flex-wrap items-center gap-3 rounded-xl border border-earth-500/50 bg-earth-900/30 p-3 sm:min-h-[84px]"
+                : "mt-6 flex min-h-[76px] flex-wrap items-center gap-3 rounded-xl border border-forest-600/40 bg-forest-950/50 p-3 sm:min-h-[84px]"
             }
           >
             {productHighlights(product, locale).map(({icon: Icon, label}) => (
-              <div key={label} className="flex items-center gap-2 text-[11px] font-bold text-parchment-50/86">
+              <div key={label} className="flex items-center gap-2 text-[11px] font-bold text-parchment-50/90">
                 <Icon className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
                 <span>{label}</span>
               </div>
@@ -179,7 +174,7 @@ export function ProductCard({
         </div>
 
         <div className="mt-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 relative z-30">
             <AddToCartButton
               product={product}
               locale={locale}
@@ -193,17 +188,19 @@ export function ProductCard({
             />
           </div>
 
-          <Link
-            href={`/shop/${product.slug}`}
-            className="mt-3 flex h-11 items-center justify-between rounded-xl px-2 text-sm font-bold text-ember animate-pulse drop-shadow-[0_0_6px_rgba(243,167,52,0.4)] transition duration-300 hover:bg-parchment-50/8 hover:text-amber-400 group/explore"
+          <div
+            className="mt-3 flex h-11 items-center justify-between rounded-xl px-2 text-sm font-bold text-ember animate-pulse drop-shadow-[0_0_6px_rgba(243,167,52,0.4)] transition duration-300 group-hover:bg-parchment-50/8 group-hover:text-amber-400 group/explore"
           >
             <span className="inline-flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-ember transition duration-300 group-hover/explore:scale-125" aria-hidden="true" />
+              <Sparkles className="h-4 w-4 text-ember transition duration-300 group-hover/explore:scale-125 group-hover:text-amber-400" aria-hidden="true" />
               {locale === "vi" ? "Khám phá ngay" : "Explore"} {localized(product.name, locale)}
             </span>
             <ArrowRight className="h-4 w-4 transition duration-300 group-hover/explore:translate-x-2" aria-hidden="true" />
-          </Link>
+          </div>
         </div>
+        
+        {/* Stretched link to make the entire card clickable */}
+        <Link href={`/shop/${product.slug}`} className="absolute inset-0 z-20" aria-label={localized(product.name, locale)} />
       </div>
     </motion.article>
   );
