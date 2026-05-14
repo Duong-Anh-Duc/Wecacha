@@ -29,10 +29,18 @@ import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {formatCurrency} from "@/lib/content";
 
+const categoryMap: Record<string, Record<string, string>> = {
+  beans: { vi: "Cà phê hạt rang", en: "Roasted Beans" },
+  ground: { vi: "Cà phê bột", en: "Ground Coffee" },
+  phin: { vi: "Dụng cụ pha chế", en: "Brewing Tools" },
+  gifts: { vi: "Bộ quà tặng", en: "Gift Sets" }
+};
+
 export function CartDrawer({solid}: {solid?: boolean}) {
   const locale = useLocale() as Locale;
   const tCommon = useTranslations("Common");
   const tNav = useTranslations("Nav");
+  const tCart = useTranslations("Cart");
   const items = useCartStore((state) => state.items);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
@@ -60,14 +68,14 @@ export function CartDrawer({solid}: {solid?: boolean}) {
         </button>
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-md bg-[#fdfcf8] border-none p-0 flex flex-col shadow-2xl">
-        <SheetTitle className="sr-only">Giỏ hàng</SheetTitle>
+        <SheetTitle className="sr-only">{tNav("cart")}</SheetTitle>
         <div className="px-6 pt-8 pb-4 bg-gradient-to-b from-[#fdfcf8] to-transparent z-10">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="font-serif text-[2.5rem] leading-none text-[#142918] mb-2 tracking-tight">Giỏ hàng</h2>
+              <h2 className="font-serif text-[2.5rem] leading-none text-[#142918] mb-2 tracking-tight">{tNav("cart")}</h2>
               <p className="flex items-center text-[13px] font-medium text-[#142918]/70">
                 <Leaf className="w-3.5 h-3.5 mr-1.5 opacity-70" />
-                {count} sản phẩm trong giỏ
+                {tCart("itemCount", {count})}
               </p>
             </div>
             <SheetClose asChild>
@@ -99,24 +107,30 @@ export function CartDrawer({solid}: {solid?: boolean}) {
                 <div key={item.slug} className="bg-white rounded-[24px] p-3 mb-4 flex gap-4 shadow-[0_4px_20px_rgba(20,41,24,0.03)] border border-[#142918]/[0.06] relative">
                   <div className="relative w-[110px] h-[120px] rounded-[18px] overflow-hidden shrink-0 bg-[#f8f9f6]">
                     <Image src={item.image} alt={item.name} fill className="object-cover" sizes="110px" />
-                    <div className="absolute bottom-1.5 right-1.5 bg-white/95 backdrop-blur-md rounded-lg px-2 py-1 flex items-center gap-1.5 text-[9px] font-bold text-[#142918] shadow-sm">
-                      <Leaf className="w-3 h-3 text-[#2c5338]" />
-                      <span className="leading-[1.1]">100%<br />NGUYÊN CHẤT</span>
-                    </div>
+                    {(!item.category || item.category === "beans" || item.category === "ground") && (
+                      <div className="absolute bottom-1.5 right-1.5 bg-white/95 backdrop-blur-md rounded-lg px-2 py-1 flex items-center gap-1.5 text-[9px] font-bold text-[#142918] shadow-sm">
+                        <Leaf className="w-3 h-3 text-[#2c5338]" />
+                        <span className="leading-[1.1]">100%<br />{tCart("pureLabel")}</span>
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 flex flex-col py-1">
                     <div className="flex justify-between items-start mb-1.5">
-                      <span className="bg-[#f0e6d6] text-[#6b4c2a] text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md">Cà phê hạt rang</span>
+                      <span className="bg-[#f0e6d6] text-[#6b4c2a] text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md">
+                        {item.category ? (categoryMap[item.category]?.[locale] || item.category) : tCommon("product")}
+                      </span>
                       <button onClick={() => removeItem(item.slug)} className="w-8 h-8 flex items-center justify-center rounded-full border border-blue-600/20 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors -mr-1 -mt-1">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                     <h3 className="font-bold text-[#142918] text-[15px] leading-tight line-clamp-1 mb-1">{item.name}</h3>
                     <p className="text-xs text-[#142918]/60 mb-2">{item.weight}</p>
-                    <p className="text-[10px] text-[#142918]/60 flex items-center gap-1.5 mb-3 line-clamp-1">
-                      <Leaf className="w-3 h-3 shrink-0 opacity-70" />
-                      Chua thanh • Hương trái cây • Hậu ngọt
-                    </p>
+                    {item.notes && item.notes.length > 0 && (
+                      <p className="text-[10px] text-[#142918]/60 flex items-center gap-1.5 mb-3 line-clamp-1">
+                        <Leaf className="w-3 h-3 shrink-0 opacity-70" />
+                        {item.notes.join(" • ")}
+                      </p>
+                    )}
                     <div className="mt-auto flex justify-between items-center">
                       <div className="flex items-center rounded-xl border border-[#142918]/15 h-[34px]">
                         <button onClick={() => updateQuantity(item.slug, item.quantity - 1)} className="w-[34px] h-full flex items-center justify-center text-[#142918]/70 hover:text-[#142918]">
@@ -137,22 +151,22 @@ export function CartDrawer({solid}: {solid?: boolean}) {
                 <div className="flex items-center gap-2.5 flex-1 justify-center border-r border-[#142918]/10 pr-2">
                   <ShieldCheck className="w-5 h-5 text-[#142918] shrink-0" />
                   <div className="text-[10px] leading-tight">
-                    <p className="text-[#142918]">Sản phẩm</p>
-                    <p className="font-bold text-[#2c5338]">chính hãng</p>
+                    <p className="text-[#142918]">{tCart("authenticTitle")}</p>
+                    <p className="font-bold text-[#2c5338]">{tCart("authenticSub")}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5 flex-1 justify-center border-r border-[#142918]/10 px-2">
                   <Truck className="w-5 h-5 text-[#142918] shrink-0" />
                   <div className="text-[10px] leading-tight">
-                    <p className="text-[#142918]">Giao hàng</p>
-                    <p className="font-bold text-[#2c5338]">nhanh chóng</p>
+                    <p className="text-[#142918]">{tCart("deliveryTitle")}</p>
+                    <p className="font-bold text-[#2c5338]">{tCart("deliverySub")}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5 flex-1 justify-center pl-2">
                   <RefreshCw className="w-5 h-5 text-[#142918] shrink-0" />
                   <div className="text-[10px] leading-tight">
-                    <p className="text-[#142918]">Đổi trả</p>
-                    <p className="font-bold text-[#2c5338]">dễ dàng</p>
+                    <p className="text-[#142918]">{tCart("returnTitle")}</p>
+                    <p className="font-bold text-[#2c5338]">{tCart("returnSub")}</p>
                   </div>
                 </div>
               </div>
@@ -165,7 +179,7 @@ export function CartDrawer({solid}: {solid?: boolean}) {
             <div className="flex justify-between items-center mb-5">
               <div className="flex items-center text-[#142918]/80 text-[15px] font-medium">
                 <Tag className="w-4 h-4 mr-2.5" />
-                Tạm tính
+                {tCommon("subtotal")}
               </div>
               <div className="text-[22px] font-bold text-[#142918]">{formatCurrency(totals.subtotal, locale)}</div>
             </div>
@@ -174,7 +188,7 @@ export function CartDrawer({solid}: {solid?: boolean}) {
               <div className="flex gap-2.5 text-[11px] mb-3 items-center">
                 <Truck className="w-4 h-4 text-[#2c5338] shrink-0" />
                 <p className="text-[#142918]/80">
-                  <strong className="text-[#142918]">Miễn phí giao hàng</strong> cho đơn từ {formatCurrency(freeShippingThreshold, locale)}
+                  <strong className="text-[#142918]">{tCart("freeShipping")}</strong> {tCart("freeShippingFrom", {amount: formatCurrency(freeShippingThreshold, locale)})}
                 </p>
               </div>
               <div className="h-1.5 w-full bg-[#e2eadc] rounded-full overflow-hidden mb-2.5">
@@ -184,7 +198,7 @@ export function CartDrawer({solid}: {solid?: boolean}) {
                 />
               </div>
               <div className="flex justify-between text-[10px] text-[#142918]/70 font-medium">
-                <p>Còn <strong className="text-[#142918]">{formatCurrency(remainingForFreeShipping, locale)}</strong> để được miễn phí</p>
+                <p>{tCart("remainingForFree", {amount: formatCurrency(remainingForFreeShipping, locale)})}</p>
                 <p>{formatCurrency(freeShippingThreshold, locale)}</p>
               </div>
             </div>
@@ -194,7 +208,7 @@ export function CartDrawer({solid}: {solid?: boolean}) {
                 <Link href="/checkout">
                   <div className="flex items-center gap-2.5">
                     <ShoppingBag className="w-[18px] h-[18px] opacity-90"/> 
-                    <span>Thanh toán ngay</span>
+                    <span>{tCart("checkoutNow")}</span>
                   </div>
                   <div className="flex items-center gap-1.5 font-bold">
                     {formatCurrency(totals.subtotal, locale)} 
@@ -206,7 +220,7 @@ export function CartDrawer({solid}: {solid?: boolean}) {
             
             <div className="flex items-center justify-center gap-2 mt-5 text-[#142918]/50 text-[11px] font-medium">
               <Lock className="w-3.5 h-3.5" />
-              Thanh toán an toàn, bảo mật
+              {tCart("securePayment")}
             </div>
           </div>
         )}

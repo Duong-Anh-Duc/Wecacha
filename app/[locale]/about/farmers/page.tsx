@@ -1,17 +1,24 @@
 import Image from "next/image";
+import {getTranslations} from "next-intl/server";
 import {Reveal} from "@/components/motion/reveal";
 import {imageLibrary} from "@/lib/content";
 import type {Locale} from "@/i18n/routing";
 
-export function generateMetadata({params: {locale}}: {params: {locale: Locale}}) {
+type Props = {
+  params: Promise<{locale: Locale}>;
+};
+
+export async function generateMetadata({params}: Props) {
+  const {locale} = await params;
   return {
     title: locale === "vi" ? "Người nông dân · Wecacha" : "Our Farmers · Wecacha",
     description: locale === "vi" ? "Gặp gỡ những người giữ mùa trên vùng núi Sơn La." : "Meet the season keepers in the mountains of Son La."
   };
 }
 
-export default function FarmersPage({params: {locale}}: {params: {locale: Locale}}) {
-  const isVi = locale === "vi";
+export default async function FarmersPage({params}: Props) {
+  const {locale} = await params;
+  const t = await getTranslations({locale, namespace: "About"});
 
   return (
     <main className="bg-parchment-50 text-forest-950">
@@ -29,10 +36,10 @@ export default function FarmersPage({params: {locale}}: {params: {locale: Locale
         <div className="relative z-10 mx-auto max-w-4xl px-4 text-center mt-20 text-white">
           <Reveal>
             <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-ember">
-              {isVi ? "Những người giữ mùa" : "The Season Keepers"}
+              {t("farmersKicker")}
             </p>
             <h1 className="font-serif text-5xl sm:text-7xl">
-              {isVi ? "Trái Tim Của Sơn La" : "The Heart of Son La"}
+              {t("farmersTitle")}
             </h1>
           </Reveal>
         </div>
@@ -54,23 +61,13 @@ export default function FarmersPage({params: {locale}}: {params: {locale: Locale
             <div className="flex flex-col justify-center">
               <Reveal delay={0.2}>
                 <h2 className="font-serif text-3xl sm:text-5xl mb-6">
-                  {isVi ? "Những đôi bàn tay thầm lặng" : "The silent hands"}
+                  {t("farmersHandsTitle")}
                 </h2>
                 <div className="space-y-6 text-lg text-forest-950/70">
-                  <p>
-                    {isVi
-                      ? "Đằng sau mỗi tách cà phê Wecacha là công sức của hàng trăm hộ nông dân đồng bào thiểu số tại Sơn La. Họ không chỉ là những người trồng trọt, họ là những người nghệ nhân của núi rừng."
-                      : "Behind every cup of Wecacha coffee is the hard work of hundreds of ethnic minority farming households in Son La. They are not just growers; they are artisans of the forest."}
-                  </p>
-                  <p>
-                    {isVi
-                      ? "Việc hái chọn lọc bằng tay 100% trái chín đòi hỏi sự kiên nhẫn phi thường. Phải đi qua những sườn đồi dốc đứng trong sương lạnh, tỉ mỉ chọn từng quả anh đào đỏ mọng để đảm bảo lượng đường tự nhiên cao nhất."
-                      : "100% hand-picking of ripe cherries requires extraordinary patience. Walking through steep hills in the cold mist, meticulously selecting each ripe red cherry ensures the highest natural sugar content."}
-                  </p>
+                  <p>{t("farmersPara1")}</p>
+                  <p>{t("farmersPara2")}</p>
                   <div className="mt-8 border-l-2 border-ember pl-6 italic">
-                    {isVi 
-                      ? "\"Cây cà phê không biết nói, nhưng nó trả ơn người chăm sóc bằng thứ quả mọng ngọt ngào nhất.\""
-                      : "\"The coffee tree doesn't speak, but it rewards the caretaker with the sweetest berries.\""}
+                    {t("farmersQuote")}
                   </div>
                 </div>
               </Reveal>

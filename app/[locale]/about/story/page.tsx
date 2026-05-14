@@ -39,6 +39,7 @@ export default async function StoryPage({params}: Props) {
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Story"});
   const common = await getTranslations({locale, namespace: "Common"});
+  const tAbout = await getTranslations({locale, namespace: "About"});
 
   return (
     <main className="bg-parchment-50">
@@ -143,9 +144,9 @@ export default async function StoryPage({params}: Props) {
       </section>
 
       <GsapStoryConclusion
-        title={locale === "vi" ? "Uống cạn một mùa sương" : "Drink a season of mist"}
-        copy={locale === "vi" ? "Từ nương cao Mộc Châu đến xưởng rang Mường La, câu chuyện của Sơn La giờ đây nằm trọn trong chiếc cốc của bạn." : "From Moc Chau high farms to Muong La roastery, the story of Son La now rests in your cup."}
-        kicker={locale === "vi" ? "Trải nghiệm" : "Experience"}
+        title={tAbout("storyConclTitle")}
+        copy={tAbout("storyConclCopy")}
+        kicker={tAbout("storyConclKicker")}
         locale={locale}
       />
     </main>

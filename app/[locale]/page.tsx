@@ -124,30 +124,21 @@ export default async function HomePage({params}: Props) {
                   value: 1050,
                   suffix: "m+",
                   label: t("statAltLabel"),
-                  caption:
-                    locale === "vi"
-                      ? "Nương cà phê trên triền núi mờ sương"
-                      : "Coffee farms on misty mountain slopes"
+                  caption: t("statAltCaption")
                 },
                 {
                   icon: "users",
                   value: 120,
                   suffix: "+",
-                  label: locale === "vi" ? "Nông hộ" : "Farmers",
-                  caption:
-                    locale === "vi"
-                      ? "Cùng giữ mùa cà phê Sơn La"
-                      : "Families keeping Son La harvests"
+                  label: t("statFarmersLabel"),
+                  caption: t("statFarmersCaption")
                 },
                 {
                   icon: "flame",
                   value: 48,
                   suffix: "h+",
-                  label: locale === "vi" ? "Rang chậm" : "Slow roast",
-                  caption:
-                    locale === "vi"
-                      ? "Theo dõi từng mẻ nhỏ"
-                      : "Small batches watched closely"
+                  label: t("statRoastValue"),
+                  caption: t("statRoastCaption")
                 }
               ]}
             />
@@ -228,23 +219,23 @@ export default async function HomePage({params}: Props) {
             {[
               {
                 icon: Leaf,
-                title: locale === "vi" ? "Nguyên chất 100%" : "100% Pure",
-                copy: locale === "vi" ? "Không pha trộn, không chất bảo quản" : "No blends, no preservatives"
+                title: t("promise1Title"),
+                copy: t("promise1Copy")
               },
               {
                 icon: Flame,
-                title: locale === "vi" ? "Rang mộc thủ công" : "Craft roasted",
-                copy: locale === "vi" ? "Giữ trọn hương vị tự nhiên" : "Natural flavor kept intact"
+                title: t("promise2Title"),
+                copy: t("promise2Copy")
               },
               {
                 icon: Truck,
-                title: locale === "vi" ? "Giao hàng toàn quốc" : "Nationwide delivery",
-                copy: locale === "vi" ? "Nhanh chóng, đóng gói cẩn thận" : "Fast and carefully packed"
+                title: t("promise3Title"),
+                copy: t("promise3Copy")
               },
               {
                 icon: ShieldCheck,
-                title: locale === "vi" ? "Cam kết chất lượng" : "Quality promise",
-                copy: locale === "vi" ? "Hoàn tiền nếu không hài lòng" : "Refund if you are not satisfied"
+                title: t("promise4Title"),
+                copy: t("promise4Copy")
               }
             ].map(({icon: Icon, title, copy}, index) => (
               <div key={title} className="group/promise relative flex items-center gap-4 rounded-xl p-3 transition duration-300 hover:bg-white/6">

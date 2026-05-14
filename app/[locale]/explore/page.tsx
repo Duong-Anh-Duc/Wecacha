@@ -33,49 +33,50 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
 export default async function ExplorePage({params}: Props) {
   const {locale} = await params;
   setRequestLocale(locale);
-  const isVi = locale === "vi";
+  const t = await getTranslations({locale, namespace: "Explore"});
+  const tNav = await getTranslations({locale, namespace: "Nav"});
 
   const listArticles = [
     {
       href: "/explore/farm",
-      title: isVi ? "Vùng trồng nguyên liệu" : "Our Farms",
-      desc: isVi ? "Từ độ cao 1.050m trên mực nước biển, nơi những cây cà phê hấp thụ trọn vẹn tinh túy của đất trời." : "From 1,050m above sea level, where coffee trees absorb the true essence of terroir.",
+      title: t("farmTitle"),
+      desc: t("farmDesc"),
       image: imageLibrary.beansBowl,
-      date: isVi ? "KHÁM PHÁ" : "EXPLORE"
+      date: t("exploreLabel")
     },
     {
       href: "/explore/processing",
-      title: isVi ? "Phương pháp sơ chế" : "Processing Methods",
-      desc: isVi ? "Khắt khe trong từng công đoạn: từ hái chín 100% bằng tay đến lên men tự nhiên." : "Strict at every stage: from 100% hand-picked ripe cherries to natural fermentation.",
+      title: t("processingTitle"),
+      desc: t("processingDesc"),
       image: imageLibrary.roasted,
-      date: isVi ? "KHÁM PHÁ" : "EXPLORE"
+      date: t("exploreLabel")
     },
     {
       href: "/explore/culture",
-      title: isVi ? "Văn hóa bản địa" : "Local Culture",
-      desc: isVi ? "Cà phê không chỉ là thức uống, mà là nhịp thở và câu chuyện của cộng đồng vùng cao." : "Coffee is not just a drink, but the breath and story of highland communities.",
+      title: t("cultureArticleTitle"),
+      desc: t("cultureArticleDesc"),
       image: imageLibrary.village,
-      date: isVi ? "KHÁM PHÁ" : "EXPLORE"
+      date: t("exploreLabel")
     }
   ];
 
   const bottomArticles = [
     {
       href: "/news/coffee-culture",
-      title: isVi ? "Văn hóa cà phê" : "Coffee Culture",
-      desc: isVi ? "Khám phá chiều sâu của hạt cà phê qua lăng kính lịch sử và nhịp sống hiện đại." : "Explore the depth of coffee beans through history and modern lifestyle.",
+      title: t("coffeeCultureTitle"),
+      desc: t("coffeeCultureDesc"),
       icon: Coffee
     },
     {
       href: "/news/events",
-      title: isVi ? "Sự kiện & Hoạt động" : "Events & Activities",
-      desc: isVi ? "Đồng hành cùng Wecacha trong các sự kiện ra mắt, workshop và hành trình về bản." : "Join Wecacha in launch events, workshops, and farm journeys.",
+      title: t("eventsTitle"),
+      desc: t("eventsDesc"),
       icon: Calendar
     },
     {
       href: "/news/recipes",
-      title: isVi ? "Công thức pha chế" : "Recipes",
-      desc: isVi ? "Bí quyết để tự tay pha một tách cà phê thơm ngon, chuẩn vị chuyên gia ngay tại nhà." : "Secrets to brewing a delicious, expert-level cup of coffee right at home.",
+      title: t("recipesTitle"),
+      desc: t("recipesDesc"),
       icon: Coffee
     }
   ];
@@ -130,9 +131,9 @@ export default async function ExplorePage({params}: Props) {
         
         {/* Breadcrumbs */}
         <div className="pl-2 lg:pl-0">
-          <Breadcrumbs 
-            homeLabel={isVi ? "Trang chủ" : "Home"} 
-            items={[{ label: isVi ? "Khám phá" : "Explore" }]} 
+          <Breadcrumbs
+            homeLabel={tNav("home")}
+            items={[{ label: tNav("explore") }]}
           />
         </div>
 
@@ -158,25 +159,25 @@ export default async function ExplorePage({params}: Props) {
                 <div className="absolute inset-0 flex flex-col justify-center p-6 sm:p-12 md:p-16">
                   <div className="mb-7">
                     <span className="inline-block bg-[#b5703a] px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
-                      {isVi ? "Câu chuyện" : "Story"}
+                      {t("storyLabel")}
                     </span>
                   </div>
                   <h2 className="mb-5 max-w-[12em] font-serif text-[2.55rem] leading-[1.02] tracking-tight text-white drop-shadow-md sm:text-6xl lg:text-[5.15rem]">
-                    {isVi ? "Về Wecacha:" : "About Wecacha:"} <br />
-                    {isVi ? "Hành trình từ nương mây" : "The journey from cloudy farms"} <br />
-                    {isVi ? "đến tách cà phê" : "to your cup"}
+                    {t("heroAbout")} <br />
+                    {t("heroTitle1")} <br />
+                    {t("heroTitle2")}
                   </h2>
                   <p className="mb-10 max-w-[31rem] text-[15px] font-medium leading-[1.75] text-[#f4f2ea] sm:text-[17px]">
-                    {isVi ? "Khám phá nguồn gốc, triết lý rang và những con người đứng sau từng hạt cà phê Sơn La đặc sản." : "Explore the origin, roasting philosophy, and the people behind each specialty Son La coffee bean."} <br />
-                    {isVi ? "Câu chuyện về sự kiên định và đam mê." : "A story of persistence and passion."}
+                    {t("heroCopy1")} <br />
+                    {t("heroCopy2")}
                   </p>
-                  
+
                   <Link href="/about" className="flex items-center gap-3 group/btn w-fit mt-auto">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#142918] shadow-md transition-transform group-hover/btn:scale-105">
                       <Play className="h-4 w-4 ml-0.5" fill="currentColor" />
                     </div>
                     <span className="text-[13px] font-bold text-white transition-colors group-hover/btn:text-[#f4f2ea]">
-                      {isVi ? "Xem hành trình của hạt cà phê" : "Watch the coffee journey"}
+                      {t("watchJourney")}
                     </span>
                   </Link>
                 </div>
@@ -264,12 +265,12 @@ export default async function ExplorePage({params}: Props) {
                       <div className="h-10 w-10 rounded-full bg-[#203823] flex items-center justify-center text-white mb-5 shadow-md transition-transform duration-300 group-hover:scale-110">
                         <Icon className="w-4 h-4" strokeWidth={2} />
                       </div>
-                      <p className="text-[10px] font-bold text-[#b5703a] uppercase tracking-[0.15em] mb-2">{isVi ? "Tin tức" : "News"}</p>
+                      <p className="text-[10px] font-bold text-[#b5703a] uppercase tracking-[0.15em] mb-2">{locale === "vi" ? "Tin tức" : "News"}</p>
                       <h3 className="font-serif text-[1.4rem] text-[#1c2a1c] mb-3 transition-colors group-hover:text-[#b5703a]">{article.title}</h3>
                       <p className="text-[13px] text-[#1c2a1c]/70 mb-8 min-h-[50px] leading-relaxed line-clamp-3">{article.desc}</p>
-                      
+
                       <Link href={article.href} className="text-[13px] font-bold flex items-center gap-2 group/link text-[#1c2a1c] hover:text-[#b5703a] transition-colors w-fit mt-auto">
-                        {isVi ? "Đọc thêm" : "Read more"} 
+                        {t("readMore")}
                         <ArrowRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
                       </Link>
                     </div>

@@ -16,49 +16,30 @@ import {
 } from "lucide-react";
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
+import {useTranslations} from "next-intl";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import type {Product} from "@/lib/content";
 import {formatCurrency, localized} from "@/lib/content";
 
-function productHighlights(product: Product, locale: Locale) {
+function productHighlights(product: Product, t: ReturnType<typeof useTranslations<"Product">>) {
   if (product.category === "gifts") {
-    return locale === "vi"
-      ? [
-          {icon: Sparkles, label: "Thiết kế thủ công"},
-          {icon: Gift, label: "Quà tặng ý nghĩa"},
-          {icon: PackageCheck, label: "Hộp cao cấp"}
-        ]
-      : [
-          {icon: Sparkles, label: "Handcrafted design"},
-          {icon: Gift, label: "Meaningful gift"},
-          {icon: PackageCheck, label: "Premium box"}
-        ];
+    return [
+      {icon: Sparkles, label: t("handicrafted")},
+      {icon: Gift, label: t("meaningfulGift")},
+      {icon: PackageCheck, label: t("premiumBox")}
+    ];
   }
 
   return [
     {
       icon: ShieldCheck,
-      label:
-        product.category === "phin"
-          ? locale === "vi"
-            ? "100% Robusta"
-            : "100% Robusta"
-          : locale === "vi"
-            ? "100% Arabica"
-            : "100% Arabica"
+      label: product.category === "phin" ? "100% Robusta" : "100% Arabica"
     },
-    {icon: Flame, label: locale === "vi" ? "Rang mộc" : "Natural roast"},
+    {icon: Flame, label: t("naturalRoast")},
     {
       icon: product.category === "phin" ? Coffee : MapPin,
-      label:
-        product.category === "phin"
-          ? locale === "vi"
-            ? "Đậm đà"
-            : "Bold cup"
-          : locale === "vi"
-            ? "Nông trại Sơn La"
-            : "Son La farms"
+      label: product.category === "phin" ? t("boldCup") : t("sonLaFarms")
     }
   ];
 }
@@ -70,6 +51,7 @@ export function ProductCard({
   product: Product;
   locale: Locale;
 }) {
+  const tProduct = useTranslations("Product");
   return (
     <motion.article
       initial={{opacity: 0, y: 30}}
@@ -114,7 +96,7 @@ export function ProductCard({
 
         {product.category === "gifts" ? (
           <div className="mt-2 w-28 bg-forest-950/84 px-4 pb-7 pt-7 text-center text-sm font-black uppercase leading-5 text-parchment-50 shadow-[0_20px_44px_rgba(0,0,0,0.32)] [clip-path:polygon(0_0,100%_0,100%_100%,50%_82%,0_100%)]">
-            {locale === "vi" ? "Quà tặng cao cấp" : "Premium gift"}
+            {tProduct("premiumGift")}
           </div>
         ) : null}
 
@@ -164,7 +146,7 @@ export function ProductCard({
                 : "mt-6 flex min-h-[76px] flex-wrap items-center gap-3 rounded-xl border border-forest-600/40 bg-forest-950/50 p-3 sm:min-h-[84px]"
             }
           >
-            {productHighlights(product, locale).map(({icon: Icon, label}) => (
+            {productHighlights(product, tProduct).map(({icon: Icon, label}) => (
               <div key={label} className="flex items-center gap-2 text-[11px] font-bold text-parchment-50/90">
                 <Icon className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
                 <span>{label}</span>
@@ -193,7 +175,7 @@ export function ProductCard({
           >
             <span className="inline-flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-ember transition duration-300 group-hover/explore:scale-125 group-hover:text-amber-400" aria-hidden="true" />
-              {locale === "vi" ? "Khám phá ngay" : "Explore"} {localized(product.name, locale)}
+              {tProduct("exploreNow")} {localized(product.name, locale)}
             </span>
             <ArrowRight className="h-4 w-4 transition duration-300 group-hover/explore:translate-x-2" aria-hidden="true" />
           </div>
