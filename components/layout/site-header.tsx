@@ -224,6 +224,7 @@ function LocaleSwitcher({
     <Link
       href={pathname}
       locale={nextLocale}
+      viewTransition
       className={cn(
         "hidden h-10 items-center justify-center gap-2 rounded-full border border-white/28 bg-white/8 px-4 text-[13px] font-semibold text-white backdrop-blur transition hover:bg-white/16 sm:inline-flex"
       )}
