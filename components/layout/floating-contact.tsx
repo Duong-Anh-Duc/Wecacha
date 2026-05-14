@@ -4,6 +4,7 @@ import {useState, useEffect} from "react";
 import {motion, AnimatePresence} from "framer-motion";
 import {MessageCircle, X} from "lucide-react";
 import {useTranslations} from "next-intl";
+import Image from "next/image";
 
 const contacts = [
   {
@@ -11,9 +12,7 @@ const contacts = [
     href: "https://zalo.me/0962083608",
     bg: "#0068FF",
     icon: (
-      <svg viewBox="0 0 48 48" fill="none" className="h-5 w-5">
-        <text x="50%" y="56%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="22" fontWeight="bold" fontFamily="Arial">Z</text>
-      </svg>
+      <Image src="/logo-zalo-vector-thumbnail.jpg" alt="Zalo" width={20} height={20} className="h-5 w-5 rounded-sm object-contain" />
     )
   },
   {
