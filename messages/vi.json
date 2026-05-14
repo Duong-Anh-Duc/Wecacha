@@ -18,7 +18,10 @@
     "searchProducts": "Tìm kiếm sản phẩm",
     "haveQuestions": "Bạn có thắc mắc?",
     "contactUsBubble": "Liên hệ chúng tôi",
-    "needAdvice": "Cần tư vấn ngay?"
+    "needAdvice": "Cần tư vấn ngay?",
+    "support": "Hỗ trợ",
+    "faq": "Câu hỏi thường gặp",
+    "returnPolicy": "Chính sách đổi trả"
   },
   "Common": {
     "brand": "Sơn La Coffee",
@@ -121,7 +124,8 @@
     "chip2": "Rang chậm, hậu ngọt dịu",
     "chip3": "Quà tặng mang sắc thổ cẩm",
     "categoryEmpty": "Đang cập nhật sản phẩm cho danh mục này.",
-    "clearFilters": "Xóa bộ lọc"
+    "clearFilters": "Xóa bộ lọc",
+    "filter": "Bộ lọc"
   },
   "Product": {
     "origin": "Nguồn gốc",
@@ -348,5 +352,27 @@
     "contactHeading": "Liên hệ",
     "tagline": "Rang thủ công tại núi rừng Việt Nam",
     "copyright": "© 2026 Sơn La Coffee. Dành cho buổi sáng trên núi."
+  },
+  "Faq": {
+    "title": "Câu hỏi thường gặp",
+    "subtitle": "Giải đáp những thắc mắc phổ biến về sản phẩm và dịch vụ của Sơn La Coffee.",
+    "q1": "Cà phê Sơn La có gì đặc biệt?",
+    "a1": "Cà phê Sơn La được trồng ở độ cao 1.500m so với mực nước biển, nơi có sương mù bao phủ quanh năm. Điều kiện thổ nhưỡng và khí hậu đặc biệt này giúp hạt cà phê (đặc biệt là Arabica) phát triển chậm, tích tụ hương vị phong phú với nốt hương hoa quả, mận chín và mật ong.",
+    "q2": "Cà phê được rang như thế nào?",
+    "a2": "Chúng tôi áp dụng phương pháp rang mộc thủ công, không tẩm ướp bất kỳ hương liệu hay bơ nào để giữ trọn vẹn hương vị nguyên bản của hạt cà phê Tây Bắc.",
+    "q3": "Bao lâu thì tôi nhận được hàng?",
+    "a3": "Thời gian giao hàng tiêu chuẩn là 2-3 ngày đối với khu vực nội thành Hà Nội & TP.HCM, và 4-5 ngày đối với các tỉnh thành khác. Cà phê luôn được rang mới ngay sau khi nhận đơn để đảm bảo độ tươi.",
+    "q4": "Tôi có thể yêu cầu xay sẵn không?",
+    "a4": "Có. Khi đặt hàng, bạn có thể chọn kích cỡ hạt hoặc yêu cầu xay sẵn phù hợp với dụng cụ pha chế của bạn (Pha phin, Espresso, Pour Over, Cold Brew...)."
+  },
+  "ReturnPolicy": {
+    "title": "Chính sách đổi trả",
+    "subtitle": "Cam kết mang đến trải nghiệm cà phê hoàn hảo nhất cho bạn.",
+    "conditionTitle": "1. Điều kiện đổi trả",
+    "conditionDesc": "Chúng tôi hỗ trợ đổi trả trong vòng 7 ngày kể từ ngày nhận hàng nếu: Sản phẩm bị rách bao bì, mất seal; Cà phê bị mốc, hỏng do lỗi bảo quản từ phía chúng tôi; Giao sai sản phẩm (sai loại hạt, sai mức độ rang/xay).",
+    "processTitle": "2. Quy trình đổi trả",
+    "processDesc": "Vui lòng liên hệ với chúng tôi qua Zalo hoặc Hotline, cung cấp video/hình ảnh mở hộp và tình trạng sản phẩm. Chúng tôi sẽ nhanh chóng gửi lại sản phẩm thay thế hoàn toàn miễn phí.",
+    "noteTitle": "3. Lưu ý quan trọng",
+    "noteDesc": "Chúng tôi không áp dụng đổi trả đối với các trường hợp khách hàng thay đổi ý định mua hoặc không hợp khẩu vị cá nhân do tính chất đặc thù của cà phê rang mộc."
   }
 }

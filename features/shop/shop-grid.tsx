@@ -137,7 +137,7 @@ export function ShopGrid({
             <SelectTrigger className="w-full sm:w-[160px] h-12 rounded-xl bg-[#8c5324] text-white border-none focus:ring-0 focus:ring-offset-0 px-4 flex justify-between items-center hover:bg-[#7a481f] transition-colors" aria-label={t("sort")}>
               <div className="flex items-center gap-2 font-medium">
                 <SlidersHorizontal className="h-4 w-4" />
-                <span>Bộ lọc</span>
+                <span>{t("filter")}</span>
               </div>
             </SelectTrigger>
             <SelectContent>

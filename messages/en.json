@@ -18,7 +18,10 @@
     "searchProducts": "Search products",
     "haveQuestions": "Have questions?",
     "contactUsBubble": "Contact us",
-    "needAdvice": "Need advice?"
+    "needAdvice": "Need advice?",
+    "support": "Support",
+    "faq": "FAQ",
+    "returnPolicy": "Return Policy"
   },
   "Common": {
     "brand": "Son La Coffee",
@@ -121,7 +124,8 @@
     "chip2": "Slow roasted, soft sweet finish",
     "chip3": "Gift sets with brocade color",
     "categoryEmpty": "Updating products for this category.",
-    "clearFilters": "Clear filters"
+    "clearFilters": "Clear filters",
+    "filter": "Filter"
   },
   "Product": {
     "origin": "Origin",
@@ -348,5 +352,27 @@
     "contactHeading": "Contact",
     "tagline": "Mountain roasted in Vietnam",
     "copyright": "© 2026 Sơn La Coffee. Crafted for mountain mornings."
+  },
+  "Faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Answers to common questions about Son La Coffee products and services.",
+    "q1": "What makes Son La coffee special?",
+    "a1": "Son La coffee is grown at an altitude of 1,500m above sea level, surrounded by fog year-round. This unique microclimate allows the coffee cherries (especially Arabica) to mature slowly, developing rich flavor notes of ripe plum, floral, and wild honey.",
+    "q2": "How is the coffee roasted?",
+    "a2": "We use traditional, artisanal unflavored roasting methods. No butter or artificial flavorings are added, preserving the authentic taste of the Northwest highlands.",
+    "q3": "How long does shipping take?",
+    "a3": "Standard shipping takes 2-3 days for Hanoi & HCMC, and 4-5 days for other provinces. Coffee is freshly roasted immediately after you place an order.",
+    "q4": "Can I request pre-ground coffee?",
+    "a4": "Yes. When ordering, you can select whole beans or specify a grind size tailored to your brewing method (Phin, Espresso, Pour Over, Cold Brew...)."
+  },
+  "ReturnPolicy": {
+    "title": "Return Policy",
+    "subtitle": "Committed to delivering the perfect coffee experience to you.",
+    "conditionTitle": "1. Return Conditions",
+    "conditionDesc": "We accept returns within 7 days of receipt if: The packaging is torn or the seal is broken; The coffee is moldy or spoiled due to our storage fault; The wrong product was delivered (wrong beans, wrong roast/grind).",
+    "processTitle": "2. Return Process",
+    "processDesc": "Please contact us via Zalo or Hotline with an unboxing video/photos and the product condition. We will promptly send a replacement completely free of charge.",
+    "noteTitle": "3. Important Notes",
+    "noteDesc": "We do not accept returns for cases where customers change their mind or do not prefer the personal taste profile, due to the specific nature of specialty unflavored roasted coffee."
   }
 }
