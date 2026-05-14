@@ -13,12 +13,16 @@ export function BuyNowButton({
   product,
   quantity = 1,
   variant = "forest",
-  className
+  className,
+  label,
+  children
 }: {
   product: Product;
   quantity?: number;
   variant?: "default" | "forest" | "outline" | "light" | "ghost";
   className?: string;
+  label?: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   const locale = useLocale() as Locale;
   const t = useTranslations("Common");
@@ -43,8 +47,12 @@ export function BuyNowButton({
         router.push("/checkout");
       }}
     >
-      <CreditCard className="h-4 w-4" aria-hidden="true" />
-      {t("buyNow")}
+      {children ? children : (
+        <>
+          <CreditCard className="h-4 w-4" aria-hidden="true" />
+          {label ?? t("buyNow")}
+        </>
+      )}
     </Button>
   );
 }

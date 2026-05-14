@@ -39,7 +39,7 @@ export function ProductGallery({
   );
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 sticky top-28 z-10">
       {/* Main Image */}
       <div className="relative aspect-[4/4.5] overflow-hidden rounded-[24px] bg-[#f8f9f6]">
         <Image

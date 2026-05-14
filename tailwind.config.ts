@@ -86,6 +86,20 @@ const config: Config = {
         "slide-out-right": {
           "0%": {transform: "translateX(0)"},
           "100%": {transform: "translateX(100%)"}
+        },
+        marquee: {
+          "0%": {transform: "translateX(0%)"},
+          "100%": {transform: "translateX(-50%)"}
+        },
+        fire: {
+          "0%, 100%": {
+            boxShadow: "0 0 10px 0px rgba(255, 69, 0, 0.4), 0 0 20px 2px rgba(255, 140, 0, 0.4) inset",
+            transform: "scale(1)"
+          },
+          "50%": {
+            boxShadow: "0 0 20px 5px rgba(255, 69, 0, 0.6), 0 0 30px 5px rgba(255, 140, 0, 0.6) inset",
+            transform: "scale(1.02)"
+          }
         }
       },
       animation: {
@@ -95,7 +109,9 @@ const config: Config = {
         "soft-sweep": "soft-sweep 6.8s ease-in-out infinite",
         "small-sweep": "small-sweep 5.6s ease-in-out infinite",
         "slide-in-right": "slide-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-        "slide-out-right": "slide-out-right 0.4s cubic-bezier(0.16, 1, 0.3, 1)"
+        "slide-out-right": "slide-out-right 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+        marquee: "marquee 25s linear infinite",
+        fire: "fire 1.5s ease-in-out infinite"
       }
     }
   },

@@ -250,13 +250,20 @@ export default async function ProductDetailPage({params}: Props) {
                 </div>
                 
                 <div className="flex-1 w-full overflow-hidden relative">
-                  <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x">
+                  {/* Fading edges for the slider */}
+                  <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10" />
+                  <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10" />
+                  
+                  <div className="flex gap-4 pb-4 animate-marquee hover:[animation-play-state:paused] w-[max-content]">
                     {[
+                      {name: "Nguyễn Minh T.", review: "Phin rất đẹp, cà phê pha ra đúng vị đậm đà, thơm mùi thảo mộc. Sẽ ủng hộ tiếp!"},
+                      {name: "Trần Hoài An", review: "Giao hàng nhanh, đóng gói cẩn thận. Cà phê ngon, hậu ngọt sâu."},
+                      {name: "Lê Văn Hùng", review: "Rất thích hương vị này, uống mỗi sáng tỉnh táo cả ngày."},
                       {name: "Nguyễn Minh T.", review: "Phin rất đẹp, cà phê pha ra đúng vị đậm đà, thơm mùi thảo mộc. Sẽ ủng hộ tiếp!"},
                       {name: "Trần Hoài An", review: "Giao hàng nhanh, đóng gói cẩn thận. Cà phê ngon, hậu ngọt sâu."},
                       {name: "Lê Văn Hùng", review: "Rất thích hương vị này, uống mỗi sáng tỉnh táo cả ngày."}
                     ].map((review, i) => (
-                      <div key={i} className="min-w-[280px] w-[280px] snap-center bg-[#fdfcf8] border border-[#142918]/[0.08] rounded-2xl p-6 flex flex-col">
+                      <div key={i} className="min-w-[280px] w-[280px] bg-[#fdfcf8] border border-[#142918]/[0.08] rounded-2xl p-6 flex flex-col shadow-[0_2px_10px_rgba(20,41,24,0.02)]">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-full bg-[#142918] shrink-0" />
                           <div>

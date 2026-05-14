@@ -16,7 +16,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
   const [quantity, setQuantity] = useState(1);
 
   return (
-    <aside className="sticky top-28 flex flex-col pt-2">
+    <aside className="flex flex-col pt-2 relative z-0">
       {/* Rating & Badge */}
       <div className="flex items-center gap-3 mb-4 text-[#142918]">
         <div className="flex items-center gap-1.5 font-bold text-sm">
@@ -47,17 +47,21 @@ export function ProductBuyPanel({product}: {product: Product}) {
       </p>
 
       {/* Price */}
-      <div className="flex items-end gap-3 mb-8">
+      <div className="flex items-end gap-3 mb-8 relative group">
         {product.originalPrice && (
-          <span className="text-[20px] font-medium text-[#142918]/40 line-through mb-1">
+          <span className="text-[20px] font-medium text-[#142918]/40 line-through mb-1 relative">
             {formatCurrency(product.originalPrice, locale)}
           </span>
         )}
-        <span className="text-[36px] font-bold text-[#b54a1a] leading-none">
-          {formatCurrency(product.price, locale)}
-        </span>
+        <div className="relative">
+          {/* Lửa cháy (Glow effect) */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-[#ff4d00] to-[#ffaa00] opacity-0 group-hover:opacity-20 blur-xl transition duration-500 rounded-full" />
+          <span className="text-[38px] font-bold text-[#e65c00] leading-none drop-shadow-[0_2px_10px_rgba(230,92,0,0.25)] relative z-10 transition duration-300 group-hover:text-[#ff4500]">
+            {formatCurrency(product.price, locale)}
+          </span>
+        </div>
         {product.originalPrice && (
-          <span className="bg-[#f2e6db] text-[#b54a1a] text-[11px] font-bold px-2 py-0.5 rounded-full mb-2">
+          <span className="bg-gradient-to-r from-[#ff4d00] to-[#ffaa00] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-2 shadow-sm animate-pulse">
             -22%
           </span>
         )}
@@ -112,9 +116,15 @@ export function ProductBuyPanel({product}: {product: Product}) {
         <BuyNowButton 
           product={product} 
           quantity={quantity} 
-          variant="outline"
-          className="w-full h-12 mt-4 rounded-xl text-[#a46131] border-[#a46131] hover:bg-[#a46131]/5 text-[15px] font-bold transition-all" 
-        />
+          variant="default"
+          className="w-full h-14 mt-4 rounded-xl bg-gradient-to-r from-[#ff5100] to-[#cc2900] text-white text-[16px] font-bold transition-all overflow-hidden relative group animate-fire" 
+        >
+          {/* Shimmer effect inside the fire button */}
+          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
+          <span className="relative flex items-center gap-2">
+            🔥 {t("buyNow")}
+          </span>
+        </BuyNowButton>
       </div>
 
       {/* Trust Badges */}
