@@ -13,7 +13,8 @@ import {
   Menu,
   PhoneCall,
   Search,
-  Store
+  Store,
+  HelpCircle
 } from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {CartDrawer} from "@/components/cart/cart-drawer";
@@ -61,7 +62,16 @@ const navItems: NavItem[] = [
     key: "explore", 
     icon: Globe2
   },
-  { href: "/contact", key: "contact", icon: Leaf }
+  { 
+    href: "/faq", 
+    key: "support", 
+    icon: HelpCircle,
+    children: [
+      { href: "/faq", label: { vi: "FAQ - Hỏi đáp", en: "FAQ" } },
+      { href: "/return-policy", label: { vi: "Chính sách đổi trả", en: "Return Policy" } },
+      { href: "/contact", label: { vi: "Liên hệ", en: "Contact" } }
+    ]
+  }
 ];
 
 const drawerEase = [0.16, 1, 0.3, 1] as const;
