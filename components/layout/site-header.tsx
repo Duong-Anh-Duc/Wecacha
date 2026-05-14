@@ -206,6 +206,8 @@ export function SiteHeader() {
   );
 }
 
+const localeFlag: Record<Locale, string> = {vi: "🇻🇳", en: "🇬🇧"};
+
 function LocaleSwitcher({
   locale,
   pathname,
@@ -222,10 +224,11 @@ function LocaleSwitcher({
       href={pathname}
       locale={nextLocale}
       className={cn(
-        "hidden h-10 min-w-14 items-center justify-center rounded-full border border-white/28 bg-white/8 px-3 text-xs font-bold uppercase text-white backdrop-blur transition hover:bg-white/16 sm:inline-flex"
+        "hidden h-10 items-center justify-center gap-1.5 rounded-full border border-white/28 bg-white/8 px-3 text-xs font-bold uppercase text-white backdrop-blur transition hover:bg-white/16 sm:inline-flex"
       )}
       aria-label={localeNames[nextLocale]}
     >
+      <span className="text-base leading-none">{localeFlag[nextLocale]}</span>
       {nextLocale}
     </Link>
   );
@@ -431,7 +434,7 @@ function MobileMenu({solid}: {solid?: boolean}) {
                 locale={nextLocale}
                 className="inline-flex h-[52px] items-center gap-3 rounded-full border border-earth-700/12 bg-parchment-50/72 px-5 py-3 text-base font-bold text-forest-800 shadow-[0_12px_36px_rgba(76,52,20,0.06)] transition duration-500 hover:-translate-y-0.5 hover:bg-parchment-50 hover:shadow-warm"
               >
-                <Globe2 className="h-4 w-4" aria-hidden="true" />
+                <span className="text-xl leading-none">{localeFlag[nextLocale]}</span>
                 {localeNames[nextLocale]}
               </Link>
             </SheetClose>
