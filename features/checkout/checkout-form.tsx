@@ -14,6 +14,7 @@ import {getCartTotals, useCartStore} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {formatCurrency} from "@/lib/content";
+import {VIETNAM_PROVINCES} from "@/lib/vietnam-address";
 import Image from "next/image";
 
 const checkoutSchema = z.object({
@@ -21,6 +22,7 @@ const checkoutSchema = z.object({
   phone: z.string().min(8),
   address: z.string().min(6),
   city: z.string().min(2),
+  district: z.string().min(2),
   note: z.string().optional()
 });
 
@@ -33,15 +35,20 @@ export function CheckoutForm() {
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const [success, setSuccess] = useState(false);
+  const [selectedProvince, setSelectedProvince] = useState("");
   const totals = getCartTotals(items);
   const {
     register,
     handleSubmit,
+    setValue,
     formState: {errors, isSubmitting}
   } = useForm<CheckoutValues>({
     resolver: zodResolver(checkoutSchema)
   });
   const errorText = t("fieldError");
+
+  const currentDistricts =
+    VIETNAM_PROVINCES.find((p) => p.name === selectedProvince)?.districts ?? [];
 
   function onSubmit() {
     setSuccess(true);
@@ -75,38 +82,91 @@ export function CheckoutForm() {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
+            {/* Họ tên */}
             <Field label={t("fullName")} error={errors.fullName && errorText}>
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input placeholder={t("fullNamePlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("fullName")} />
+              <Input
+                placeholder={t("fullNamePlaceholder")}
+                className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]"
+                {...register("fullName")}
+              />
             </Field>
 
+            {/* Số điện thoại */}
             <Field label={t("phone")} error={errors.phone && errorText}>
               <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input placeholder={t("phonePlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("phone")} />
+              <Input
+                placeholder={t("phonePlaceholder")}
+                className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]"
+                {...register("phone")}
+              />
             </Field>
 
-            <Field label={t("address")} error={errors.address && errorText} className="sm:col-span-1">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input placeholder={t("addressPlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("address")} />
-            </Field>
-
+            {/* Tỉnh / Thành phố */}
             <Field label={t("city")} error={errors.city && errorText}>
               <Map className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input placeholder={t("cityPlaceholder")} className="pl-11 pr-10 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] cursor-pointer text-[14px]" {...register("city")} />
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              <select
+                className="w-full appearance-none pl-11 pr-10 h-12 rounded-xl border border-[#e5e0d8] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a3020] text-[14px] text-[#142918] cursor-pointer"
+                {...register("city")}
+                onChange={(e) => {
+                  setValue("city", e.target.value);
+                  setValue("district", "");
+                  setSelectedProvince(e.target.value);
+                }}
+              >
+                <option value="">{t("cityPlaceholder")}</option>
+                {VIETNAM_PROVINCES.map((p) => (
+                  <option key={p.name} value={p.name}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
             </Field>
 
-            <Field
-              className="sm:col-span-2"
-              label={t("noteOptional")}
-              error={errors.note && errorText}
-            >
+            {/* Quận / Huyện */}
+            <Field label={t("district")} error={errors.district && errorText}>
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              <select
+                className="w-full appearance-none pl-11 pr-10 h-12 rounded-xl border border-[#e5e0d8] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a3020] text-[14px] text-[#142918] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!selectedProvince}
+                {...register("district")}
+              >
+                <option value="">{t("districtPlaceholder")}</option>
+                {currentDistricts.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            {/* Địa chỉ cụ thể */}
+            <Field label={t("address")} error={errors.address && errorText} className="sm:col-span-2">
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              <Input
+                placeholder={t("addressPlaceholder")}
+                className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]"
+                {...register("address")}
+              />
+            </Field>
+
+            {/* Ghi chú */}
+            <Field className="sm:col-span-2" label={t("noteOptional")} error={errors.note && errorText}>
               <FileText className="absolute left-4 top-4 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Textarea placeholder={t("notePlaceholder")} className="pl-11 pt-4 min-h-[120px] rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] resize-none text-[14px]" {...register("note")} />
+              <Textarea
+                placeholder={t("notePlaceholder")}
+                className="pl-11 pt-4 min-h-[120px] rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] resize-none text-[14px]"
+                {...register("note")}
+              />
             </Field>
           </div>
 
-          <Button className="mt-10 bg-[#1a3020] hover:bg-[#142918] text-white rounded-xl h-14 px-8 font-medium transition-all shadow-md hover:-translate-y-0.5 w-fit" disabled={isSubmitting}>
+          <Button
+            className="mt-10 bg-[#1a3020] hover:bg-[#142918] text-white rounded-xl h-14 px-8 font-medium transition-all shadow-md hover:-translate-y-0.5 w-fit"
+            disabled={isSubmitting}
+          >
             <ShoppingBag className="w-4 h-4 mr-2" /> {t("placeOrder")}
           </Button>
         </form>
@@ -145,7 +205,7 @@ export function CheckoutForm() {
             <ShoppingBag className="w-4 h-4 text-white" />
           </div>
         </div>
-        
+
         <div className="space-y-6 relative z-10">
           {items.length === 0 ? (
             <p className="text-white/60 py-4">{common("emptyCart")}</p>
@@ -161,7 +221,9 @@ export function CheckoutForm() {
                       <h4 className="text-[13px] font-medium text-white">{item.name}</h4>
                       <span className="text-[13px] text-white/50">x {item.quantity}</span>
                     </div>
-                    <span className="font-medium text-[13px] whitespace-nowrap shrink-0">{formatCurrency(item.price * item.quantity, locale)}</span>
+                    <span className="font-medium text-[13px] whitespace-nowrap shrink-0">
+                      {formatCurrency(item.price * item.quantity, locale)}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -177,7 +239,6 @@ export function CheckoutForm() {
               <span>{t("shippingFee")}</span>
               <span>{formatCurrency(totals.shipping, locale)}</span>
             </div>
-
             <div className="pt-5 border-t border-dashed border-white/10 flex justify-between items-center">
               <span className="text-base text-[#b5703a] font-semibold">{common("total")}</span>
               <span className="text-xl text-[#b5703a] font-bold">{formatCurrency(totals.total, locale)}</span>
@@ -211,9 +272,7 @@ function Field({
   return (
     <div className={className}>
       <Label className="text-[13px] font-semibold text-[#1a3020] mb-2.5 inline-block">{label}</Label>
-      <div className="relative">
-        {children}
-      </div>
+      <div className="relative">{children}</div>
       {error ? <p className="mt-1.5 text-[11px] text-red-500">{error}</p> : null}
     </div>
   );
