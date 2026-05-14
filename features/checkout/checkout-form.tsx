@@ -1,8 +1,8 @@
 "use client";
 
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {CheckCircle2, User, Phone, MapPin, Map, FileText, ShoppingBag, Truck, ShieldCheck, Headset, ChevronDown} from "lucide-react";
+import {CheckCircle2, User, Phone, MapPin, Map, FileText, ShoppingBag, Truck, ShieldCheck, Headset, ChevronDown, Loader2} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
@@ -14,8 +14,10 @@ import {getCartTotals, useCartStore} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {formatCurrency} from "@/lib/content";
-import {VIETNAM_PROVINCES} from "@/lib/vietnam-address";
 import Image from "next/image";
+
+type Province = {code: number; name: string};
+type District = {code: number; name: string};
 
 const checkoutSchema = z.object({
   fullName: z.string().min(2),
@@ -35,20 +37,44 @@ export function CheckoutForm() {
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const [success, setSuccess] = useState(false);
-  const [selectedProvince, setSelectedProvince] = useState("");
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [loadingProvinces, setLoadingProvinces] = useState(true);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
   const totals = getCartTotals(items);
+
   const {
     register,
     handleSubmit,
     setValue,
     formState: {errors, isSubmitting}
-  } = useForm<CheckoutValues>({
-    resolver: zodResolver(checkoutSchema)
-  });
+  } = useForm<CheckoutValues>({resolver: zodResolver(checkoutSchema)});
+
   const errorText = t("fieldError");
 
-  const currentDistricts =
-    VIETNAM_PROVINCES.find((p) => p.name === selectedProvince)?.districts ?? [];
+  useEffect(() => {
+    fetch("https://provinces.open-api.vn/api/?depth=1")
+      .then((r) => r.json())
+      .then((data: Province[]) => setProvinces(data))
+      .catch(() => {})
+      .finally(() => setLoadingProvinces(false));
+  }, []);
+
+  async function handleProvinceChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const code = e.target.value;
+    const name = provinces.find((p) => String(p.code) === code)?.name ?? "";
+    setValue("city", name);
+    setValue("district", "");
+    setDistricts([]);
+    if (!code) return;
+    setLoadingDistricts(true);
+    try {
+      const res = await fetch(`https://provinces.open-api.vn/api/p/${code}?depth=2`);
+      const data = await res.json();
+      setDistricts(data.districts ?? []);
+    } catch {}
+    setLoadingDistricts(false);
+  }
 
   function onSubmit() {
     setSuccess(true);
@@ -59,9 +85,7 @@ export function CheckoutForm() {
     return (
       <div className="rounded-[2rem] border border-[#142918]/10 bg-white p-12 text-center shadow-[0_20px_50px_rgba(20,41,24,0.05)]">
         <CheckCircle2 className="mx-auto h-16 w-16 text-[#2a5a31]" aria-hidden="true" />
-        <h2 className="mt-6 font-serif text-4xl text-[#142918]">
-          {t("success")}
-        </h2>
+        <h2 className="mt-6 font-serif text-4xl text-[#142918]">{t("success")}</h2>
         <Button asChild className="mt-8 bg-[#142918] text-white hover:bg-[#2a5a31] rounded-xl px-8 py-6" variant="default">
           <Link href="/">{common("continueShopping")}</Link>
         </Button>
@@ -85,41 +109,31 @@ export function CheckoutForm() {
             {/* Họ tên */}
             <Field label={t("fullName")} error={errors.fullName && errorText}>
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input
-                placeholder={t("fullNamePlaceholder")}
-                className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]"
-                {...register("fullName")}
-              />
+              <Input placeholder={t("fullNamePlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("fullName")} />
             </Field>
 
             {/* Số điện thoại */}
             <Field label={t("phone")} error={errors.phone && errorText}>
               <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input
-                placeholder={t("phonePlaceholder")}
-                className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]"
-                {...register("phone")}
-              />
+              <Input placeholder={t("phonePlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("phone")} />
             </Field>
 
             {/* Tỉnh / Thành phố */}
             <Field label={t("city")} error={errors.city && errorText}>
               <Map className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              {loadingProvinces
+                ? <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+                : <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              }
               <select
-                className="w-full appearance-none pl-11 pr-10 h-12 rounded-xl border border-[#e5e0d8] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a3020] text-[14px] text-[#142918] cursor-pointer"
-                {...register("city")}
-                onChange={(e) => {
-                  setValue("city", e.target.value);
-                  setValue("district", "");
-                  setSelectedProvince(e.target.value);
-                }}
+                className="w-full appearance-none pl-11 pr-10 h-12 rounded-xl border border-[#e5e0d8] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a3020] text-[14px] text-[#142918] cursor-pointer disabled:opacity-50"
+                disabled={loadingProvinces}
+                defaultValue=""
+                onChange={handleProvinceChange}
               >
                 <option value="">{t("cityPlaceholder")}</option>
-                {VIETNAM_PROVINCES.map((p) => (
-                  <option key={p.name} value={p.name}>
-                    {p.name}
-                  </option>
+                {provinces.map((p) => (
+                  <option key={p.code} value={p.code}>{p.name}</option>
                 ))}
               </select>
             </Field>
@@ -127,17 +141,19 @@ export function CheckoutForm() {
             {/* Quận / Huyện */}
             <Field label={t("district")} error={errors.district && errorText}>
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              {loadingDistricts
+                ? <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+                : <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
+              }
               <select
                 className="w-full appearance-none pl-11 pr-10 h-12 rounded-xl border border-[#e5e0d8] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a3020] text-[14px] text-[#142918] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!selectedProvince}
+                disabled={districts.length === 0 || loadingDistricts}
+                defaultValue=""
                 {...register("district")}
               >
                 <option value="">{t("districtPlaceholder")}</option>
-                {currentDistricts.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
+                {districts.map((d) => (
+                  <option key={d.code} value={d.name}>{d.name}</option>
                 ))}
               </select>
             </Field>
@@ -145,33 +161,21 @@ export function CheckoutForm() {
             {/* Địa chỉ cụ thể */}
             <Field label={t("address")} error={errors.address && errorText} className="sm:col-span-2">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Input
-                placeholder={t("addressPlaceholder")}
-                className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]"
-                {...register("address")}
-              />
+              <Input placeholder={t("addressPlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("address")} />
             </Field>
 
             {/* Ghi chú */}
             <Field className="sm:col-span-2" label={t("noteOptional")} error={errors.note && errorText}>
               <FileText className="absolute left-4 top-4 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              <Textarea
-                placeholder={t("notePlaceholder")}
-                className="pl-11 pt-4 min-h-[120px] rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] resize-none text-[14px]"
-                {...register("note")}
-              />
+              <Textarea placeholder={t("notePlaceholder")} className="pl-11 pt-4 min-h-[120px] rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] resize-none text-[14px]" {...register("note")} />
             </Field>
           </div>
 
-          <Button
-            className="mt-10 bg-[#1a3020] hover:bg-[#142918] text-white rounded-xl h-14 px-8 font-medium transition-all shadow-md hover:-translate-y-0.5 w-fit"
-            disabled={isSubmitting}
-          >
+          <Button className="mt-10 bg-[#1a3020] hover:bg-[#142918] text-white rounded-xl h-14 px-8 font-medium transition-all shadow-md hover:-translate-y-0.5 w-fit" disabled={isSubmitting}>
             <ShoppingBag className="w-4 h-4 mr-2" /> {t("placeOrder")}
           </Button>
         </form>
 
-        {/* Footer Perks */}
         <div className="mt-12 pt-6 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="flex items-center gap-3">
             <Truck className="w-5 h-5 text-gray-400 shrink-0" />
@@ -205,7 +209,6 @@ export function CheckoutForm() {
             <ShoppingBag className="w-4 h-4 text-white" />
           </div>
         </div>
-
         <div className="space-y-6 relative z-10">
           {items.length === 0 ? (
             <p className="text-white/60 py-4">{common("emptyCart")}</p>
@@ -221,15 +224,12 @@ export function CheckoutForm() {
                       <h4 className="text-[13px] font-medium text-white">{item.name}</h4>
                       <span className="text-[13px] text-white/50">x {item.quantity}</span>
                     </div>
-                    <span className="font-medium text-[13px] whitespace-nowrap shrink-0">
-                      {formatCurrency(item.price * item.quantity, locale)}
-                    </span>
+                    <span className="font-medium text-[13px] whitespace-nowrap shrink-0">{formatCurrency(item.price * item.quantity, locale)}</span>
                   </div>
                 </div>
               ))}
             </div>
           )}
-
           <div className="pt-6 border-t border-dashed border-white/10 space-y-5">
             <div className="flex justify-between text-[13px] text-white/80">
               <span>{common("subtotal")}</span>
@@ -245,7 +245,6 @@ export function CheckoutForm() {
             </div>
           </div>
         </div>
-
         <div className="mt-8 rounded-[0.8rem] bg-[#eef4ea] p-4 flex gap-3 relative z-10 border border-[#e5f0df]">
           <ShieldCheck className="w-5 h-5 text-[#2a5a31] shrink-0" />
           <div>
@@ -258,12 +257,7 @@ export function CheckoutForm() {
   );
 }
 
-function Field({
-  label,
-  error,
-  className,
-  children
-}: {
+function Field({label, error, className, children}: {
   label: string;
   error?: string | false;
   className?: string;
