@@ -17,14 +17,14 @@ import {formatCurrency} from "@/lib/content";
 import Image from "next/image";
 
 type Province = {code: number; name: string};
-type District = {code: number; name: string};
+type Ward = {code: number; name: string};
 
 const checkoutSchema = z.object({
   fullName: z.string().min(2),
   phone: z.string().min(8),
   address: z.string().min(6),
   city: z.string().min(2),
-  district: z.string().min(2),
+  ward: z.string().min(2),
   note: z.string().optional()
 });
 
@@ -38,9 +38,9 @@ export function CheckoutForm() {
   const clearCart = useCartStore((state) => state.clearCart);
   const [success, setSuccess] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
-  const [districts, setDistricts] = useState<District[]>([]);
+  const [wards, setWards] = useState<Ward[]>([]);
   const [loadingProvinces, setLoadingProvinces] = useState(true);
-  const [loadingDistricts, setLoadingDistricts] = useState(false);
+  const [loadingWards, setLoadingWards] = useState(false);
   const totals = getCartTotals(items);
 
   const {
@@ -53,7 +53,7 @@ export function CheckoutForm() {
   const errorText = t("fieldError");
 
   useEffect(() => {
-    fetch("https://provinces.open-api.vn/api/?depth=1")
+    fetch("https://provinces.open-api.vn/api/v2/?depth=1")
       .then((r) => r.json())
       .then((data: Province[]) => setProvinces(data))
       .catch(() => {})
@@ -64,16 +64,16 @@ export function CheckoutForm() {
     const code = e.target.value;
     const name = provinces.find((p) => String(p.code) === code)?.name ?? "";
     setValue("city", name);
-    setValue("district", "");
-    setDistricts([]);
+    setValue("ward", "");
+    setWards([]);
     if (!code) return;
-    setLoadingDistricts(true);
+    setLoadingWards(true);
     try {
-      const res = await fetch(`https://provinces.open-api.vn/api/p/${code}?depth=2`);
+      const res = await fetch(`https://provinces.open-api.vn/api/v2/p/${code}?depth=2`);
       const data = await res.json();
-      setDistricts(data.districts ?? []);
+      setWards(data.wards ?? []);
     } catch {}
-    setLoadingDistricts(false);
+    setLoadingWards(false);
   }
 
   function onSubmit() {
@@ -138,22 +138,22 @@ export function CheckoutForm() {
               </select>
             </Field>
 
-            {/* Quận / Huyện */}
-            <Field label={t("district")} error={errors.district && errorText}>
+            {/* Xã / Phường */}
+            <Field label={t("ward")} error={errors.ward && errorText}>
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-              {loadingDistricts
+              {loadingWards
                 ? <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
                 : <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               }
               <select
                 className="w-full appearance-none pl-11 pr-10 h-12 rounded-xl border border-[#e5e0d8] bg-white focus:outline-none focus:ring-2 focus:ring-[#1a3020] text-[14px] text-[#142918] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={districts.length === 0 || loadingDistricts}
+                disabled={wards.length === 0 || loadingWards}
                 defaultValue=""
-                {...register("district")}
+                {...register("ward")}
               >
-                <option value="">{t("districtPlaceholder")}</option>
-                {districts.map((d) => (
-                  <option key={d.code} value={d.name}>{d.name}</option>
+                <option value="">{t("wardPlaceholder")}</option>
+                {wards.map((w) => (
+                  <option key={w.code} value={w.name}>{w.name}</option>
                 ))}
               </select>
             </Field>
