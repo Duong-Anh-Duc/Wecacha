@@ -144,13 +144,18 @@ export default async function ProductDetailPage({params}: Props) {
                   </div>
                 </div>
               </div>
-              <div className="flex-1 w-full relative min-h-[300px] lg:min-h-full h-full">
-                {/* Mobile top fade overlay */}
+              <div className="relative flex-1 min-h-[280px] lg:min-h-[520px]">
+                <Image
+                  src="/son_la_bg.png"
+                  alt="Coffee berries"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(min-width: 1024px) 45vw, 100vw"
+                />
+                {/* Mobile top fade */}
                 <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#fdfcf8] to-transparent z-10 lg:hidden" />
-                {/* Desktop left fade overlay */}
+                {/* Desktop left fade */}
                 <div className="hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#fdfcf8] to-transparent z-10" />
-                
-                <Image src="/son_la_bg.png" alt="Coffee berries" fill className="object-cover" />
               </div>
             </div>
           </Reveal>
