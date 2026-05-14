@@ -26,7 +26,7 @@ import {
   SheetTitle,
   SheetTrigger
 } from "@/components/ui/sheet";
-import {Link, usePathname} from "@/i18n/navigation";
+import {Link, usePathname, useRouter} from "@/i18n/navigation";
 import {localeNames} from "@/lib/site";
 import {cn} from "@/lib/utils";
 import type {Locale} from "@/i18n/routing";
@@ -219,13 +219,21 @@ function LocaleSwitcher({
   solid: boolean;
 }) {
   const nextLocale = locale === "vi" ? "en" : "vi";
+  const router = useRouter();
+
+  function handleSwitch() {
+    if (typeof document !== "undefined" && "startViewTransition" in document) {
+      document.startViewTransition(() => {
+        router.replace(pathname, {locale: nextLocale, scroll: false});
+      });
+    } else {
+      router.replace(pathname, {locale: nextLocale, scroll: false});
+    }
+  }
 
   return (
-    <Link
-      href={pathname}
-      locale={nextLocale}
-      scroll={false}
-      viewTransition
+    <button
+      onClick={handleSwitch}
       className={cn(
         "hidden h-10 items-center justify-center gap-2 rounded-full border border-white/28 bg-white/8 px-4 text-[13px] font-semibold text-white backdrop-blur transition hover:bg-white/16 sm:inline-flex"
       )}
@@ -233,7 +241,7 @@ function LocaleSwitcher({
     >
       <span className="text-base leading-none">{localeFlag[nextLocale]}</span>
       {localeNames[nextLocale]}
-    </Link>
+    </button>
   );
 }
 
@@ -242,6 +250,17 @@ function MobileMenu({solid}: {solid?: boolean}) {
   const pathname = usePathname();
   const locale = useLocale() as Locale;
   const nextLocale = locale === "vi" ? "en" : "vi";
+  const router = useRouter();
+
+  function handleMobileSwitch() {
+    if (typeof document !== "undefined" && "startViewTransition" in document) {
+      document.startViewTransition(() => {
+        router.replace(pathname, {locale: nextLocale, scroll: false});
+      });
+    } else {
+      router.replace(pathname, {locale: nextLocale, scroll: false});
+    }
+  }
 
   return (
     <Sheet>
@@ -432,16 +451,13 @@ function MobileMenu({solid}: {solid?: boolean}) {
             transition={{duration: 0.7, delay: 0.7, ease: drawerEase}}
           >
             <SheetClose asChild>
-              <Link
-                href={pathname}
-                locale={nextLocale}
-                scroll={false}
-                viewTransition
+              <button
+                onClick={handleMobileSwitch}
                 className="inline-flex h-[52px] items-center gap-3 rounded-full border border-earth-700/12 bg-parchment-50/72 px-6 py-3 text-[15px] font-bold text-forest-800 shadow-[0_12px_36px_rgba(76,52,20,0.06)] transition duration-500 hover:-translate-y-0.5 hover:bg-parchment-50 hover:shadow-warm"
               >
                 <span className="text-[22px] leading-none">{localeFlag[nextLocale]}</span>
                 {localeNames[nextLocale]}
-              </Link>
+              </button>
             </SheetClose>
           </motion.div>
         </motion.div>
