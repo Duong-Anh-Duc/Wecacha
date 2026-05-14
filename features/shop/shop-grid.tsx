@@ -174,7 +174,7 @@ export function ShopGrid({
               className="flex items-center gap-2 text-sm font-medium text-forest-950/50 hover:text-[#b5703a] transition-colors whitespace-nowrap shrink-0"
             >
               <RotateCcw className="w-4 h-4" />
-              Xóa bộ lọc
+              {t("clearFilters")}
             </button>
           </div>
         )}

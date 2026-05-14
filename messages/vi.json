@@ -42,7 +42,8 @@
     "scrollDown": "Cuộn xuống",
     "readMore": "Đọc thêm",
     "exploreNow": "Khám phá ngay",
-    "product": "Sản phẩm"
+    "product": "Sản phẩm",
+    "loyalCustomer": "Khách hàng thân thiết"
   },
   "Home": {
     "kicker": "Tây Bắc trong một tách cà phê",
@@ -116,7 +117,8 @@
     "chip1": "Hạt rang trên triền đồi 1.000m",
     "chip2": "Rang chậm, hậu ngọt dịu",
     "chip3": "Quà tặng mang sắc thổ cẩm",
-    "categoryEmpty": "Đang cập nhật sản phẩm cho danh mục này."
+    "categoryEmpty": "Đang cập nhật sản phẩm cho danh mục này.",
+    "clearFilters": "Xóa bộ lọc"
   },
   "Product": {
     "origin": "Nguồn gốc",

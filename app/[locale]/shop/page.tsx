@@ -35,6 +35,7 @@ export default async function ShopPage({params}: Props) {
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Shop"});
   const common = await getTranslations({locale, namespace: "Common"});
+  const tNav = await getTranslations({locale, namespace: "Nav"});
 
   return (
     <main className="bg-parchment-50">
@@ -49,7 +50,7 @@ export default async function ShopPage({params}: Props) {
         scrollLabel={common("scrollDown")}
         breadcrumbs={
           <Breadcrumbs 
-            homeLabel={locale === "vi" ? "Trang chủ" : "Home"} 
+            homeLabel={tNav("home")}
             theme="dark"
             items={[{ label: t("title") }]} 
           />

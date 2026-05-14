@@ -1,5 +1,5 @@
 import type {Metadata} from "next";
-import {setRequestLocale} from "next-intl/server";
+import {setRequestLocale, getTranslations} from "next-intl/server";
 import {CinematicPageHero} from "@/components/sections/cinematic-page-hero";
 import {Reveal} from "@/components/motion/reveal";
 import type {Locale} from "@/i18n/routing";
@@ -53,6 +53,8 @@ export default async function ExploreCategoryPage({params}: Props) {
   const {locale, slug} = await params;
   setRequestLocale(locale);
   const isVi = locale === "vi";
+  const tNav = await getTranslations({locale, namespace: "Nav"});
+  const tCommon = await getTranslations({locale, namespace: "Common"});
 
   // Data structure for editorial content
   const contentMap: Record<string, any> = {
@@ -160,18 +162,18 @@ export default async function ExploreCategoryPage({params}: Props) {
   return (
     <main className="bg-parchment-50">
       <CinematicPageHero
-        kicker={isVi ? "Khám phá" : "Explore"}
+        kicker={tNav("explore")}
         title={content.title}
         copy={content.intro}
         image={data.image}
         imageAlt={content.title}
-        scrollLabel={isVi ? "Cuộn xuống" : "Scroll down"}
+        scrollLabel={tCommon("scrollDown")}
         breadcrumbs={
-          <Breadcrumbs 
-            homeLabel={isVi ? "Trang chủ" : "Home"} 
+          <Breadcrumbs
+            homeLabel={tNav("home")}
             theme="dark"
             items={[
-              { label: isVi ? "Khám phá" : "Explore", href: "/explore" },
+              { label: tNav("explore"), href: "/explore" },
               { label: content.title }
             ]} 
           />

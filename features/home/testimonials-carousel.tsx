@@ -193,7 +193,7 @@ export function TestimonialsCarousel({ locale }: { locale: Locale }) {
                       <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", isActive ? "bg-[#142918] text-white" : "bg-white/10 text-white")}>
                         <Award className="w-3.5 h-3.5" />
                       </div>
-                      <span className="text-[11px] font-bold uppercase tracking-wider">Khách hàng thân thiết</span>
+                      <span className="text-[11px] font-bold uppercase tracking-wider">{tCommon("loyalCustomer")}</span>
                     </div>
                   </div>
                 </div>

@@ -10,6 +10,8 @@ export type CartItem = {
   image: string;
   weight: string;
   quantity: number;
+  category?: string;
+  notes?: string[];
 };
 
 type CartState = {

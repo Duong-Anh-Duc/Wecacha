@@ -42,7 +42,8 @@
     "scrollDown": "Scroll",
     "readMore": "Read more",
     "exploreNow": "Explore now",
-    "product": "Product"
+    "product": "Product",
+    "loyalCustomer": "Loyal customer"
   },
   "Home": {
     "kicker": "Northwest Vietnam in a cup",
@@ -116,7 +117,8 @@
     "chip1": "Beans from 1,000m hillsides",
     "chip2": "Slow roasted, soft sweet finish",
     "chip3": "Gift sets with brocade color",
-    "categoryEmpty": "Updating products for this category."
+    "categoryEmpty": "Updating products for this category.",
+    "clearFilters": "Clear filters"
   },
   "Product": {
     "origin": "Origin",

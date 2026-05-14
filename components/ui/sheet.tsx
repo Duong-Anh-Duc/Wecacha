@@ -37,7 +37,9 @@ const SheetContent = React.forwardRef<
       ref={ref}
       className={cn(
         "fixed top-0 z-50 h-full w-[min(92vw,430px)] bg-parchment-50 p-6 text-forest-950 shadow-cinematic transition ease-out data-[state=closed]:duration-200 data-[state=open]:duration-500",
-        side === "right" ? "right-0" : "left-0",
+        side === "right"
+          ? "right-0 data-[state=open]:animate-slide-in-right data-[state=closed]:animate-slide-out-right"
+          : "left-0",
         className
       )}
       {...props}

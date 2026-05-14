@@ -78,6 +78,14 @@ const config: Config = {
           "42%": {opacity: "0.52"},
           "70%": {opacity: "0"},
           "100%": {transform: "translateX(130%)", opacity: "0"}
+        },
+        "slide-in-right": {
+          "0%": {transform: "translateX(100%)"},
+          "100%": {transform: "translateX(0)"}
+        },
+        "slide-out-right": {
+          "0%": {transform: "translateX(0)"},
+          "100%": {transform: "translateX(100%)"}
         }
       },
       animation: {
@@ -85,7 +93,9 @@ const config: Config = {
         "drift-image": "drift-image 24s ease-in-out infinite alternate",
         grain: "grain 6s steps(6) infinite",
         "soft-sweep": "soft-sweep 6.8s ease-in-out infinite",
-        "small-sweep": "small-sweep 5.6s ease-in-out infinite"
+        "small-sweep": "small-sweep 5.6s ease-in-out infinite",
+        "slide-in-right": "slide-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+        "slide-out-right": "slide-out-right 0.4s cubic-bezier(0.16, 1, 0.3, 1)"
       }
     }
   },
