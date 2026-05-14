@@ -37,6 +37,7 @@ export default async function CategoryPage({params}: Props) {
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "Shop"});
   const common = await getTranslations({locale, namespace: "Common"});
+  const tNav = await getTranslations({locale, namespace: "Nav"});
   
   // Filter products by the current category slug
   const filteredProducts = products.filter(
@@ -65,7 +66,7 @@ export default async function CategoryPage({params}: Props) {
         scrollLabel={common("scrollDown")}
         breadcrumbs={
           <Breadcrumbs 
-            homeLabel={locale === "vi" ? "Trang chủ" : "Home"} 
+            homeLabel={tNav("home")}
             theme="dark"
             items={[
               { label: t("title"), href: "/shop" },
@@ -82,9 +83,7 @@ export default async function CategoryPage({params}: Props) {
           ) : (
             <div className="py-20 text-center">
               <p className="text-lg text-forest-950/60">
-                {locale === "vi" 
-                  ? "Đang cập nhật sản phẩm cho danh mục này." 
-                  : "Updating products for this category."}
+                {t("categoryEmpty")}
               </p>
             </div>
           )}

@@ -94,7 +94,9 @@
     "fieldNotes": "Ghi chép thực địa",
     "coffeeCupAlt": "Tách cà phê",
     "brocadeAlt": "Vải thổ cẩm",
-    "slowRoastKicker": "Rang chậm"
+    "slowRoastKicker": "Rang chậm",
+    "scrollToGlide": "Cuộn để trượt",
+    "tasteCta": "Thử ngay"
   },
   "Shop": {
     "title": "Cửa hàng cà phê Sơn La",
@@ -113,7 +115,8 @@
     "farmImageAlt": "Nông trại cà phê trong sương núi",
     "chip1": "Hạt rang trên triền đồi 1.000m",
     "chip2": "Rang chậm, hậu ngọt dịu",
-    "chip3": "Quà tặng mang sắc thổ cẩm"
+    "chip3": "Quà tặng mang sắc thổ cẩm",
+    "categoryEmpty": "Đang cập nhật sản phẩm cho danh mục này."
   },
   "Product": {
     "origin": "Nguồn gốc",
@@ -130,7 +133,10 @@
     "boldCup": "Đậm đà",
     "sonLaFarms": "Nông trại Sơn La",
     "premiumGift": "Quà tặng cao cấp",
-    "exploreNow": "Khám phá ngay"
+    "exploreNow": "Khám phá ngay",
+    "journeyLabel": "Hành trình sản phẩm",
+    "journeyTitle": "Mỗi túi cà phê có đường đi riêng",
+    "journeyCopy": "Từ vùng trồng, cách sơ chế đến nhịp rang, câu chuyện của sản phẩm này không trùng với bất kỳ dòng nào khác."
   },
   "Explore": {
     "title": "Khám phá Tây Bắc qua cà phê",
@@ -272,6 +278,28 @@
     "storyConclTitle": "Uống cạn một mùa sương",
     "storyConclCopy": "Từ nương cao Mộc Châu đến xưởng rang Mường La, câu chuyện của Sơn La giờ đây nằm trọn trong chiếc cốc của bạn.",
     "storyConclKicker": "Trải nghiệm"
+  },
+  "News": {
+    "kicker": "Góc nhìn",
+    "title": "Tin Tức & Cập Nhật",
+    "copy": "Cập nhật những câu chuyện mới nhất về cà phê, sự kiện và công thức pha chế đặc biệt từ Sơn La.",
+    "scrollLabel": "Khám phá ngay",
+    "coffeeCultureTitle": "Văn hóa cà phê",
+    "eventsTitle": "Sự kiện & Hoạt động",
+    "recipesTitle": "Công thức pha chế"
+  },
+  "Philosophy": {
+    "heatKicker": "Sự chuyển hóa của nhiệt",
+    "heroTitle": "Triết Lý Rang",
+    "respectTitle": "Tôn trọng nguyên bản, khơi dậy tiềm năng",
+    "respectPara1": "Tại Wecacha, chúng tôi không xem rang cà phê là việc 'nấu chín' hạt. Rang là một cuộc đối thoại với những hạt cà phê nhân xanh, lắng nghe cấu trúc tế bào của chúng và quyết định thời điểm hoàn hảo để dừng lại.",
+    "respectPara2": "Chúng tôi áp dụng triết lý rang chậm (Slow Roast). Việc kéo dài thời gian phát triển hương vị giúp làm nổi bật vị ngọt tự nhiên, giảm bớt độ chua gắt, và lưu giữ trọn vẹn những nốt hương hoa quả tinh tế của vùng đất Sơn La.",
+    "heatControlLabel": "Kiểm soát nhiệt",
+    "heatControlDesc": "Profile rang được thiết kế riêng cho từng mẻ thu hoạch.",
+    "timeLabel": "Thời gian",
+    "timeDesc": "Phát triển đủ lâu để caramel hóa trọn vẹn lượng đường tự nhiên.",
+    "coolingLabel": "Làm nguội nhanh",
+    "coolingDesc": "Khóa chặt hương thơm ngay tại thời điểm hạt đạt độ chín hoàn hảo nhất."
   },
   "NotFound": {
     "title": "Lạc trong sương núi",

@@ -265,7 +265,7 @@ export default async function ExplorePage({params}: Props) {
                       <div className="h-10 w-10 rounded-full bg-[#203823] flex items-center justify-center text-white mb-5 shadow-md transition-transform duration-300 group-hover:scale-110">
                         <Icon className="w-4 h-4" strokeWidth={2} />
                       </div>
-                      <p className="text-[10px] font-bold text-[#b5703a] uppercase tracking-[0.15em] mb-2">{locale === "vi" ? "Tin tức" : "News"}</p>
+                      <p className="text-[10px] font-bold text-[#b5703a] uppercase tracking-[0.15em] mb-2">{tNav("news")}</p>
                       <h3 className="font-serif text-[1.4rem] text-[#1c2a1c] mb-3 transition-colors group-hover:text-[#b5703a]">{article.title}</h3>
                       <p className="text-[13px] text-[#1c2a1c]/70 mb-8 min-h-[50px] leading-relaxed line-clamp-3">{article.desc}</p>
 

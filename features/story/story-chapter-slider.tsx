@@ -4,6 +4,7 @@ import {useEffect, useRef, useState} from "react";
 import Image from "next/image";
 import {ArrowDownRight, ArrowUpRight, Coffee} from "lucide-react";
 import {motion, useScroll, useTransform} from "framer-motion";
+import {useTranslations} from "next-intl";
 import type {Locale} from "@/i18n/routing";
 import {localized, storyChapters} from "@/lib/content";
 import {cn} from "@/lib/utils";
@@ -19,6 +20,7 @@ export function StoryChapterSlider({
   fieldNotes,
   quote
 }: StoryChapterSliderProps) {
+  const tStory = useTranslations("Story");
   const rootRef = useRef<HTMLElement | null>(null);
   const {scrollYProgress} = useScroll({
     target: rootRef,
@@ -103,7 +105,7 @@ export function StoryChapterSlider({
             </div>
 
             <div className="mt-6 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.16em] text-forest-950/48">
-              <span>{locale === "vi" ? "Cuộn để trượt" : "Scroll to glide"}</span>
+              <span>{tStory("scrollToGlide")}</span>
               <ArrowDownRight className="h-4 w-4" aria-hidden="true" />
             </div>
           </div>

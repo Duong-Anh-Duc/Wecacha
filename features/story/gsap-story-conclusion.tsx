@@ -2,6 +2,7 @@
 
 import {useEffect, useRef} from "react";
 import Image from "next/image";
+import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import {Link} from "@/i18n/navigation";
 import {imageLibrary} from "@/lib/content";
@@ -17,6 +18,7 @@ export function GsapStoryConclusion({
   kicker: string;
   locale: string;
 }) {
+  const tStory = useTranslations("Story");
   const containerRef = useRef<HTMLElement | null>(null);
   const imageRef = useRef<HTMLDivElement | null>(null);
   const textRef = useRef<HTMLDivElement | null>(null);
@@ -103,7 +105,7 @@ export function GsapStoryConclusion({
             size="lg"
             className="h-14 min-w-[200px] rounded-full text-base"
           >
-            <Link href="/shop">{locale === "vi" ? "Thử ngay" : "Taste it now"}</Link>
+            <Link href="/shop">{tStory("tasteCta")}</Link>
           </Button>
         </div>
       </div>

@@ -70,6 +70,7 @@ export function SiteHeader() {
   const locale = useLocale() as Locale;
   const pathname = usePathname();
   const t = useTranslations("Nav");
+  const tCommon = useTranslations("Common");
   const [scrolled, setScrolled] = useState(false);
   const isHome = pathname === "/";
 
@@ -191,7 +192,7 @@ export function SiteHeader() {
               className="hidden h-12 items-center gap-3 rounded-full bg-forest-950 px-7 text-sm font-bold text-parchment-50 shadow-warm transition hover:-translate-y-0.5 hover:bg-forest-900 lg:inline-flex"
             >
               <Coffee className="h-4 w-4" aria-hidden="true" />
-              {locale === "vi" ? "Khám phá ngay" : "Explore now"}
+              {tCommon("exploreNow")}
             </Link>
           ) : (
             <>

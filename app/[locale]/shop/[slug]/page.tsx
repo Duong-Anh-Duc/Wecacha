@@ -83,6 +83,7 @@ export default async function ProductDetailPage({params}: Props) {
 
   const t = await getTranslations({locale, namespace: "Product"});
   const tShop = await getTranslations({locale, namespace: "Shop"});
+  const tNav = await getTranslations({locale, namespace: "Nav"});
   const related = getRelatedProducts(product.slug);
 
   return (
@@ -91,7 +92,7 @@ export default async function ProductDetailPage({params}: Props) {
       <section className="px-4 pb-16 pt-32 sm:px-6 lg:px-8 lg:pb-24">
         <div className="mx-auto max-w-7xl">
           <Breadcrumbs 
-            homeLabel={locale === "vi" ? "Trang chủ" : "Home"} 
+            homeLabel={tNav("home")}
             items={[
               { label: tShop("title"), href: "/shop" },
               { label: localized(product.name, locale) }
@@ -148,17 +149,13 @@ export default async function ProductDetailPage({params}: Props) {
             <div className="sticky top-28">
               <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-ember">
                 <MapPinned className="h-4 w-4" aria-hidden="true" />
-                {locale === "vi" ? "Hành trình sản phẩm" : "Product journey"}
+                {t("journeyLabel")}
               </p>
               <h2 className="mt-5 max-w-xl font-serif text-5xl leading-[0.98] text-parchment-50 sm:text-6xl">
-                {locale === "vi"
-                  ? "Mỗi túi cà phê có đường đi riêng"
-                  : "Every bag has its own route"}
+                {t("journeyTitle")}
               </h2>
               <p className="mt-6 max-w-md leading-8 text-white/66">
-                {locale === "vi"
-                  ? "Từ vùng trồng, cách sơ chế đến nhịp rang, câu chuyện của sản phẩm này không trùng với bất kỳ dòng nào khác."
-                  : "From origin and processing to roast rhythm, this product carries a story no other lot shares."}
+                {t("journeyCopy")}
               </p>
             </div>
           </Reveal>

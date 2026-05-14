@@ -94,7 +94,9 @@
     "fieldNotes": "Field notes",
     "coffeeCupAlt": "Coffee cup",
     "brocadeAlt": "Brocade textile",
-    "slowRoastKicker": "Slow roast"
+    "slowRoastKicker": "Slow roast",
+    "scrollToGlide": "Scroll to glide",
+    "tasteCta": "Taste it now"
   },
   "Shop": {
     "title": "Son La coffee shop",
@@ -113,7 +115,8 @@
     "farmImageAlt": "Coffee farm in misty mountains",
     "chip1": "Beans from 1,000m hillsides",
     "chip2": "Slow roasted, soft sweet finish",
-    "chip3": "Gift sets with brocade color"
+    "chip3": "Gift sets with brocade color",
+    "categoryEmpty": "Updating products for this category."
   },
   "Product": {
     "origin": "Origin",
@@ -130,7 +133,10 @@
     "boldCup": "Bold cup",
     "sonLaFarms": "Son La farms",
     "premiumGift": "Premium gift",
-    "exploreNow": "Explore now"
+    "exploreNow": "Explore now",
+    "journeyLabel": "Product journey",
+    "journeyTitle": "Every bag has its own route",
+    "journeyCopy": "From origin and processing to roast rhythm, this product carries a story no other lot shares."
   },
   "Explore": {
     "title": "Explore the northwest through coffee",
@@ -272,6 +278,28 @@
     "storyConclTitle": "Drink a season of mist",
     "storyConclCopy": "From the high gardens of Moc Chau to the roastery in Muong La, the story of Son La now rests entirely in your cup.",
     "storyConclKicker": "Experience"
+  },
+  "News": {
+    "kicker": "Perspectives",
+    "title": "News & Updates",
+    "copy": "Latest stories about coffee, events, and special recipes from Son La.",
+    "scrollLabel": "Explore now",
+    "coffeeCultureTitle": "Coffee Culture",
+    "eventsTitle": "Events & Activities",
+    "recipesTitle": "Recipes"
+  },
+  "Philosophy": {
+    "heatKicker": "The Transformation of Heat",
+    "heroTitle": "Roasting Philosophy",
+    "respectTitle": "Respect the origin, awaken the potential",
+    "respectPara1": "At Wecacha, we don't see roasting as 'cooking' the beans. Roasting is a dialogue with the green coffee beans, listening to their cellular structure and deciding the perfect moment to stop.",
+    "respectPara2": "We apply the Slow Roast philosophy. Extending the flavor development time highlights natural sweetness, reduces harsh acidity, and fully preserves the delicate fruity notes of the Son La terroir.",
+    "heatControlLabel": "Heat Control",
+    "heatControlDesc": "Roast profile tailored for each harvest batch.",
+    "timeLabel": "Time",
+    "timeDesc": "Developed long enough to fully caramelize natural sugars.",
+    "coolingLabel": "Rapid Cooling",
+    "coolingDesc": "Locking in the aroma exactly when the beans reach perfect maturity."
   },
   "NotFound": {
     "title": "Lost in mountain mist",
