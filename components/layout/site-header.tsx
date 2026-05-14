@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from "react";
 import Image from "next/image";
-import {motion} from "framer-motion";
+import {motion, AnimatePresence} from "framer-motion";
 import {
   ArrowUpRight,
   BookOpen,
@@ -72,6 +72,7 @@ export function SiteHeader() {
   const t = useTranslations("Nav");
   const tCommon = useTranslations("Common");
   const [scrolled, setScrolled] = useState(false);
+  const [localeLoading, setLocaleLoading] = useState(false);
   const isHome = pathname === "/";
 
   useEffect(() => {
@@ -85,7 +86,34 @@ export function SiteHeader() {
   const lightHeader = false;
 
   return (
-    <header
+    <>
+      <AnimatePresence>
+        {localeLoading && (
+          <motion.div
+            key="locale-overlay"
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            transition={{duration: 0.2}}
+            className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#fdfcf8]/75 backdrop-blur-md"
+          >
+            {/* Spinning ring */}
+            <div className="relative w-16 h-16">
+              <div className="absolute inset-0 rounded-full border-4 border-[#a46131]/15" />
+              <motion.div
+                className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#a46131]"
+                animate={{rotate: 360}}
+                transition={{duration: 0.9, repeat: Infinity, ease: "linear"}}
+              />
+              {/* Coffee dot in center */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#a46131]" />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-500",
         lightHeader
@@ -196,14 +224,15 @@ export function SiteHeader() {
             </Link>
           ) : (
             <>
-              <LocaleSwitcher locale={locale} pathname={pathname} solid={solid} />
+              <LocaleSwitcher locale={locale} pathname={pathname} solid={solid} onLoading={setLocaleLoading} />
               <CartDrawer solid={solid} />
             </>
           )}
-          <MobileMenu solid={solid} />
+          <MobileMenu solid={solid} onLoading={setLocaleLoading} />
         </div>
       </div>
     </header>
+    </>
   );
 }
 
@@ -212,23 +241,20 @@ const localeFlag: Record<Locale, string> = {vi: "🇻🇳", en: "🇬🇧"};
 function LocaleSwitcher({
   locale,
   pathname,
-  solid
+  solid,
+  onLoading
 }: {
   locale: Locale;
   pathname: string;
   solid: boolean;
+  onLoading: (v: boolean) => void;
 }) {
   const nextLocale = locale === "vi" ? "en" : "vi";
   const router = useRouter();
 
   function handleSwitch() {
-    if (typeof document !== "undefined" && "startViewTransition" in document) {
-      document.startViewTransition(() => {
-        router.replace(pathname, {locale: nextLocale, scroll: false});
-      });
-    } else {
-      router.replace(pathname, {locale: nextLocale, scroll: false});
-    }
+    onLoading(true);
+    router.replace(pathname, {locale: nextLocale, scroll: false});
   }
 
   return (
@@ -245,7 +271,7 @@ function LocaleSwitcher({
   );
 }
 
-function MobileMenu({solid}: {solid?: boolean}) {
+function MobileMenu({solid, onLoading}: {solid?: boolean; onLoading: (v: boolean) => void}) {
   const t = useTranslations("Nav");
   const pathname = usePathname();
   const locale = useLocale() as Locale;
@@ -253,13 +279,8 @@ function MobileMenu({solid}: {solid?: boolean}) {
   const router = useRouter();
 
   function handleMobileSwitch() {
-    if (typeof document !== "undefined" && "startViewTransition" in document) {
-      document.startViewTransition(() => {
-        router.replace(pathname, {locale: nextLocale, scroll: false});
-      });
-    } else {
-      router.replace(pathname, {locale: nextLocale, scroll: false});
-    }
+    onLoading(true);
+    router.replace(pathname, {locale: nextLocale, scroll: false});
   }
 
   return (
