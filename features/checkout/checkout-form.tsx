@@ -217,7 +217,7 @@ export function CheckoutForm() {
               {items.map((item) => (
                 <div className="flex items-center gap-4 w-full" key={item.slug}>
                   <div className="relative w-14 h-14 rounded-[0.6rem] overflow-hidden bg-white/10 shrink-0 border border-white/5">
-                    <Image src={item.image} alt={item.name} fill className="object-cover" />
+                    <Image src={item.image} alt={item.name} fill sizes="56px" className="object-cover" />
                   </div>
                   <div className="flex-1 flex items-center justify-between min-w-0 gap-4">
                     <div className="flex flex-wrap items-center gap-x-2">
