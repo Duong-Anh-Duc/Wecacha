@@ -7,6 +7,7 @@ import {ProductCard} from "@/components/shop/product-card";
 import {Button} from "@/components/ui/button";
 import {Reveal} from "@/components/motion/reveal";
 import {CinematicHero} from "@/features/home/cinematic-hero";
+import {RecentPurchasesMarquee} from "@/features/home/recent-purchases-marquee";
 import {AnimatedStats} from "@/features/home/animated-stats";
 import {JourneyCards} from "@/features/home/journey-cards";
 import {TestimonialsCarousel} from "@/features/home/testimonials-carousel";
@@ -89,6 +90,8 @@ export default async function HomePage({params}: Props) {
         secondary={common("ctaStory")}
         scrollLabel={t("scroll")}
       />
+
+      <RecentPurchasesMarquee />
 
       <section className="relative overflow-hidden bg-parchment-50 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         {/* Background image — right half only */}

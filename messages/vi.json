@@ -86,8 +86,20 @@
     "promise2Copy": "Giữ trọn hương vị tự nhiên",
     "promise3Title": "Giao hàng toàn quốc",
     "promise3Copy": "Nhanh chóng, đóng gói cẩn thận",
-    "promise4Title": "Cam kết chất lượng",
-    "promise4Copy": "Hoàn tiền nếu không hài lòng"
+    "promise4Title": "Đảm bảo chất lượng",
+    "promise4Copy": "Hoàn trả nếu không hài lòng",
+    "recentPurchases": {
+      "buyPlum": "vừa mua 2 Cà phê Mận Chín",
+      "buyGift": "vừa đặt Set Quà Tặng Thổ Cẩm",
+      "buyHoney": "vừa mua 1 Cà phê Mật Ong",
+      "buyPhin": "vừa mua 3 Cà phê Phin Đặc Biệt",
+      "rateArabica": "đã đánh giá 5 sao cho Arabica",
+      "time2m": "2 phút trước",
+      "time15m": "15 phút trước",
+      "time1h": "1 giờ trước",
+      "time2h": "2 giờ trước",
+      "time3h": "3 giờ trước"
+    }
   },
   "Story": {
     "title": "Câu chuyện Sơn La trong làn sương",

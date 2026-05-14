@@ -5,6 +5,7 @@ import {ArrowDown, Play, ShoppingBag} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Link} from "@/i18n/navigation";
 import {heroVideo, imageLibrary} from "@/lib/content";
+import {RecentPurchasesMarquee} from "./recent-purchases-marquee";
 
 type Props = {
   kicker: string;
@@ -83,7 +84,7 @@ export function CinematicHero({
         </motion.div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 z-10 flex w-full max-w-[280px] -translate-x-1/2 flex-col items-center gap-3 text-center text-xs uppercase text-white/56">
+      <div className="absolute bottom-[80px] left-1/2 z-10 flex w-full max-w-[280px] -translate-x-1/2 flex-col items-center gap-3 text-center text-xs uppercase text-white/56">
         <span>{scrollLabel}</span>
         <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/22">
           <ArrowDown className="h-4 w-4 animate-bounce" aria-hidden="true" />

@@ -87,7 +87,19 @@
     "promise3Title": "Nationwide delivery",
     "promise3Copy": "Fast, carefully packaged",
     "promise4Title": "Quality guarantee",
-    "promise4Copy": "Full refund if not satisfied"
+    "promise4Copy": "Full refund if not satisfied",
+    "recentPurchases": {
+      "buyPlum": "just bought 2 Plum Coffee",
+      "buyGift": "just ordered Brocade Gift Set",
+      "buyHoney": "just bought 1 Honey Coffee",
+      "buyPhin": "just bought 3 Special Phin Coffee",
+      "rateArabica": "just rated 5 stars for Arabica",
+      "time2m": "2 mins ago",
+      "time15m": "15 mins ago",
+      "time1h": "1 hour ago",
+      "time2h": "2 hours ago",
+      "time3h": "3 hours ago"
+    }
   },
   "Story": {
     "title": "The Son La story in the mist",
