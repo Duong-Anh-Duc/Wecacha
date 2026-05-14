@@ -12,7 +12,7 @@ const contacts = [
     href: "https://zalo.me/0962083608",
     bg: "#0068FF",
     icon: (
-      <Image src="/logo-zalo-vector-thumbnail.jpg" alt="Zalo" width={20} height={20} className="h-5 w-5 rounded-sm object-contain" />
+      <Image src="/Icon_of_Zalo.svg.png" alt="Zalo" width={20} height={20} className="h-5 w-5 object-contain" />
     )
   },
   {
