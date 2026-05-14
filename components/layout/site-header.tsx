@@ -72,11 +72,17 @@ export function SiteHeader() {
   const t = useTranslations("Nav");
   const tCommon = useTranslations("Common");
   const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [localeLoading, setLocaleLoading] = useState(false);
   const isHome = pathname === "/";
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 24);
+      const el = document.documentElement;
+      const progress = (el.scrollTop || document.body.scrollTop) / (el.scrollHeight - el.clientHeight);
+      setScrollProgress(Math.min(1, Math.max(0, progress)));
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, {passive: true});
     return () => window.removeEventListener("scroll", onScroll);
@@ -115,7 +121,7 @@ export function SiteHeader() {
       </AnimatePresence>
       <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-500",
+        "fixed inset-x-0 top-0 z-50 transition-all duration-500 overflow-hidden",
         lightHeader
           ? "border-b border-forest-950/0 bg-[#f4f2ea]/92 backdrop-blur-xl"
           : solid
@@ -123,6 +129,14 @@ export function SiteHeader() {
           : "bg-gradient-to-b from-forest-950/78 via-forest-950/34 to-transparent"
       )}
     >
+      {/* Scroll progress bar */}
+      <div className="absolute top-0 left-0 right-0 h-[3px] z-10">
+        <motion.div
+          className="h-full origin-left bg-gradient-to-r from-[#38bdf8] via-[#4ade80] to-[#a3e635]"
+          style={{scaleX: scrollProgress}}
+          transition={{duration: 0}}
+        />
+      </div>
       <div className={cn(
         "mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8",
         lightHeader ? "max-w-[1720px]" : "max-w-7xl"
