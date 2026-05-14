@@ -7,7 +7,6 @@ import {
   ShoppingBag,
   Trash2,
   Leaf,
-  X,
   Tag,
   ChevronRight,
   Lock,
@@ -70,19 +69,12 @@ export function CartDrawer({solid}: {solid?: boolean}) {
       <SheetContent className="w-full sm:max-w-md bg-[#fdfcf8] border-none p-0 flex flex-col shadow-2xl">
         <SheetTitle className="sr-only">{tNav("cart")}</SheetTitle>
         <div className="px-6 pt-8 pb-4 bg-gradient-to-b from-[#fdfcf8] to-transparent z-10">
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="font-serif text-[2.5rem] leading-none text-[#142918] mb-2 tracking-tight">{tNav("cart")}</h2>
-              <p className="flex items-center text-[13px] font-medium text-[#142918]/70">
-                <Leaf className="w-3.5 h-3.5 mr-1.5 opacity-70" />
-                {tCart("itemCount", {count})}
-              </p>
-            </div>
-            <SheetClose asChild>
-              <button className="w-11 h-11 flex items-center justify-center rounded-2xl bg-white border border-[#142918]/10 text-[#142918]/60 hover:text-[#142918] transition-colors shadow-sm">
-                <X className="w-5 h-5" />
-              </button>
-            </SheetClose>
+          <div>
+            <h2 className="font-serif text-[2.5rem] leading-none text-[#142918] mb-2 tracking-tight">{tNav("cart")}</h2>
+            <p className="flex items-center text-[13px] font-medium text-[#142918]/70">
+              <Leaf className="w-3.5 h-3.5 mr-1.5 opacity-70" />
+              {tCart("itemCount", {count})}
+            </p>
           </div>
         </div>
 
