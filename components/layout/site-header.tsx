@@ -224,12 +224,12 @@ function LocaleSwitcher({
       href={pathname}
       locale={nextLocale}
       className={cn(
-        "hidden h-10 items-center justify-center gap-1.5 rounded-full border border-white/28 bg-white/8 px-3 text-xs font-bold uppercase text-white backdrop-blur transition hover:bg-white/16 sm:inline-flex"
+        "hidden h-10 items-center justify-center gap-2 rounded-full border border-white/28 bg-white/8 px-4 text-[13px] font-semibold text-white backdrop-blur transition hover:bg-white/16 sm:inline-flex"
       )}
       aria-label={localeNames[nextLocale]}
     >
       <span className="text-base leading-none">{localeFlag[nextLocale]}</span>
-      {nextLocale}
+      {localeNames[nextLocale]}
     </Link>
   );
 }
@@ -268,7 +268,7 @@ function MobileMenu({solid}: {solid?: boolean}) {
           transition={{duration: 5.5, repeat: Infinity, ease: "easeInOut"}}
         />
         <motion.div
-          className="relative flex min-h-full flex-col px-7 pb-7 pt-7"
+          className="relative flex h-full flex-col overflow-y-auto px-7 pb-7 pt-7"
           initial={{opacity: 0, y: 18}}
           animate={{opacity: 1, y: 0}}
           transition={{duration: 0.7, ease: drawerEase}}
@@ -335,16 +335,16 @@ function MobileMenu({solid}: {solid?: boolean}) {
                   <Link
                     href={item.href}
                     className={cn(
-                      "group flex min-h-[86px] items-center gap-5 border-b border-earth-700/14 px-1 text-forest-950 transition duration-500",
-                      "hover:bg-forest-950/[0.03]",
-                      active && "my-2 min-h-[78px] rounded-xl border border-earth-700/18 bg-parchment-50/58 px-4 text-earth-700 shadow-[0_18px_45px_rgba(76,52,20,0.08)]",
-                      item.children && !active && "border-none min-h-[72px]"
+                      "group flex min-h-[86px] w-full items-center gap-5 px-2 text-forest-950 transition duration-500 outline-none",
+                      "hover:bg-forest-950/[0.03] focus-visible:bg-forest-950/[0.03]",
+                      active && "text-earth-700",
+                      item.children && "min-h-[72px]"
                     )}
                   >
                     <span
                       className={cn(
                         "flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-forest-950/6 text-forest-800 transition duration-500 group-hover:scale-110 group-hover:bg-earth-600/10 group-hover:text-earth-700",
-                        active && "bg-transparent text-earth-700"
+                        active && "bg-earth-600/10 text-earth-700"
                       )}
                     >
                       <Icon className="h-7 w-7 transition duration-500 group-hover:-rotate-6" aria-hidden="true" />
@@ -363,7 +363,7 @@ function MobileMenu({solid}: {solid?: boolean}) {
                 </SheetClose>
                 
                 {item.children && (
-                  <div className="mb-4 ml-16 mr-4 flex flex-col gap-1 border-b border-earth-700/14 pb-5">
+                  <div className="mb-4 ml-16 mr-4 flex flex-col gap-1 pb-5">
                     {item.children.map((child) => (
                       <SheetClose asChild key={child.href}>
                         <Link 
@@ -423,7 +423,7 @@ function MobileMenu({solid}: {solid?: boolean}) {
           </motion.div>
 
           <motion.div
-            className="relative z-10 mt-6"
+            className="relative z-10 mt-6 flex justify-center pb-8"
             initial={{opacity: 0, y: 12}}
             animate={{opacity: 1, y: 0}}
             transition={{duration: 0.7, delay: 0.7, ease: drawerEase}}
@@ -432,9 +432,9 @@ function MobileMenu({solid}: {solid?: boolean}) {
               <Link
                 href={pathname}
                 locale={nextLocale}
-                className="inline-flex h-[52px] items-center gap-3 rounded-full border border-earth-700/12 bg-parchment-50/72 px-5 py-3 text-base font-bold text-forest-800 shadow-[0_12px_36px_rgba(76,52,20,0.06)] transition duration-500 hover:-translate-y-0.5 hover:bg-parchment-50 hover:shadow-warm"
+                className="inline-flex h-[52px] items-center gap-3 rounded-full border border-earth-700/12 bg-parchment-50/72 px-6 py-3 text-[15px] font-bold text-forest-800 shadow-[0_12px_36px_rgba(76,52,20,0.06)] transition duration-500 hover:-translate-y-0.5 hover:bg-parchment-50 hover:shadow-warm"
               >
-                <span className="text-xl leading-none">{localeFlag[nextLocale]}</span>
+                <span className="text-[22px] leading-none">{localeFlag[nextLocale]}</span>
                 {localeNames[nextLocale]}
               </Link>
             </SheetClose>
