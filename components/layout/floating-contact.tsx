@@ -8,7 +8,7 @@ import {useTranslations} from "next-intl";
 const contacts = [
   {
     label: "Zalo",
-    href: "https://zalo.me/YOUR_ZALO_NUMBER",
+    href: "https://zalo.me/0962083608",
     bg: "#0068FF",
     icon: (
       <svg viewBox="0 0 48 48" fill="none" className="h-5 w-5">
@@ -18,7 +18,7 @@ const contacts = [
   },
   {
     label: "Facebook",
-    href: "https://facebook.com/YOUR_PAGE",
+    href: "https://www.facebook.com/wecachacoffeeandtea/?locale=vi_VN",
     bg: "#1877F2",
     icon: (
       <svg viewBox="0 0 24 24" fill="white" className="h-5 w-5">
@@ -28,7 +28,7 @@ const contacts = [
   },
   {
     label: "Messenger",
-    href: "https://m.me/YOUR_PAGE",
+    href: "https://www.facebook.com/messages/new?initial_e2ee_toggle_position=true",
     bg: "#0099FF",
     icon: (
       <svg viewBox="0 0 24 24" fill="white" className="h-5 w-5">
