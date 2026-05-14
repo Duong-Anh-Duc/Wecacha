@@ -121,7 +121,7 @@ export function SiteHeader() {
       </AnimatePresence>
       <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-500 overflow-hidden",
+        "fixed inset-x-0 top-0 z-50 transition-all duration-500",
         lightHeader
           ? "border-b border-forest-950/0 bg-[#f4f2ea]/92 backdrop-blur-xl"
           : solid
