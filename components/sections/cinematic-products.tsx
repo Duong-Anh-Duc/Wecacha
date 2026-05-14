@@ -122,7 +122,7 @@ export function CinematicProducts() {
                 <div className="group relative w-full h-[750px] rounded-[2.5rem] overflow-hidden border border-[#b5703a]/20 bg-[#081009] shadow-[0_30px_80px_rgba(0,0,0,0.6)] transition-all duration-700 hover:shadow-[0_40px_100px_rgba(181,112,58,0.25)] hover:-translate-y-3">
                   
                   {/* Cinematic Image Background */}
-                  <div className="absolute top-0 left-0 w-full h-[65%] overflow-hidden bg-[#111]">
+                  <div className="absolute inset-0 w-full h-full overflow-hidden bg-[#111]">
                     <Image 
                       src={product.image} 
                       alt={product.name} 
@@ -130,24 +130,18 @@ export function CinematicProducts() {
                       className="object-cover transition-transform duration-[3s] ease-out group-hover:scale-[1.15] opacity-90 group-hover:opacity-100"
                       sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                     />
-                    {/* Smoky Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#081009] via-[#081009]/50 to-transparent" />
+                    {/* Stronger Dark Gradient Overlay for Readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent opacity-90" />
                   </div>
 
                   {/* Ambient Amber Flare */}
-                  <div className="absolute -right-20 top-10 w-64 h-64 bg-[#b5703a] rounded-full mix-blend-screen filter blur-[100px] opacity-20 group-hover:opacity-50 transition-opacity duration-1000 pointer-events-none" />
-
-                  {/* Film Grain Texture */}
-                  <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
+                  <div className="absolute -right-20 top-10 w-64 h-64 bg-[#b5703a] rounded-full mix-blend-screen filter blur-[100px] opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
 
                   {/* Top Badges */}
                   <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-20">
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/90 text-xs font-bold tracking-widest shadow-xl">
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs font-bold tracking-widest shadow-xl">
                       <Coffee className="w-3.5 h-3.5 text-[#b5703a]" /> {product.weight}
                     </div>
-                    <button className="flex items-center justify-center w-11 h-11 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/60 hover:text-[#b5703a] hover:bg-black/60 transition-all shadow-xl group/btn">
-                      <Heart className="w-5 h-5 transition-transform group-hover/btn:scale-110" />
-                    </button>
                   </div>
 
                   {/* Content Area */}
@@ -156,35 +150,42 @@ export function CinematicProducts() {
                     {/* Floating Tags */}
                     <div className="flex flex-wrap gap-2.5 mb-5">
                       {product.tags.map((tag, tagIdx) => (
-                        <span key={tagIdx} className="px-3.5 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-[#f4f2ea]/80 text-[10px] font-bold tracking-widest uppercase shadow-sm">
+                        <span key={tagIdx} className="px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white text-[11px] font-bold tracking-widest uppercase shadow-sm">
                           {tag}
                         </span>
                       ))}
                     </div>
 
                     {/* Title & Price */}
-                    <div className="flex justify-between items-end gap-4 mb-4">
-                      <h3 className="font-serif text-[2.2rem] xl:text-[2.5rem] text-[#f4f2ea] leading-[1.1] drop-shadow-xl group-hover:text-[#b5703a] transition-colors duration-500">
+                    <div className="flex flex-col gap-3 mb-5">
+                      <h3 className="font-serif text-[2.2rem] xl:text-[2.5rem] text-white leading-[1.1] drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] group-hover:text-[#b5703a] transition-colors duration-500">
                         {product.name}
                       </h3>
-                      <span className="text-[#b5703a] font-bold text-2xl whitespace-nowrap drop-shadow-[0_0_15px_rgba(181,112,58,0.4)]">
-                        {product.price}
-                      </span>
+                      <div className="flex items-center gap-4">
+                        <span className="text-[#b5703a] font-bold text-[28px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                          {product.price}
+                        </span>
+                        {/* Fake old price & discount for visual flair */}
+                        <div className="flex items-center gap-2 bg-black/40 px-3 py-1 rounded-full border border-white/10">
+                          <span className="text-white/50 line-through text-sm font-medium">350.000 đ</span>
+                          <span className="text-[#ff4d00] text-xs font-bold">-19%</span>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Storytelling Snippet */}
-                    <p className="text-white/60 text-[14px] leading-[1.7] mb-7 font-light">
+                    <p className="text-white/80 text-[15px] leading-[1.6] mb-7 font-light drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                       {product.desc}
                     </p>
 
                     {/* Glassmorphism Specs Panel */}
-                    <div className="grid grid-cols-3 gap-2 p-4 mb-7 rounded-2xl bg-black/40 backdrop-blur-md border border-white/5 shadow-inner">
+                    <div className="grid grid-cols-3 gap-2 p-5 mb-7 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
                       {product.features.map((feat, featIdx) => {
                         const Icon = feat.icon;
                         return (
                           <div key={featIdx} className="flex flex-col items-center justify-center gap-2 text-center px-1">
-                            <Icon className="w-4 h-4 text-[#b5703a]" strokeWidth={1.5} />
-                            <span className="text-[10px] text-white/80 font-bold uppercase tracking-wider">{feat.text}</span>
+                            <Icon className="w-5 h-5 text-[#b5703a]" strokeWidth={1.5} />
+                            <span className="text-[11px] text-white font-bold uppercase tracking-wider">{feat.text}</span>
                           </div>
                         )
                       })}
@@ -192,17 +193,17 @@ export function CinematicProducts() {
 
                     {/* Irresistible Buttons */}
                     <div className="flex gap-4 mb-6">
-                      <button className="flex-[0.8] flex items-center justify-center gap-2 bg-[#f4f2ea] text-[#142918] py-4 rounded-2xl font-bold text-sm transition-all hover:bg-white hover:scale-[1.02] shadow-[0_10px_20px_rgba(0,0,0,0.2)]">
+                      <button className="flex-[0.8] flex items-center justify-center gap-2 bg-black/50 backdrop-blur-md border border-white/20 text-white py-4 rounded-2xl font-bold text-sm transition-all hover:bg-white hover:text-black hover:scale-[1.02] shadow-[0_10px_20px_rgba(0,0,0,0.4)]">
                         <ShoppingBag className="w-4 h-4" /> Thêm giỏ
                       </button>
-                      <button className="flex-[1.2] flex items-center justify-center gap-2 bg-gradient-to-r from-[#b5703a] via-[#c6824b] to-[#b5703a] text-white py-4 rounded-2xl font-bold text-sm transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(181,112,58,0.5)] shadow-[0_10px_20px_rgba(181,112,58,0.3)] bg-[length:200%_auto] hover:bg-right">
+                      <button className="flex-[1.2] flex items-center justify-center gap-2 bg-gradient-to-r from-[#b5703a] to-[#8a5226] text-white py-4 rounded-2xl font-bold text-sm transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(181,112,58,0.5)] shadow-[0_10px_20px_rgba(181,112,58,0.4)]">
                         <Package className="w-4 h-4" /> Mua ngay
                       </button>
                     </div>
 
                     {/* Immersive Bottom Link */}
                     <div className="pt-5 border-t border-white/10 flex justify-between items-center group/link cursor-pointer">
-                      <span className="text-[#b5703a] text-[12px] font-bold uppercase tracking-[0.15em] flex items-center gap-2">
+                      <span className="text-[#b5703a] text-[13px] font-bold uppercase tracking-[0.15em] flex items-center gap-2">
                         <Sparkles className="w-4 h-4" /> Khám phá ngay {product.name.split(' ')[0]}
                       </span>
                       <ArrowRight className="w-4 h-4 text-[#b5703a] transition-transform duration-300 group-hover/link:translate-x-2" />
@@ -221,7 +222,7 @@ export function CinematicProducts() {
                 <div className="group relative w-full h-[750px] rounded-[2.5rem] overflow-hidden border border-[#b5703a]/20 bg-[#081009] shadow-[0_30px_80px_rgba(0,0,0,0.6)] transition-all duration-700 hover:shadow-[0_40px_100px_rgba(181,112,58,0.25)] hover:-translate-y-3">
                   
                   {/* Cinematic Image Background */}
-                  <div className="absolute top-0 left-0 w-full h-[65%] overflow-hidden bg-[#111]">
+                  <div className="absolute inset-0 w-full h-full overflow-hidden bg-[#111]">
                     <Image 
                       src={product.image} 
                       alt={product.name} 
@@ -229,23 +230,18 @@ export function CinematicProducts() {
                       className="object-cover transition-transform duration-[3s] ease-out group-hover:scale-[1.15] opacity-90 group-hover:opacity-100"
                       sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#081009] via-[#081009]/50 to-transparent" />
+                    {/* Stronger Dark Gradient Overlay for Readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent opacity-90" />
                   </div>
 
                   {/* Ambient Amber Flare */}
-                  <div className="absolute -right-20 top-10 w-64 h-64 bg-[#b5703a] rounded-full mix-blend-screen filter blur-[100px] opacity-20 group-hover:opacity-50 transition-opacity duration-1000 pointer-events-none" />
-
-                  {/* Film Grain Texture */}
-                  <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
+                  <div className="absolute -right-20 top-10 w-64 h-64 bg-[#b5703a] rounded-full mix-blend-screen filter blur-[100px] opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
 
                   {/* Top Badges */}
                   <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-20">
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/90 text-xs font-bold tracking-widest shadow-xl">
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs font-bold tracking-widest shadow-xl">
                       <Coffee className="w-3.5 h-3.5 text-[#b5703a]" /> {product.weight}
                     </div>
-                    <button className="flex items-center justify-center w-11 h-11 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/60 hover:text-[#b5703a] hover:bg-black/60 transition-all shadow-xl group/btn">
-                      <Heart className="w-5 h-5 transition-transform group-hover/btn:scale-110" />
-                    </button>
                   </div>
 
                   {/* Content Area */}
@@ -254,35 +250,42 @@ export function CinematicProducts() {
                     {/* Floating Tags */}
                     <div className="flex flex-wrap gap-2.5 mb-5">
                       {product.tags.map((tag, tagIdx) => (
-                        <span key={tagIdx} className="px-3.5 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-[#f4f2ea]/80 text-[10px] font-bold tracking-widest uppercase shadow-sm">
+                        <span key={tagIdx} className="px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white text-[11px] font-bold tracking-widest uppercase shadow-sm">
                           {tag}
                         </span>
                       ))}
                     </div>
 
                     {/* Title & Price */}
-                    <div className="flex justify-between items-end gap-4 mb-4">
-                      <h3 className="font-serif text-[2.2rem] xl:text-[2.5rem] text-[#f4f2ea] leading-[1.1] drop-shadow-xl group-hover:text-[#b5703a] transition-colors duration-500">
+                    <div className="flex flex-col gap-3 mb-5">
+                      <h3 className="font-serif text-[2.2rem] xl:text-[2.5rem] text-white leading-[1.1] drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] group-hover:text-[#b5703a] transition-colors duration-500">
                         {product.name}
                       </h3>
-                      <span className="text-[#b5703a] font-bold text-2xl whitespace-nowrap drop-shadow-[0_0_15px_rgba(181,112,58,0.4)]">
-                        {product.price}
-                      </span>
+                      <div className="flex items-center gap-4">
+                        <span className="text-[#b5703a] font-bold text-[28px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                          {product.price}
+                        </span>
+                        {/* Fake old price & discount */}
+                        <div className="flex items-center gap-2 bg-black/40 px-3 py-1 rounded-full border border-white/10">
+                          <span className="text-white/50 line-through text-sm font-medium">250.000 đ</span>
+                          <span className="text-[#ff4d00] text-xs font-bold">-22%</span>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Storytelling Snippet */}
-                    <p className="text-white/60 text-[14px] leading-[1.7] mb-7 font-light">
+                    <p className="text-white/80 text-[15px] leading-[1.6] mb-7 font-light drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                       {product.desc}
                     </p>
 
                     {/* Glassmorphism Specs Panel */}
-                    <div className="grid grid-cols-3 gap-2 p-4 mb-7 rounded-2xl bg-black/40 backdrop-blur-md border border-white/5 shadow-inner">
+                    <div className="grid grid-cols-3 gap-2 p-5 mb-7 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
                       {product.features.map((feat, featIdx) => {
                         const Icon = feat.icon;
                         return (
                           <div key={featIdx} className="flex flex-col items-center justify-center gap-2 text-center px-1">
-                            <Icon className="w-4 h-4 text-[#b5703a]" strokeWidth={1.5} />
-                            <span className="text-[10px] text-white/80 font-bold uppercase tracking-wider">{feat.text}</span>
+                            <Icon className="w-5 h-5 text-[#b5703a]" strokeWidth={1.5} />
+                            <span className="text-[11px] text-white font-bold uppercase tracking-wider">{feat.text}</span>
                           </div>
                         )
                       })}
@@ -290,17 +293,17 @@ export function CinematicProducts() {
 
                     {/* Irresistible Buttons */}
                     <div className="flex gap-4 mb-6">
-                      <button className="flex-[0.8] flex items-center justify-center gap-2 bg-[#f4f2ea] text-[#142918] py-4 rounded-2xl font-bold text-sm transition-all hover:bg-white hover:scale-[1.02] shadow-[0_10px_20px_rgba(0,0,0,0.2)]">
+                      <button className="flex-[0.8] flex items-center justify-center gap-2 bg-black/50 backdrop-blur-md border border-white/20 text-white py-4 rounded-2xl font-bold text-sm transition-all hover:bg-white hover:text-black hover:scale-[1.02] shadow-[0_10px_20px_rgba(0,0,0,0.4)]">
                         <ShoppingBag className="w-4 h-4" /> Thêm giỏ
                       </button>
-                      <button className="flex-[1.2] flex items-center justify-center gap-2 bg-gradient-to-r from-[#b5703a] via-[#c6824b] to-[#b5703a] text-white py-4 rounded-2xl font-bold text-sm transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(181,112,58,0.5)] shadow-[0_10px_20px_rgba(181,112,58,0.3)] bg-[length:200%_auto] hover:bg-right">
+                      <button className="flex-[1.2] flex items-center justify-center gap-2 bg-gradient-to-r from-[#b5703a] to-[#8a5226] text-white py-4 rounded-2xl font-bold text-sm transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(181,112,58,0.5)] shadow-[0_10px_20px_rgba(181,112,58,0.4)]">
                         <Package className="w-4 h-4" /> Mua ngay
                       </button>
                     </div>
 
                     {/* Immersive Bottom Link */}
                     <div className="pt-5 border-t border-white/10 flex justify-between items-center group/link cursor-pointer">
-                      <span className="text-[#b5703a] text-[12px] font-bold uppercase tracking-[0.15em] flex items-center gap-2">
+                      <span className="text-[#b5703a] text-[13px] font-bold uppercase tracking-[0.15em] flex items-center gap-2">
                         <Sparkles className="w-4 h-4" /> Khám phá ngay {product.name.split(' ')[0]}
                       </span>
                       <ArrowRight className="w-4 h-4 text-[#b5703a] transition-transform duration-300 group-hover/link:translate-x-2" />

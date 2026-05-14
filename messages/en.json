@@ -15,7 +15,10 @@
     "checkout": "Checkout",
     "menu": "Open menu",
     "close": "Close",
-    "searchProducts": "Search products"
+    "searchProducts": "Search products",
+    "haveQuestions": "Have questions?",
+    "contactUsBubble": "Contact us",
+    "needAdvice": "Need advice?"
   },
   "Common": {
     "brand": "Son La Coffee",

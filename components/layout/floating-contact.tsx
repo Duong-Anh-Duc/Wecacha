@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {motion, AnimatePresence} from "framer-motion";
 import {MessageCircle, X} from "lucide-react";
 import {useTranslations} from "next-intl";
@@ -41,6 +41,17 @@ const contacts = [
 export function FloatingContact() {
   const t = useTranslations("Nav");
   const [open, setOpen] = useState(false);
+  const [textIndex, setTextIndex] = useState(0);
+
+  const bubbleTexts = ["haveQuestions", "contactUsBubble", "needAdvice"] as const;
+
+  useEffect(() => {
+    if (open) return;
+    const interval = setInterval(() => {
+      setTextIndex((prev) => (prev + 1) % bubbleTexts.length);
+    }, 3500); // Change text every 3.5 seconds
+    return () => clearInterval(interval);
+  }, [open, bubbleTexts.length]);
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
@@ -105,8 +116,19 @@ export function FloatingContact() {
               animate={{scale: [0.9, 1.2, 0.9], opacity: [0.38, 0.72, 0.38]}}
               transition={{duration: 1.55, repeat: Infinity, ease: "easeInOut"}}
             />
-            <span className="pointer-events-none absolute right-[calc(100%+0.75rem)] top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-full bg-forest-950 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-parchment-50 shadow-warm opacity-0 transition duration-300 group-hover:opacity-100 sm:block">
-              {t("contact")}
+            <span className="pointer-events-none absolute right-[calc(100%+1rem)] top-1/2 -translate-y-1/2 whitespace-nowrap overflow-hidden rounded-[16px] rounded-br-[4px] bg-white px-4 py-2 text-[13px] font-bold text-[#b54a1a] shadow-[0_4px_14px_rgba(0,0,0,0.15)] transition-all duration-300 origin-right animate-[pulse_3s_infinite]">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={textIndex}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="block"
+                >
+                  {t(bubbleTexts[textIndex])}
+                </motion.span>
+              </AnimatePresence>
             </span>
           </>
         ) : null}

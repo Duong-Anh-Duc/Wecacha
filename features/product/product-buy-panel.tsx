@@ -38,56 +38,56 @@ export function ProductBuyPanel({product}: {product: Product}) {
         )}
       </div>
 
-      <h1 className="font-serif text-[42px] leading-[1.1] text-[#142918] mb-4">
+      <h1 className="font-serif text-[32px] lg:text-[42px] leading-[1.1] text-[#142918] mb-4">
         {localized(product.name, locale)}
       </h1>
       
-      <p className="text-[15px] leading-[1.6] text-[#142918]/80 mb-6 max-w-[90%]">
+      <p className="text-[14px] lg:text-[15px] leading-[1.6] text-[#142918]/80 mb-6 w-full lg:max-w-[90%]">
         {localized(product.description, locale)}
       </p>
 
       {/* Price */}
       <div className="flex items-end gap-3 mb-8 relative group">
         {product.originalPrice && (
-          <span className="text-[20px] font-medium text-[#142918]/40 line-through mb-1 relative">
+          <span className="text-[18px] lg:text-[20px] font-medium text-[#142918]/40 line-through mb-1 relative">
             {formatCurrency(product.originalPrice, locale)}
           </span>
         )}
         <div className="relative">
           {/* Lửa cháy (Glow effect) */}
           <div className="absolute -inset-1 bg-gradient-to-r from-[#ff4d00] to-[#ffaa00] opacity-0 group-hover:opacity-20 blur-xl transition duration-500 rounded-full" />
-          <span className="text-[38px] font-bold text-[#e65c00] leading-none drop-shadow-[0_2px_10px_rgba(230,92,0,0.25)] relative z-10 transition duration-300 group-hover:text-[#ff4500]">
+          <span className="text-[32px] lg:text-[38px] font-bold text-[#e65c00] leading-none drop-shadow-[0_2px_10px_rgba(230,92,0,0.25)] relative z-10 transition duration-300 group-hover:text-[#ff4500]">
             {formatCurrency(product.price, locale)}
           </span>
         </div>
         {product.originalPrice && (
-          <span className="bg-gradient-to-r from-[#ff4d00] to-[#ffaa00] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-2 shadow-sm animate-pulse">
+          <span className="bg-gradient-to-r from-[#ff4d00] to-[#ffaa00] text-white text-[10px] lg:text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-2 shadow-sm animate-pulse">
             -22%
           </span>
         )}
       </div>
 
       {/* Feature Pills */}
-      <div className="flex flex-wrap gap-3 mb-8">
-        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl w-[120px] h-[72px]">
-          <Coffee className="w-5 h-5 text-[#142918]/70" />
-          <span className="text-[9px] font-bold text-[#142918]">{tProduct("arabicaPill")}</span>
+      <div className="grid grid-cols-3 gap-2 lg:gap-3 mb-8">
+        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl h-[72px] text-center p-1">
+          <Coffee className="w-5 h-5 text-[#142918]/70 shrink-0" />
+          <span className="text-[8px] lg:text-[9px] font-bold text-[#142918] leading-tight">{tProduct("arabicaPill")}</span>
         </div>
-        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl w-[120px] h-[72px]">
-          <Droplet className="w-5 h-5 text-[#142918]/70" />
-          <span className="text-[9px] font-bold text-[#142918]">{tProduct("naturalRoastFull")}</span>
+        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl h-[72px] text-center p-1">
+          <Droplet className="w-5 h-5 text-[#142918]/70 shrink-0" />
+          <span className="text-[8px] lg:text-[9px] font-bold text-[#142918] leading-tight">{tProduct("naturalRoastFull")}</span>
         </div>
-        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl w-[120px] h-[72px]">
-          <AlertCircle className="w-5 h-5 text-[#142918]/70" />
-          <span className="text-[9px] font-bold text-[#142918]">{tProduct("noPreservatives")}</span>
+        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl h-[72px] text-center p-1">
+          <AlertCircle className="w-5 h-5 text-[#142918]/70 shrink-0" />
+          <span className="text-[8px] lg:text-[9px] font-bold text-[#142918] leading-tight">{tProduct("noPreservatives")}</span>
         </div>
       </div>
 
       {/* Add to Cart Actions */}
       <div className="mb-8">
         <p className="mb-3 text-[13px] font-bold text-[#142918]">{t("quantity")}</p>
-        <div className="flex gap-4">
-          <div className="inline-flex h-12 items-center rounded-xl border border-[#142918]/20 bg-white px-2">
+        <div className="flex gap-3 lg:gap-4">
+          <div className="inline-flex h-12 lg:h-14 items-center rounded-xl border border-[#142918]/20 bg-white px-2">
             <button
               className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
               onClick={() => setQuantity((value) => Math.max(1, value - 1))}
@@ -95,7 +95,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
             >
               <Minus className="h-4 w-4" />
             </button>
-            <span className="min-w-10 text-center font-bold text-[15px]">{quantity}</span>
+            <span className="min-w-8 lg:min-w-10 text-center font-bold text-[15px]">{quantity}</span>
             <button
               className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
               onClick={() => setQuantity((value) => value + 1)}
@@ -109,7 +109,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
             locale={locale}
             quantity={quantity}
             variant="default"
-            className="flex-1 h-12 bg-[#a46131] hover:bg-[#8e5227] text-white rounded-xl text-[15px] font-bold shadow-[0_4px_14px_rgba(164,97,49,0.25)] transition-all hover:-translate-y-0.5"
+            className="flex-1 h-12 lg:h-14 bg-[#a46131] hover:bg-[#8e5227] text-white rounded-xl text-[14px] lg:text-[15px] font-bold shadow-[0_4px_14px_rgba(164,97,49,0.25)] transition-all hover:-translate-y-0.5 px-2"
             label={t("addToCart")}
           />
         </div>
@@ -117,7 +117,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
           product={product} 
           quantity={quantity} 
           variant="default"
-          className="w-full h-14 mt-4 rounded-xl bg-gradient-to-r from-[#ff5100] to-[#cc2900] text-white text-[16px] font-bold transition-all overflow-hidden relative group animate-fire" 
+          className="w-full h-12 lg:h-14 mt-4 rounded-xl bg-gradient-to-r from-[#ff5100] to-[#cc2900] text-white text-[15px] lg:text-[16px] font-bold transition-all overflow-hidden relative group animate-fire" 
         >
           {/* Shimmer effect inside the fire button */}
           <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
@@ -128,22 +128,22 @@ export function ProductBuyPanel({product}: {product: Product}) {
       </div>
 
       {/* Trust Badges */}
-      <div className="flex gap-4 p-4 rounded-2xl bg-white/50 border border-[#142918]/5">
-        <div className="flex gap-3 flex-1 items-start">
+      <div className="flex flex-col sm:flex-row gap-4 lg:gap-4 p-4 rounded-2xl bg-white/50 border border-[#142918]/5">
+        <div className="flex gap-3 flex-1 items-center sm:items-start">
           <Truck className="w-5 h-5 text-[#142918]/80 shrink-0" />
           <div>
             <p className="text-[11px] font-bold text-[#142918] leading-tight">{tProduct("freeShippingTitle")}</p>
             <p className="text-[10px] text-[#142918]/60 mt-0.5">{tProduct("freeShippingDesc")}</p>
           </div>
         </div>
-        <div className="flex gap-3 flex-1 items-start">
+        <div className="flex gap-3 flex-1 items-center sm:items-start">
           <ShieldCheck className="w-5 h-5 text-[#142918]/80 shrink-0" />
           <div>
             <p className="text-[11px] font-bold text-[#142918] leading-tight">{tProduct("easyReturnTitle")}</p>
             <p className="text-[10px] text-[#142918]/60 mt-0.5">{tProduct("easyReturnDesc")}</p>
           </div>
         </div>
-        <div className="flex gap-3 flex-1 items-start">
+        <div className="flex gap-3 flex-1 items-center sm:items-start">
           <Headphones className="w-5 h-5 text-[#142918]/80 shrink-0" />
           <div>
             <p className="text-[11px] font-bold text-[#142918] leading-tight">{tProduct("supportTitle")}</p>

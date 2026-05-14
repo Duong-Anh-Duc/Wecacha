@@ -15,7 +15,10 @@
     "checkout": "Thanh toán",
     "menu": "Mở menu",
     "close": "Đóng",
-    "searchProducts": "Tìm kiếm sản phẩm"
+    "searchProducts": "Tìm kiếm sản phẩm",
+    "haveQuestions": "Bạn có thắc mắc?",
+    "contactUsBubble": "Liên hệ chúng tôi",
+    "needAdvice": "Cần tư vấn ngay?"
   },
   "Common": {
     "brand": "Sơn La Coffee",
