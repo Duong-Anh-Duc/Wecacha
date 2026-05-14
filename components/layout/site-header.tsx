@@ -224,6 +224,7 @@ function LocaleSwitcher({
     <Link
       href={pathname}
       locale={nextLocale}
+      scroll={false}
       viewTransition
       className={cn(
         "hidden h-10 items-center justify-center gap-2 rounded-full border border-white/28 bg-white/8 px-4 text-[13px] font-semibold text-white backdrop-blur transition hover:bg-white/16 sm:inline-flex"
@@ -434,6 +435,8 @@ function MobileMenu({solid}: {solid?: boolean}) {
               <Link
                 href={pathname}
                 locale={nextLocale}
+                scroll={false}
+                viewTransition
                 className="inline-flex h-[52px] items-center gap-3 rounded-full border border-earth-700/12 bg-parchment-50/72 px-6 py-3 text-[15px] font-bold text-forest-800 shadow-[0_12px_36px_rgba(76,52,20,0.06)] transition duration-500 hover:-translate-y-0.5 hover:bg-parchment-50 hover:shadow-warm"
               >
                 <span className="text-[22px] leading-none">{localeFlag[nextLocale]}</span>
