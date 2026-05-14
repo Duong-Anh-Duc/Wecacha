@@ -1,11 +1,10 @@
 "use client";
 
 import {useState} from "react";
-import {Minus, Plus} from "lucide-react";
+import {Minus, Plus, Star, ShieldCheck, Truck, Headphones, Droplet, Coffee, AlertCircle, ShoppingBag} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
-import {Button} from "@/components/ui/button";
 import type {Locale} from "@/i18n/routing";
 import type {Product} from "@/lib/content";
 import {formatCurrency, localized} from "@/lib/content";
@@ -13,74 +12,134 @@ import {formatCurrency, localized} from "@/lib/content";
 export function ProductBuyPanel({product}: {product: Product}) {
   const locale = useLocale() as Locale;
   const t = useTranslations("Common");
-  const productT = useTranslations("Product");
+  const tProduct = useTranslations("Product");
   const [quantity, setQuantity] = useState(1);
 
   return (
-    <aside className="sticky top-28 rounded-md border border-forest-950/10 bg-parchment-50 p-5 shadow-warm">
-      <p className="text-xs font-bold uppercase text-earth-600">
-        {product.weight}
-      </p>
-      <h1 className="mt-3 font-serif text-5xl leading-tight text-forest-950">
+    <aside className="sticky top-28 flex flex-col pt-2">
+      {/* Rating & Badge */}
+      <div className="flex items-center gap-3 mb-4 text-[#142918]">
+        <div className="flex items-center gap-1.5 font-bold text-sm">
+          <span>4.9</span>
+          <div className="flex text-[#f3a734]">
+            <Star className="w-4 h-4 fill-current" />
+            <Star className="w-4 h-4 fill-current" />
+            <Star className="w-4 h-4 fill-current" />
+            <Star className="w-4 h-4 fill-current" />
+            <Star className="w-4 h-4 fill-current" />
+          </div>
+          <span className="text-[#142918]/60 font-medium px-1">|</span>
+          <span className="text-[#142918]/70 font-medium">{tProduct("reviewCount", {count: 128})}</span>
+        </div>
+        {product.featured && (
+          <span className="bg-[#417a22] text-white text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-sm">
+            {tProduct("bestseller")}
+          </span>
+        )}
+      </div>
+
+      <h1 className="font-serif text-[42px] leading-[1.1] text-[#142918] mb-4">
         {localized(product.name, locale)}
       </h1>
-      <p className="mt-4 text-base leading-7 text-forest-950/68">
+      
+      <p className="text-[15px] leading-[1.6] text-[#142918]/80 mb-6 max-w-[90%]">
         {localized(product.description, locale)}
       </p>
-      <p className="mt-6 text-2xl font-bold text-earth-700">
-        {formatCurrency(product.price, locale)}
-      </p>
 
-      <div className="mt-6">
-        <p className="mb-2 text-sm font-semibold">{t("quantity")}</p>
-        <div className="inline-flex items-center rounded-full border border-forest-950/14">
-          <button
-            className="p-3"
-            onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-            aria-label={t("decreaseQty")}
-          >
-            <Minus className="h-4 w-4" />
-          </button>
-          <span className="min-w-10 text-center font-semibold">{quantity}</span>
-          <button
-            className="p-3"
-            onClick={() => setQuantity((value) => value + 1)}
-            aria-label={t("increaseQty")}
-          >
-            <Plus className="h-4 w-4" />
-          </button>
+      {/* Price */}
+      <div className="flex items-end gap-3 mb-8">
+        {product.originalPrice && (
+          <span className="text-[20px] font-medium text-[#142918]/40 line-through mb-1">
+            {formatCurrency(product.originalPrice, locale)}
+          </span>
+        )}
+        <span className="text-[36px] font-bold text-[#b54a1a] leading-none">
+          {formatCurrency(product.price, locale)}
+        </span>
+        {product.originalPrice && (
+          <span className="bg-[#f2e6db] text-[#b54a1a] text-[11px] font-bold px-2 py-0.5 rounded-full mb-2">
+            -22%
+          </span>
+        )}
+      </div>
+
+      {/* Feature Pills */}
+      <div className="flex flex-wrap gap-3 mb-8">
+        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl w-[120px] h-[72px]">
+          <Coffee className="w-5 h-5 text-[#142918]/70" />
+          <span className="text-[9px] font-bold text-[#142918]">{tProduct("arabicaPill")}</span>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl w-[120px] h-[72px]">
+          <Droplet className="w-5 h-5 text-[#142918]/70" />
+          <span className="text-[9px] font-bold text-[#142918]">{tProduct("naturalRoastFull")}</span>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl w-[120px] h-[72px]">
+          <AlertCircle className="w-5 h-5 text-[#142918]/70" />
+          <span className="text-[9px] font-bold text-[#142918]">{tProduct("noPreservatives")}</span>
         </div>
       </div>
 
-      <div className="mt-7 grid gap-3">
-        <AddToCartButton
-          product={product}
-          locale={locale}
-          quantity={quantity}
-          variant="light"
-          className="w-full h-12 text-sm font-bold border-forest-950/20"
-        />
+      {/* Add to Cart Actions */}
+      <div className="mb-8">
+        <p className="mb-3 text-[13px] font-bold text-[#142918]">{t("quantity")}</p>
+        <div className="flex gap-4">
+          <div className="inline-flex h-12 items-center rounded-xl border border-[#142918]/20 bg-white px-2">
+            <button
+              className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
+              onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+              aria-label={t("decreaseQty")}
+            >
+              <Minus className="h-4 w-4" />
+            </button>
+            <span className="min-w-10 text-center font-bold text-[15px]">{quantity}</span>
+            <button
+              className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
+              onClick={() => setQuantity((value) => value + 1)}
+              aria-label={t("increaseQty")}
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+          <AddToCartButton
+            product={product}
+            locale={locale}
+            quantity={quantity}
+            variant="default"
+            className="flex-1 h-12 bg-[#a46131] hover:bg-[#8e5227] text-white rounded-xl text-[15px] font-bold shadow-[0_4px_14px_rgba(164,97,49,0.25)] transition-all hover:-translate-y-0.5"
+            label={t("addToCart")}
+          />
+        </div>
         <BuyNowButton 
           product={product} 
           quantity={quantity} 
-          variant="default"
-          className="w-full h-12 text-sm font-bold bg-[#b5703a] hover:bg-[#9a5d2e] border-none text-white shadow-md" 
+          variant="outline"
+          className="w-full h-12 mt-4 rounded-xl text-[#a46131] border-[#a46131] hover:bg-[#a46131]/5 text-[15px] font-bold transition-all" 
         />
       </div>
 
-      <div className="mt-7 grid gap-3 border-t border-forest-950/12 pt-5 text-sm text-forest-950/68">
-        <p>
-          <strong className="text-forest-950">{productT("origin")}:</strong>{" "}
-          {localized(product.origin, locale)}
-        </p>
-        <p>
-          <strong className="text-forest-950">{productT("altitude")}:</strong>{" "}
-          {product.altitude}
-        </p>
-        <p>
-          <strong className="text-forest-950">{productT("roast")}:</strong>{" "}
-          {localized(product.roast, locale)}
-        </p>
+      {/* Trust Badges */}
+      <div className="flex gap-4 p-4 rounded-2xl bg-white/50 border border-[#142918]/5">
+        <div className="flex gap-3 flex-1 items-start">
+          <Truck className="w-5 h-5 text-[#142918]/80 shrink-0" />
+          <div>
+            <p className="text-[11px] font-bold text-[#142918] leading-tight">{tProduct("freeShippingTitle")}</p>
+            <p className="text-[10px] text-[#142918]/60 mt-0.5">{tProduct("freeShippingDesc")}</p>
+          </div>
+        </div>
+        <div className="flex gap-3 flex-1 items-start">
+          <ShieldCheck className="w-5 h-5 text-[#142918]/80 shrink-0" />
+          <div>
+            <p className="text-[11px] font-bold text-[#142918] leading-tight">{tProduct("easyReturnTitle")}</p>
+            <p className="text-[10px] text-[#142918]/60 mt-0.5">{tProduct("easyReturnDesc")}</p>
+          </div>
+        </div>
+        <div className="flex gap-3 flex-1 items-start">
+          <Headphones className="w-5 h-5 text-[#142918]/80 shrink-0" />
+          <div>
+            <p className="text-[11px] font-bold text-[#142918] leading-tight">{tProduct("supportTitle")}</p>
+            <p className="text-[10px] text-[#142918]/60 mt-0.5">{tProduct("supportDesc")}</p>
+          </div>
+        </div>
       </div>
     </aside>
   );
