@@ -1,11 +1,32 @@
+import type {Metadata} from "next";
 import {useTranslations} from "next-intl";
-import {setRequestLocale} from "next-intl/server";
+import {getTranslations, setRequestLocale} from "next-intl/server";
 import {routing} from "@/i18n/routing";
+import type {Locale} from "@/i18n/routing";
 import {ShieldCheck, RefreshCcw, AlertTriangle} from "lucide-react";
 import {Reveal} from "@/components/motion/reveal";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({locale}));
+}
+
+export async function generateMetadata({params}: {params: {locale: Locale}}): Promise<Metadata> {
+  const {locale} = params;
+  const t = await getTranslations({locale, namespace: "ReturnPolicy"});
+  const tNav = await getTranslations({locale, namespace: "Nav"});
+  return {
+    title: t("title"),
+    description: t("subtitle"),
+    alternates: {
+      canonical: `/${locale}/return-policy`,
+      languages: {vi: "/vi/return-policy", en: "/en/return-policy", "x-default": "/vi/return-policy"}
+    },
+    openGraph: {
+      title: t("title"),
+      description: t("subtitle"),
+      images: [{url: `/og/image.png?locale=${locale}&title=${encodeURIComponent(t("title"))}&kicker=${encodeURIComponent(tNav("returnPolicy"))}`, width: 1200, height: 630}]
+    }
+  };
 }
 
 export default function ReturnPolicyPage({params}: {params: {locale: string}}) {

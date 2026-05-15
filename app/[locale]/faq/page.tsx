@@ -1,12 +1,33 @@
+import type {Metadata} from "next";
 import {useTranslations} from "next-intl";
-import {setRequestLocale} from "next-intl/server";
+import {getTranslations, setRequestLocale} from "next-intl/server";
 import {routing} from "@/i18n/routing";
+import type {Locale} from "@/i18n/routing";
 import Image from "next/image";
 import {ChevronDown, Coffee, HelpCircle, Flame, Leaf, Package} from "lucide-react";
 import {Reveal} from "@/components/motion/reveal";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({locale}));
+}
+
+export async function generateMetadata({params}: {params: {locale: Locale}}): Promise<Metadata> {
+  const {locale} = params;
+  const t = await getTranslations({locale, namespace: "Faq"});
+  const tNav = await getTranslations({locale, namespace: "Nav"});
+  return {
+    title: t("title"),
+    description: t("subtitle"),
+    alternates: {
+      canonical: `/${locale}/faq`,
+      languages: {vi: "/vi/faq", en: "/en/faq", "x-default": "/vi/faq"}
+    },
+    openGraph: {
+      title: t("title"),
+      description: t("subtitle"),
+      images: [{url: `/og/image.png?locale=${locale}&title=${encodeURIComponent(t("title"))}&kicker=${encodeURIComponent(tNav("support"))}`, width: 1200, height: 630}]
+    }
+  };
 }
 
 export default function FAQPage({params}: {params: {locale: string}}) {

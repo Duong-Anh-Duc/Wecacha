@@ -16,6 +16,7 @@ type Props = {
 export async function generateMetadata({params}: Props): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: "Contact"});
+  const tNav = await getTranslations({locale, namespace: "Nav"});
 
   return {
     title: t("title"),
@@ -27,6 +28,11 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
         en: "/en/contact",
         "x-default": "/vi/contact"
       }
+    },
+    openGraph: {
+      title: t("title"),
+      description: t("intro"),
+      images: [{url: `/og/image.png?locale=${locale}&title=${encodeURIComponent(t("title"))}&kicker=${encodeURIComponent(tNav("contact"))}`, width: 1200, height: 630}]
     }
   };
 }
