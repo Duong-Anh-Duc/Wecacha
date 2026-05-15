@@ -100,6 +100,30 @@ const config: Config = {
             boxShadow: "0 0 20px 5px rgba(255, 69, 0, 0.6), 0 0 30px 5px rgba(255, 140, 0, 0.6) inset",
             transform: "scale(1.02)"
           }
+        },
+        flow: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(400%)" }
+        },
+        "card-glow": {
+          "0%, 100%": {
+            boxShadow: "0 24px 80px rgba(91, 45, 9, 0.24)",
+            borderColor: "rgba(6, 31, 7, 0.1)",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            transform: "translateY(0)"
+          },
+          "15%": {
+            boxShadow: "0 0 40px rgba(181, 112, 58, 0.3)",
+            borderColor: "rgba(181, 112, 58, 0.5)",
+            backgroundColor: "rgba(251, 243, 231, 1)", // A soft, warm parchment glow
+            transform: "translateY(-6px)"
+          },
+          "30%": {
+            boxShadow: "0 24px 80px rgba(91, 45, 9, 0.24)",
+            borderColor: "rgba(6, 31, 7, 0.1)",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            transform: "translateY(0)"
+          }
         }
       },
       animation: {
@@ -111,7 +135,9 @@ const config: Config = {
         "slide-in-right": "slide-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
         "slide-out-right": "slide-out-right 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
         marquee: "marquee 25s linear infinite",
-        fire: "fire 1.5s ease-in-out infinite"
+        fire: "fire 1.5s ease-in-out infinite",
+        flow: "flow 4s linear infinite",
+        "card-glow": "card-glow 4s ease-in-out infinite"
       }
     }
   },
