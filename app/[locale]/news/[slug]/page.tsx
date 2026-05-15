@@ -2,10 +2,34 @@ import type {Metadata} from "next";
 import {setRequestLocale, getTranslations} from "next-intl/server";
 import {CinematicPageHero} from "@/components/sections/cinematic-page-hero";
 import {Reveal} from "@/components/motion/reveal";
+import {JsonLd} from "@/components/seo/json-ld";
 import type {Locale} from "@/i18n/routing";
 import {imageLibrary} from "@/lib/content";
+import {newsArticleJsonLd} from "@/lib/seo";
+import {siteUrl} from "@/lib/site";
 import Image from "next/image";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
+
+function parseArticleDate(dateStr: string): string {
+  const months: Record<string, string> = {
+    "Tháng 1": "01", "Tháng 2": "02", "Tháng 3": "03", "Tháng 4": "04",
+    "Tháng 5": "05", "Tháng 6": "06", "Tháng 7": "07", "Tháng 8": "08",
+    "Tháng 9": "09", "Tháng 10": "10", "Tháng 11": "11", "Tháng 12": "12",
+    January: "01", February: "02", March: "03", April: "04",
+    May: "05", June: "06", July: "07", August: "08",
+    September: "09", October: "10", November: "11", December: "12"
+  };
+  for (const [name, num] of Object.entries(months)) {
+    if (dateStr.includes(name)) {
+      const dayMatch = dateStr.match(/(\d{1,2})/);
+      const yearMatch = dateStr.match(/(20\d{2})/);
+      if (dayMatch && yearMatch) {
+        return `${yearMatch[1]}-${num}-${dayMatch[1].padStart(2, "0")}`;
+      }
+    }
+  }
+  return new Date().toISOString().split("T")[0];
+}
 
 type Props = {
   params: Promise<{locale: Locale; slug: string}>;
@@ -151,9 +175,19 @@ export default async function NewsCategoryPage({params}: Props) {
 
   const data = contentMap[slug] || contentMap["coffee-culture"];
   const content = data[isVi ? "vi" : "en"];
+  const articleUrl = `${siteUrl}/${locale}/news/${slug}`;
+  const articleJsonLd = newsArticleJsonLd({
+    title: content.article.title,
+    description: content.intro,
+    datePublished: parseArticleDate(content.article.date),
+    image: data.secondaryImage,
+    url: articleUrl,
+    locale
+  });
 
   return (
     <main className="bg-parchment-50">
+      <JsonLd data={articleJsonLd} />
       <CinematicPageHero
         kicker={tNav("news")}
         title={content.title}

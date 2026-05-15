@@ -65,6 +65,50 @@ export function organizationJsonLd(locale: Locale) {
   };
 }
 
+export function newsArticleJsonLd({
+  title,
+  description,
+  datePublished,
+  image,
+  url,
+  locale
+}: {
+  title: string;
+  description: string;
+  datePublished: string;
+  image: string;
+  url: string;
+  locale: Locale;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: title,
+    description,
+    image: image.startsWith("http") ? image : `${siteUrl}${image}`,
+    datePublished,
+    dateModified: datePublished,
+    inLanguage: locale === "vi" ? "vi-VN" : "en-US",
+    author: {
+      "@type": "Organization",
+      name: "Sơn La Coffee",
+      url: siteUrl
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Sơn La Coffee",
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/wecacha-mark.svg`
+      }
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url
+    }
+  };
+}
+
 export function productJsonLd(product: Product, locale: Locale) {
   return {
     "@context": "https://schema.org",

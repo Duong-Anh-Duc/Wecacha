@@ -1,0 +1,40 @@
+export const imageLibrary = {
+  hero:
+    "/son_la_bg.png",
+  heroPoster:
+    "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2400&q=86",
+  farmer:
+    "https://images.unsplash.com/photo-1495107334309-fcf20504a5ab?auto=format&fit=crop&w=1400&q=82",
+  harvest:
+    "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1400&q=82",
+  village:
+    "/sonla_stilt_village.png",
+  brocade:
+    "/sonla_brocade.png",
+  campfire:
+    "/sonla_village_night.png",
+  roasted:
+    "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1400&q=82",
+  cup:
+    "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1400&q=82",
+  beans:
+    "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&q=82",
+  beansBowl:
+    "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=1400&q=82",
+  coffeePour:
+    "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=82",
+  coffeeRoast:
+    "https://images.unsplash.com/photo-1518057111178-44a106bad636?auto=format&fit=crop&w=1400&q=82",
+  coffeeSet:
+    "https://images.unsplash.com/photo-1522992319-0365e5f11656?auto=format&fit=crop&w=1400&q=82",
+  farm:
+    "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=1600&q=84",
+  mountains:
+    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1800&q=84",
+  packaging:
+    "https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?auto=format&fit=crop&w=1400&q=82",
+  phin:
+    "https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=1400&q=82"
+};
+
+export const heroVideo = "/video1.mov";
