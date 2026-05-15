@@ -21,7 +21,9 @@
     "needAdvice": "Need advice?",
     "support": "Support",
     "faq": "FAQ",
-    "returnPolicy": "Return Policy"
+    "returnPolicy": "Return Policy",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
   },
   "Common": {
     "brand": "Son La Coffee",
@@ -386,5 +388,29 @@
     "processDesc": "Please contact us via Zalo or Hotline with an unboxing video/photos and the product condition. We will promptly send a replacement completely free of charge.",
     "noteTitle": "3. Important Notes",
     "noteDesc": "We do not accept returns for cases where customers change their mind or do not prefer the personal taste profile, due to the specific nature of specialty unflavored roasted coffee."
+  },
+  "PrivacyPolicy": {
+    "title": "Privacy Policy",
+    "subtitle": "How we protect and use your data",
+    "section1Title": "1. Information we collect",
+    "section1Desc": "When you visit or shop at Wecacha, we may collect personal information including: Full name, phone number, email address, delivery address, and purchase history. This collection is solely to enhance your experience.",
+    "section2Title": "2. Purpose of using data",
+    "section2Desc": "Your information is mainly used to process orders, support delivery, and customer care. In addition, we may send marketing emails about promotions and new products (only if you opt-in).",
+    "section3Title": "3. Sharing with 3rd parties",
+    "section3Desc": "Wecacha is committed to NOT selling or trading your data. We only share the most necessary information with trusted partners such as shipping companies (for delivery) and online payment gateways (for secure transactions).",
+    "section4Title": "4. Customer rights",
+    "section4Desc": "You have the full right to request us to extract, edit, or completely delete your personal information from the Wecacha system at any time by contacting us via our Hotline or Support Email."
+  },
+  "TermsOfService": {
+    "title": "Terms of Service",
+    "subtitle": "Rules and agreements when using our services",
+    "section1Title": "1. Applicability",
+    "section1Desc": "These terms apply to all customers who access, register an account, or shop on the Wecacha website system. By using the website, you agree to abide by the rules below.",
+    "section2Title": "2. Rights and Obligations",
+    "section2Desc": "Customers are obliged to provide accurate delivery information and make payments on time. Wecacha is responsible for providing products with the committed quality, careful packaging, and supporting all inquiries during the shopping process.",
+    "section3Title": "3. Intellectual Property",
+    "section3Desc": "All content, images, logos, and designs on this website are copyrighted by Wecacha. Copying or using them for commercial purposes without written permission is a violation of the law.",
+    "section4Title": "4. Dispute Resolution",
+    "section4Desc": "Any arising issues or disputes during transactions will be prioritized by Wecacha to be resolved through negotiation and mediation, ensuring the highest benefits for customers in accordance with the laws of Vietnam."
   }
 }

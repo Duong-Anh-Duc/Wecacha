@@ -54,6 +54,12 @@ export async function SiteFooter({locale}: {locale: Locale}) {
             <Link className="transition hover:text-white" href="/return-policy">
               {nav("returnPolicy")}
             </Link>
+            <Link className="transition hover:text-white" href="/privacy">
+              {nav("privacy")}
+            </Link>
+            <Link className="transition hover:text-white" href="/terms">
+              {nav("terms")}
+            </Link>
           </nav>
         </div>
 

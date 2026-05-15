@@ -21,7 +21,9 @@
     "needAdvice": "Cần tư vấn ngay?",
     "support": "Hỗ trợ",
     "faq": "Câu hỏi thường gặp",
-    "returnPolicy": "Chính sách đổi trả"
+    "returnPolicy": "Chính sách đổi trả",
+    "privacy": "Chính sách bảo mật",
+    "terms": "Điều khoản sử dụng"
   },
   "Common": {
     "brand": "Sơn La Coffee",
@@ -386,5 +388,29 @@
     "processDesc": "Vui lòng liên hệ với chúng tôi qua Zalo hoặc Hotline, cung cấp video/hình ảnh mở hộp và tình trạng sản phẩm. Chúng tôi sẽ nhanh chóng gửi lại sản phẩm thay thế hoàn toàn miễn phí.",
     "noteTitle": "3. Lưu ý quan trọng",
     "noteDesc": "Chúng tôi không áp dụng đổi trả đối với các trường hợp khách hàng thay đổi ý định mua hoặc không hợp khẩu vị cá nhân do tính chất đặc thù của cà phê rang mộc."
+  },
+  "PrivacyPolicy": {
+    "title": "Chính sách Bảo mật",
+    "subtitle": "Cách chúng tôi bảo vệ và sử dụng dữ liệu của bạn",
+    "section1Title": "1. Thông tin chúng tôi thu thập",
+    "section1Desc": "Khi bạn truy cập hoặc mua sắm tại Wecacha, chúng tôi có thể thu thập các thông tin cá nhân bao gồm: Tên đầy đủ, số điện thoại, địa chỉ email, địa chỉ giao hàng và lịch sử mua sắm. Việc thu thập này chỉ nhằm mục đích nâng cao trải nghiệm của bạn.",
+    "section2Title": "2. Mục đích sử dụng dữ liệu",
+    "section2Desc": "Thông tin của bạn được sử dụng chủ yếu để xử lý đơn hàng, hỗ trợ giao nhận và chăm sóc khách hàng. Ngoài ra, chúng tôi có thể gửi email thông báo về các ưu đãi, sản phẩm mới (chỉ khi bạn đồng ý nhận thông tin tiếp thị).",
+    "section3Title": "3. Chia sẻ thông tin với bên thứ 3",
+    "section3Desc": "Wecacha cam kết KHÔNG bán hay trao đổi dữ liệu của bạn. Chúng tôi chỉ chia sẻ những thông tin cần thiết nhất cho các đối tác đáng tin cậy như: đơn vị vận chuyển (để giao hàng) và cổng thanh toán trực tuyến (để xử lý giao dịch an toàn).",
+    "section4Title": "4. Quyền lợi của khách hàng",
+    "section4Desc": "Bạn hoàn toàn có quyền yêu cầu chúng tôi trích xuất, chỉnh sửa hoặc xóa toàn bộ thông tin cá nhân của bạn khỏi hệ thống Wecacha bất cứ lúc nào bằng cách liên hệ qua Hotline hoặc Email hỗ trợ."
+  },
+  "TermsOfService": {
+    "title": "Điều khoản Sử dụng",
+    "subtitle": "Quy định và thỏa thuận khi sử dụng dịch vụ",
+    "section1Title": "1. Đối tượng áp dụng",
+    "section1Desc": "Các điều khoản này áp dụng cho tất cả khách hàng truy cập, đăng ký tài khoản hoặc mua sắm trên hệ thống website của Wecacha. Bằng việc sử dụng trang web, bạn đồng ý tuân thủ các quy định dưới đây.",
+    "section2Title": "2. Quyền và Nghĩa vụ",
+    "section2Desc": "Khách hàng có nghĩa vụ cung cấp thông tin giao hàng chính xác và thanh toán đúng hạn. Wecacha có trách nhiệm cung cấp sản phẩm đúng chất lượng như cam kết, đóng gói cẩn thận và hỗ trợ giải đáp mọi thắc mắc trong suốt quá trình mua hàng.",
+    "section3Title": "3. Sở hữu trí tuệ",
+    "section3Desc": "Toàn bộ nội dung, hình ảnh, logo và thiết kế trên website này đều thuộc bản quyền của Wecacha. Việc sao chép, sử dụng vào mục đích thương mại mà không có sự cho phép bằng văn bản là vi phạm pháp luật.",
+    "section4Title": "4. Giải quyết tranh chấp",
+    "section4Desc": "Bất kỳ phát sinh hay tranh chấp nào trong quá trình giao dịch sẽ được Wecacha ưu tiên giải quyết trên tinh thần thương lượng, hòa giải, đảm bảo quyền lợi cao nhất cho khách hàng theo đúng quy định của pháp luật Việt Nam."
   }
 }
