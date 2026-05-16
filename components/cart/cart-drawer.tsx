@@ -121,7 +121,7 @@ export function CartDrawer({solid}: {solid?: boolean}) {
                       <span className="bg-[#f0e6d6] text-[#6b4c2a] text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md">
                         {item.category ? (categoryMap[item.category]?.[locale] || item.category) : tCommon("product")}
                       </span>
-                      <button onClick={() => removeItem(item.slug)} className="w-8 h-8 flex items-center justify-center rounded-full border border-blue-600/20 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors -mr-1 -mt-1">
+                      <button onClick={() => setConfirmRemove(item.slug)} className="w-8 h-8 flex items-center justify-center rounded-full border border-blue-600/20 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors -mr-1 -mt-1">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
