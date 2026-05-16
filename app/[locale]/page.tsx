@@ -1,6 +1,6 @@
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {CinematicHero} from "@/features/home/cinematic-hero";
-import {RecentPurchasesMarquee} from "@/features/home/recent-purchases-marquee";
+// import {RecentPurchasesMarquee} from "@/features/home/recent-purchases-marquee";
 import {OriginStorySection} from "@/features/home/origin-story-section";
 import {CultureSection} from "@/features/home/culture-section";
 import {FeaturedProductsSection} from "@/features/home/featured-products-section";
@@ -78,7 +78,7 @@ export default async function HomePage({params}: Props) {
         secondary={common("ctaStory")}
         scrollLabel={t("scroll")}
       />
-      <RecentPurchasesMarquee />
+      {/* <RecentPurchasesMarquee /> — tạm ẩn */}
       <OriginStorySection locale={locale} />
       <CultureSection locale={locale} />
       <FeaturedProductsSection locale={locale} />

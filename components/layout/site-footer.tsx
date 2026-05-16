@@ -33,31 +33,31 @@ export async function SiteFooter({locale}: {locale: Locale}) {
         <div className="text-center sm:text-left">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-ember">{footer("pages")}</h2>
           <nav className="mt-6 grid gap-4 text-sm text-white/68" aria-label="Footer Navigation">
-            <Link className="transition hover:text-white" href="/">
+            <Link className="w-fit transition hover:text-white" href="/">
               {nav("home")}
             </Link>
-            <Link className="transition hover:text-white" href="/about">
+            <Link className="w-fit transition hover:text-white" href="/about">
               {nav("about")}
             </Link>
-            <Link className="transition hover:text-white" href="/shop">
+            <Link className="w-fit transition hover:text-white" href="/shop">
               {nav("shop")}
             </Link>
-            <Link className="transition hover:text-white" href="/explore">
+            <Link className="w-fit transition hover:text-white" href="/explore">
               {nav("explore")}
             </Link>
-            <Link className="transition hover:text-white" href="/contact">
+            <Link className="w-fit transition hover:text-white" href="/contact">
               {nav("contact")}
             </Link>
-            <Link className="transition hover:text-white" href="/faq">
+            <Link className="w-fit transition hover:text-white" href="/faq">
               {nav("faq")}
             </Link>
-            <Link className="transition hover:text-white" href="/return-policy">
+            <Link className="w-fit transition hover:text-white" href="/return-policy">
               {nav("returnPolicy")}
             </Link>
-            <Link className="transition hover:text-white" href="/privacy">
+            <Link className="w-fit transition hover:text-white" href="/privacy">
               {nav("privacy")}
             </Link>
-            <Link className="transition hover:text-white" href="/terms">
+            <Link className="w-fit transition hover:text-white" href="/terms">
               {nav("terms")}
             </Link>
           </nav>
