@@ -74,13 +74,14 @@ export function SiteHeader() {
             : "bg-gradient-to-b from-forest-950/78 via-forest-950/34 to-transparent"
         )}
       >
-        <div className="absolute top-0 left-0 right-0 h-[3px] z-10">
+        {/* Scroll progress bar — tạm ẩn */}
+        {/* <div className="absolute top-0 left-0 right-0 h-[3px] z-10">
           <motion.div
             className="h-full origin-left bg-gradient-to-r from-[#38bdf8] via-[#4ade80] to-[#a3e635]"
             style={{scaleX: scrollProgress}}
             transition={{duration: 0}}
           />
-        </div>
+        </div> */}
         <div className={cn(
           "mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8",
           lightHeader ? "max-w-[1720px]" : "max-w-7xl"
