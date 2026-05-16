@@ -271,6 +271,7 @@
   },
   "Checkout": {
     "title": "Thanh toán",
+    "minQuantity": "Số lượng sản phẩm phải ít nhất là 1",
     "details": "Thông tin giao hàng",
     "payment": "Thanh toán khi nhận hàng",
     "fullName": "Họ tên",

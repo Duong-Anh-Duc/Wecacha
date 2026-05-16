@@ -2,7 +2,7 @@
 
 import {useState, useEffect} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {CheckCircle2, User, Phone, MapPin, Map, FileText, ShoppingBag, Truck, ShieldCheck, Headset, ChevronDown, Loader2, Minus, Plus, Trash2} from "lucide-react";
+import {CheckCircle2, User, Phone, MapPin, Map, FileText, ShoppingBag, Truck, ShieldCheck, Headset, ChevronDown, Loader2, Minus, Plus, Trash2, AlertCircle} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {useSearchParams} from "next/navigation";
 import {useForm} from "react-hook-form";
@@ -11,7 +11,7 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
-import {getCartTotals, useCartStore} from "@/features/cart/cart-store";
+import {getCartTotals, useCartStore, type CartItem} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {formatCurrency} from "@/lib/content";
@@ -44,6 +44,7 @@ export function CheckoutForm() {
   const updateBuyNowQuantity = useCartStore((state) => state.updateBuyNowQuantity);
   const clearBuyNow = useCartStore((state) => state.clearBuyNow);
   const [success, setSuccess] = useState(false);
+  const [minQtyWarning, setMinQtyWarning] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [loadingProvinces, setLoadingProvinces] = useState(true);
@@ -70,6 +71,24 @@ export function CheckoutForm() {
       .catch(() => {})
       .finally(() => setLoadingProvinces(false));
   }, []);
+
+  useEffect(() => {
+    if (!minQtyWarning) return;
+    const id = setTimeout(() => setMinQtyWarning(false), 2800);
+    return () => clearTimeout(id);
+  }, [minQtyWarning]);
+
+  function handleDecrease(item: CartItem) {
+    if (item.quantity <= 1) {
+      setMinQtyWarning(true);
+      return;
+    }
+    if (isBuyNow) {
+      updateBuyNowQuantity(item.quantity - 1);
+    } else {
+      updateQuantity(item.slug, item.quantity - 1);
+    }
+  }
 
   async function handleProvinceChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const code = e.target.value;
@@ -243,11 +262,7 @@ export function CheckoutForm() {
                       <div className="inline-flex items-center rounded-lg border border-white/15 bg-white/5">
                         <button
                           type="button"
-                          onClick={() =>
-                            isBuyNow
-                              ? updateBuyNowQuantity(item.quantity - 1)
-                              : updateQuantity(item.slug, item.quantity - 1)
-                          }
+                          onClick={() => handleDecrease(item)}
                           className="flex h-7 w-7 items-center justify-center text-white/70 transition-colors hover:text-white"
                           aria-label={common("decreaseQty")}
                         >
@@ -306,6 +321,18 @@ export function CheckoutForm() {
           </div>
         </div>
       </aside>
+
+      {/* Min quantity warning toast */}
+      {minQtyWarning && (
+        <div className="fixed inset-x-0 top-24 z-[9999] flex justify-center px-4">
+          <div className="flex items-center gap-3 rounded-xl border border-[#b5703a]/20 bg-white px-5 py-3.5 shadow-[0_12px_40px_rgba(20,41,24,0.18)] animate-[slide-in-right_0.3s_ease-out]">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#b5703a]/10 text-[#b5703a]">
+              <AlertCircle className="h-5 w-5" />
+            </div>
+            <p className="text-[14px] font-semibold text-[#142918]">{t("minQuantity")}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

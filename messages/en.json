@@ -271,6 +271,7 @@
   },
   "Checkout": {
     "title": "Checkout",
+    "minQuantity": "Quantity must be at least 1",
     "details": "Shipping details",
     "payment": "Cash on delivery",
     "fullName": "Full name",
