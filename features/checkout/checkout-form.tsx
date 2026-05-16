@@ -2,7 +2,7 @@
 
 import {useState, useEffect} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {CheckCircle2, User, Phone, MapPin, Map, FileText, ShoppingBag, Truck, ShieldCheck, Headset, ChevronDown, Loader2} from "lucide-react";
+import {CheckCircle2, User, Phone, MapPin, Map, FileText, ShoppingBag, Truck, ShieldCheck, Headset, ChevronDown, Loader2, Minus, Plus, Trash2} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
@@ -36,6 +36,8 @@ export function CheckoutForm() {
   const common = useTranslations("Common");
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
+  const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const removeItem = useCartStore((state) => state.removeItem);
   const [success, setSuccess] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
@@ -213,18 +215,46 @@ export function CheckoutForm() {
           {items.length === 0 ? (
             <p className="text-white/60 py-4">{common("emptyCart")}</p>
           ) : (
-            <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-5 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {items.map((item) => (
-                <div className="flex items-center gap-4 w-full" key={item.slug}>
+                <div className="flex items-start gap-4 w-full" key={item.slug}>
                   <div className="relative w-14 h-14 rounded-[0.6rem] overflow-hidden bg-white/10 shrink-0 border border-white/5">
                     <Image src={item.image} alt={item.name} fill sizes="56px" className="object-cover" />
                   </div>
-                  <div className="flex-1 flex items-center justify-between min-w-0 gap-4">
-                    <div className="flex flex-wrap items-center gap-x-2">
-                      <h4 className="text-[13px] font-medium text-white">{item.name}</h4>
-                      <span className="text-[13px] text-white/50">x {item.quantity}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <h4 className="text-[13px] font-medium text-white leading-snug">{item.name}</h4>
+                      <span className="font-medium text-[13px] whitespace-nowrap shrink-0">{formatCurrency(item.price * item.quantity, locale)}</span>
                     </div>
-                    <span className="font-medium text-[13px] whitespace-nowrap shrink-0">{formatCurrency(item.price * item.quantity, locale)}</span>
+                    <div className="mt-2 flex items-center gap-3">
+                      <div className="inline-flex items-center rounded-lg border border-white/15 bg-white/5">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.slug, item.quantity - 1)}
+                          className="flex h-7 w-7 items-center justify-center text-white/70 transition-colors hover:text-white"
+                          aria-label={common("decreaseQty")}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </button>
+                        <span className="min-w-7 text-center text-[13px] font-semibold text-white">{item.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.slug, item.quantity + 1)}
+                          className="flex h-7 w-7 items-center justify-center text-white/70 transition-colors hover:text-white"
+                          aria-label={common("increaseQty")}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeItem(item.slug)}
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-white/40 transition-colors hover:bg-white/5 hover:text-red-300"
+                        aria-label={common("removeItem")}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
