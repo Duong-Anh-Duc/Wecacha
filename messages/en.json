@@ -162,6 +162,8 @@
     "journeyCopy": "From origin and processing to roast rhythm, this product carries a story no other lot shares.",
     "bestseller": "Bestseller",
     "discountBadge": "Save {percent}%",
+    "flashEndsIn": "Ends in",
+    "flashSlots": "{remaining}/{total} slots left",
     "reviewCount": "{count} reviews",
     "arabicaPill": "100% Arabica Coffee",
     "naturalRoastFull": "Natural roast",
