@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import {Minus, Plus, Star, ShieldCheck, Truck, Headphones, Droplet, Coffee, AlertCircle, ShoppingBag} from "lucide-react";
+import {Minus, Plus, Star, ShieldCheck, Truck, Headphones, Droplet, Coffee, AlertCircle, ShoppingBag, CreditCard} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
@@ -47,23 +47,22 @@ export function ProductBuyPanel({product}: {product: Product}) {
       </p>
 
       {/* Price */}
-      <div className="flex items-end gap-3 mb-8 relative group">
+      <div className="flex items-end gap-3 mb-8">
+        <span className="text-[32px] lg:text-[38px] font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-[#b5703a] to-[#e89d5f]">
+          {formatCurrency(product.price, locale)}
+        </span>
         {product.originalPrice && (
-          <span className="text-[18px] lg:text-[20px] font-medium text-[#142918]/40 line-through mb-1 relative">
-            {formatCurrency(product.originalPrice, locale)}
-          </span>
-        )}
-        <div className="relative">
-          {/* Lửa cháy (Glow effect) */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-[#ff4d00] to-[#ffaa00] opacity-0 group-hover:opacity-20 blur-xl transition duration-500 rounded-full" />
-          <span className="text-[32px] lg:text-[38px] font-bold text-[#e65c00] leading-none drop-shadow-[0_2px_10px_rgba(230,92,0,0.25)] relative z-10 transition duration-300 group-hover:text-[#ff4500]">
-            {formatCurrency(product.price, locale)}
-          </span>
-        </div>
-        {product.originalPrice && (
-          <span className="bg-gradient-to-r from-[#ff4d00] to-[#ffaa00] text-white text-[10px] lg:text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-2 shadow-sm animate-pulse">
-            -22%
-          </span>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[18px] lg:text-[20px] font-medium text-[#142918]/40 line-through">
+              {formatCurrency(product.originalPrice, locale)}
+            </span>
+            <div className="relative group flex items-center overflow-hidden rounded-md border border-[#b5703a]/20 bg-gradient-to-r from-[#b5703a]/5 to-[#b5703a]/10 px-2.5 py-1 transition-all hover:border-[#b5703a]/40 hover:shadow-sm">
+              <div className="absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-[#b5703a]/80 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <span className="bg-gradient-to-r from-[#b5703a] to-[#d68b4d] bg-clip-text text-[10px] font-bold text-transparent lg:text-[12px]">
+                {tProduct("discountBadge", {percent: 22})}
+              </span>
+            </div>
+          </div>
         )}
       </div>
 
@@ -121,8 +120,9 @@ export function ProductBuyPanel({product}: {product: Product}) {
         >
           {/* Shimmer effect inside the fire button */}
           <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
-          <span className="relative flex items-center gap-2">
-            🔥 {t("buyNow")}
+          <span className="relative flex items-center justify-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            <span>{t("buyNow")}</span>
           </span>
         </BuyNowButton>
       </div>
