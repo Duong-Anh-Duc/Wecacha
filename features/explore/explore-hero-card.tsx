@@ -12,7 +12,7 @@ export async function ExploreHeroCard({locale}: {locale: Locale}) {
   return (
     <div className="lg:col-span-8">
       <Reveal>
-        <div className="group relative h-[560px] w-full overflow-hidden rounded-[2rem] shadow-[0_26px_80px_rgba(20,41,24,0.18)] lg:h-[610px]">
+        <div className="group relative h-[440px] w-full overflow-hidden rounded-[2rem] shadow-[0_26px_80px_rgba(20,41,24,0.18)] sm:h-[540px] lg:h-[610px]">
           <Image
             src={imageLibrary.mountains}
             alt="Giới thiệu"
