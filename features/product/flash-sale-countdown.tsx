@@ -46,10 +46,27 @@ export function FlashSaleCountdown({
         }}
       />
 
+      {/* Lightning flash overlay */}
+      <div className="pointer-events-none absolute inset-0 animate-lightning bg-white" />
+
+      {/* Lightning bolt streak */}
+      <svg
+        className="pointer-events-none absolute -top-2 right-[28%] h-20 w-12 animate-lightning"
+        viewBox="0 0 40 80"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M24 0L6 44h12L14 80l22-50H22L24 0z"
+          fill="#fff"
+          style={{filter: "drop-shadow(0 0 6px rgba(255,255,255,0.9))"}}
+        />
+      </svg>
+
       {/* Row 1: label + countdown */}
       <div className="relative flex items-center justify-between gap-3">
         <span className="flex items-center gap-1.5 text-[14px] font-bold text-white">
-          <Zap className="h-4 w-4 fill-white" />
+          <Zap className="h-4 w-4 animate-bolt-flicker fill-white" />
           {t("flashEndsIn")}
         </span>
         <div className="flex items-center gap-1.5">
