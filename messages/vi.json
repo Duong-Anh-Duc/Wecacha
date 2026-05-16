@@ -263,7 +263,11 @@
     "freeShippingFrom": "cho đơn từ {amount}",
     "remainingForFree": "Còn {amount} để được miễn phí",
     "checkoutNow": "Thanh toán ngay",
-    "securePayment": "Thanh toán an toàn, bảo mật"
+    "securePayment": "Thanh toán an toàn, bảo mật",
+    "confirmRemoveTitle": "Xóa sản phẩm?",
+    "confirmRemoveDesc": "Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng không?",
+    "confirmRemoveCancel": "Hủy",
+    "confirmRemoveConfirm": "Xóa khỏi giỏ"
   },
   "Checkout": {
     "title": "Thanh toán",

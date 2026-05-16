@@ -27,14 +27,14 @@ export function BuyNowButton({
   const locale = useLocale() as Locale;
   const t = useTranslations("Common");
   const router = useRouter();
-  const addItem = useCartStore((state) => state.addItem);
+  const setBuyNow = useCartStore((state) => state.setBuyNow);
 
   return (
     <Button
       className={className}
       variant={variant}
       onClick={() => {
-        addItem(
+        setBuyNow(
           {
             slug: product.slug,
             name: localized(product.name, locale),
@@ -44,7 +44,7 @@ export function BuyNowButton({
           },
           quantity
         );
-        router.push("/checkout");
+        router.push("/checkout?mode=buynow");
       }}
     >
       {children ? children : (

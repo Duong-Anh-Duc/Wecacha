@@ -1,5 +1,6 @@
 "use client";
 
+import {useState} from "react";
 import Image from "next/image";
 import {
   Minus,
@@ -45,6 +46,15 @@ export function CartDrawer({solid}: {solid?: boolean}) {
   const removeItem = useCartStore((state) => state.removeItem);
   const totals = getCartTotals(items);
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
+
+  function handleDecrease(slug: string, quantity: number) {
+    if (quantity <= 1) {
+      setConfirmRemove(slug);
+    } else {
+      updateQuantity(slug, quantity - 1);
+    }
+  }
 
   const freeShippingThreshold = 300000;
   const progressPercent = Math.min((totals.subtotal / freeShippingThreshold) * 100, 100);
@@ -125,7 +135,7 @@ export function CartDrawer({solid}: {solid?: boolean}) {
                     )}
                     <div className="mt-auto flex justify-between items-center">
                       <div className="flex items-center rounded-xl border border-[#142918]/15 h-[34px]">
-                        <button onClick={() => updateQuantity(item.slug, item.quantity - 1)} className="w-[34px] h-full flex items-center justify-center text-[#142918]/70 hover:text-[#142918]">
+                        <button onClick={() => handleDecrease(item.slug, item.quantity)} className="w-[34px] h-full flex items-center justify-center text-[#142918]/70 hover:text-[#142918]">
                           <Minus className="w-3.5 h-3.5" />
                         </button>
                         <span className="text-sm font-semibold w-5 text-center text-[#142918]">{item.quantity}</span>
@@ -213,6 +223,40 @@ export function CartDrawer({solid}: {solid?: boolean}) {
             <div className="flex items-center justify-center gap-2 mt-5 text-[#142918]/50 text-[11px] font-medium">
               <Lock className="w-3.5 h-3.5" />
               {tCart("securePayment")}
+            </div>
+          </div>
+        )}
+
+        {/* Confirm remove modal */}
+        {confirmRemove && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#142918]/40 backdrop-blur-sm px-6">
+            <div className="w-full max-w-[320px] rounded-2xl bg-white p-6 shadow-2xl">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <h3 className="text-center text-[17px] font-bold text-[#142918]">
+                {tCart("confirmRemoveTitle")}
+              </h3>
+              <p className="mt-2 text-center text-[13px] leading-relaxed text-[#142918]/60">
+                {tCart("confirmRemoveDesc")}
+              </p>
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => setConfirmRemove(null)}
+                  className="flex-1 h-11 rounded-xl border border-[#142918]/15 text-[14px] font-bold text-[#142918] transition-colors hover:bg-[#142918]/5"
+                >
+                  {tCart("confirmRemoveCancel")}
+                </button>
+                <button
+                  onClick={() => {
+                    removeItem(confirmRemove);
+                    setConfirmRemove(null);
+                  }}
+                  className="flex-1 h-11 rounded-xl bg-red-500 text-[14px] font-bold text-white transition-colors hover:bg-red-600"
+                >
+                  {tCart("confirmRemoveConfirm")}
+                </button>
+              </div>
             </div>
           </div>
         )}

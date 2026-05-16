@@ -263,7 +263,11 @@
     "freeShippingFrom": "on orders from {amount}",
     "remainingForFree": "{amount} away from free shipping",
     "checkoutNow": "Checkout now",
-    "securePayment": "Safe & secure checkout"
+    "securePayment": "Safe & secure checkout",
+    "confirmRemoveTitle": "Remove product?",
+    "confirmRemoveDesc": "Are you sure you want to remove this product from your cart?",
+    "confirmRemoveCancel": "Cancel",
+    "confirmRemoveConfirm": "Remove from cart"
   },
   "Checkout": {
     "title": "Checkout",

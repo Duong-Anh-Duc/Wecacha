@@ -4,6 +4,7 @@ import {useState, useEffect} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {CheckCircle2, User, Phone, MapPin, Map, FileText, ShoppingBag, Truck, ShieldCheck, Headset, ChevronDown, Loader2, Minus, Plus, Trash2} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
+import {useSearchParams} from "next/navigation";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {Button} from "@/components/ui/button";
@@ -34,15 +35,23 @@ export function CheckoutForm() {
   const locale = useLocale() as Locale;
   const t = useTranslations("Checkout");
   const common = useTranslations("Common");
-  const items = useCartStore((state) => state.items);
+  const searchParams = useSearchParams();
+  const cartItems = useCartStore((state) => state.items);
+  const buyNowItem = useCartStore((state) => state.buyNowItem);
   const clearCart = useCartStore((state) => state.clearCart);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
+  const updateBuyNowQuantity = useCartStore((state) => state.updateBuyNowQuantity);
+  const clearBuyNow = useCartStore((state) => state.clearBuyNow);
   const [success, setSuccess] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [loadingProvinces, setLoadingProvinces] = useState(true);
   const [loadingWards, setLoadingWards] = useState(false);
+
+  // Buy Now mode: chỉ thanh toán đúng 1 sản phẩm, không liên quan giỏ hàng
+  const isBuyNow = searchParams.get("mode") === "buynow" && Boolean(buyNowItem);
+  const items = isBuyNow && buyNowItem ? [buyNowItem] : cartItems;
   const totals = getCartTotals(items);
 
   const {
@@ -80,7 +89,11 @@ export function CheckoutForm() {
 
   function onSubmit() {
     setSuccess(true);
-    clearCart();
+    if (isBuyNow) {
+      clearBuyNow();
+    } else {
+      clearCart();
+    }
   }
 
   if (success) {
@@ -109,19 +122,19 @@ export function CheckoutForm() {
 
           <div className="grid gap-6 sm:grid-cols-2">
             {/* Họ tên */}
-            <Field label={t("fullName")} error={errors.fullName && errorText}>
+            <Field label={t("fullName")} required error={errors.fullName && errorText}>
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               <Input placeholder={t("fullNamePlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("fullName")} />
             </Field>
 
             {/* Số điện thoại */}
-            <Field label={t("phone")} error={errors.phone && errorText}>
+            <Field label={t("phone")} required error={errors.phone && errorText}>
               <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               <Input placeholder={t("phonePlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("phone")} />
             </Field>
 
             {/* Tỉnh / Thành phố */}
-            <Field label={t("city")} error={errors.city && errorText}>
+            <Field label={t("city")} required error={errors.city && errorText}>
               <Map className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               {loadingProvinces
                 ? <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
@@ -141,7 +154,7 @@ export function CheckoutForm() {
             </Field>
 
             {/* Xã / Phường */}
-            <Field label={t("ward")} error={errors.ward && errorText}>
+            <Field label={t("ward")} required error={errors.ward && errorText}>
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               {loadingWards
                 ? <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
@@ -161,7 +174,7 @@ export function CheckoutForm() {
             </Field>
 
             {/* Địa chỉ cụ thể */}
-            <Field label={t("address")} error={errors.address && errorText} className="sm:col-span-2">
+            <Field label={t("address")} required error={errors.address && errorText} className="sm:col-span-2">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               <Input placeholder={t("addressPlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("address")} />
             </Field>
@@ -230,7 +243,11 @@ export function CheckoutForm() {
                       <div className="inline-flex items-center rounded-lg border border-white/15 bg-white/5">
                         <button
                           type="button"
-                          onClick={() => updateQuantity(item.slug, item.quantity - 1)}
+                          onClick={() =>
+                            isBuyNow
+                              ? updateBuyNowQuantity(item.quantity - 1)
+                              : updateQuantity(item.slug, item.quantity - 1)
+                          }
                           className="flex h-7 w-7 items-center justify-center text-white/70 transition-colors hover:text-white"
                           aria-label={common("decreaseQty")}
                         >
@@ -239,21 +256,27 @@ export function CheckoutForm() {
                         <span className="min-w-7 text-center text-[13px] font-semibold text-white">{item.quantity}</span>
                         <button
                           type="button"
-                          onClick={() => updateQuantity(item.slug, item.quantity + 1)}
+                          onClick={() =>
+                            isBuyNow
+                              ? updateBuyNowQuantity(item.quantity + 1)
+                              : updateQuantity(item.slug, item.quantity + 1)
+                          }
                           className="flex h-7 w-7 items-center justify-center text-white/70 transition-colors hover:text-white"
                           aria-label={common("increaseQty")}
                         >
                           <Plus className="h-3 w-3" />
                         </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeItem(item.slug)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-white/40 transition-colors hover:bg-white/5 hover:text-red-300"
-                        aria-label={common("removeItem")}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                      {!isBuyNow && (
+                        <button
+                          type="button"
+                          onClick={() => removeItem(item.slug)}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-white/40 transition-colors hover:bg-white/5 hover:text-red-300"
+                          aria-label={common("removeItem")}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -287,15 +310,19 @@ export function CheckoutForm() {
   );
 }
 
-function Field({label, error, className, children}: {
+function Field({label, error, className, required, children}: {
   label: string;
   error?: string | false;
   className?: string;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div className={className}>
-      <Label className="text-[13px] font-semibold text-[#1a3020] mb-2.5 inline-block">{label}</Label>
+      <Label className="text-[13px] font-semibold text-[#1a3020] mb-2.5 inline-block">
+        {label}
+        {required && <span className="ml-0.5 text-red-500">*</span>}
+      </Label>
       <div className="relative">{children}</div>
       {error ? <p className="mt-1.5 text-[11px] text-red-500">{error}</p> : null}
     </div>

@@ -5,7 +5,7 @@ import {Minus, Plus, Star, ShieldCheck, Truck, Headphones, Droplet, Coffee, Aler
 import {useLocale, useTranslations} from "next-intl";
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
-import {FlashSaleCountdown} from "@/features/product/flash-sale-countdown";
+// import {FlashSaleCountdown} from "@/features/product/flash-sale-countdown";
 import type {Locale} from "@/i18n/routing";
 import type {Product} from "@/lib/content";
 import {formatCurrency, localized} from "@/lib/content";
@@ -67,8 +67,8 @@ export function ProductBuyPanel({product}: {product: Product}) {
         )}
       </div>
 
-      {/* Flash Sale Countdown */}
-      {product.originalPrice && <FlashSaleCountdown />}
+      {/* Flash Sale Countdown — tạm ẩn */}
+      {/* {product.originalPrice && <FlashSaleCountdown />} */}
 
       {/* Feature Pills */}
       <div className="grid grid-cols-3 gap-2 lg:gap-3 mb-8">

@@ -1,4 +1,5 @@
 import type {Metadata} from "next";
+import {Suspense} from "react";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {Reveal} from "@/components/motion/reveal";
 import {ShieldCheck} from "lucide-react";
@@ -68,7 +69,9 @@ export default async function CheckoutPage({params}: Props) {
         </Reveal>
         
         <div className="mt-8">
-          <CheckoutForm />
+          <Suspense fallback={null}>
+            <CheckoutForm />
+          </Suspense>
         </div>
       </div>
     </main>

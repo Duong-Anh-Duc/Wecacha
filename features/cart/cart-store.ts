@@ -16,16 +16,21 @@ export type CartItem = {
 
 type CartState = {
   items: CartItem[];
+  buyNowItem: CartItem | null;
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
   removeItem: (slug: string) => void;
   updateQuantity: (slug: string, quantity: number) => void;
   clearCart: () => void;
+  setBuyNow: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
+  updateBuyNowQuantity: (quantity: number) => void;
+  clearBuyNow: () => void;
 };
 
 export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
       items: [],
+      buyNowItem: null,
       addItem: (item, quantity = 1) =>
         set((state) => {
           const existing = state.items.find(
@@ -62,7 +67,16 @@ export const useCartStore = create<CartState>()(
                   item.slug === slug ? {...item, quantity} : item
                 )
         })),
-      clearCart: () => set({items: []})
+      clearCart: () => set({items: []}),
+      setBuyNow: (item, quantity = 1) =>
+        set({buyNowItem: {...item, quantity}}),
+      updateBuyNowQuantity: (quantity) =>
+        set((state) =>
+          state.buyNowItem
+            ? {buyNowItem: {...state.buyNowItem, quantity: Math.max(1, quantity)}}
+            : {}
+        ),
+      clearBuyNow: () => set({buyNowItem: null})
     }),
     {
       name: "son-la-coffee-cart"
