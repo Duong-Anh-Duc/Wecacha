@@ -125,22 +125,28 @@ const config: Config = {
             transform: "translateY(0)"
           }
         },
-        lightning: {
-          "0%, 88%, 100%": { opacity: "0" },
-          "89%": { opacity: "0.85" },
-          "90%": { opacity: "0.1" },
-          "91%": { opacity: "0.95" },
-          "92%": { opacity: "0.2" },
-          "93%": { opacity: "0.7" },
-          "94%": { opacity: "0" }
+        "lightning-strike": {
+          "0%, 100%": { strokeDashoffset: "260", opacity: "0" },
+          "5%": { strokeDashoffset: "260", opacity: "0" },
+          "7%": { strokeDashoffset: "0", opacity: "1" },
+          "9%": { strokeDashoffset: "0", opacity: "0.15" },
+          "11%": { strokeDashoffset: "0", opacity: "1" },
+          "14%": { strokeDashoffset: "0", opacity: "0.85" },
+          "20%": { strokeDashoffset: "0", opacity: "0" }
+        },
+        "strike-glow": {
+          "0%, 5%, 22%, 100%": { opacity: "0", transform: "scale(0.6)" },
+          "7%, 11%": { opacity: "0.55", transform: "scale(1)" },
+          "9%": { opacity: "0.12", transform: "scale(0.8)" },
+          "14%": { opacity: "0.3", transform: "scale(1.1)" }
         },
         "bolt-flicker": {
-          "0%, 86%, 100%": { transform: "scale(1)", filter: "drop-shadow(0 0 0 transparent)" },
-          "89%, 91%, 93%": {
-            transform: "scale(1.25)",
+          "0%, 5%, 22%, 100%": { transform: "scale(1)", filter: "drop-shadow(0 0 0 transparent)" },
+          "7%, 11%": {
+            transform: "scale(1.3)",
             filter: "drop-shadow(0 0 8px rgba(255,255,255,0.95))"
           },
-          "90%, 92%": { transform: "scale(1)", filter: "drop-shadow(0 0 2px rgba(255,255,255,0.4))" }
+          "9%": { transform: "scale(1)", filter: "drop-shadow(0 0 2px rgba(255,255,255,0.4))" }
         }
       },
       animation: {
@@ -155,8 +161,9 @@ const config: Config = {
         fire: "fire 1.5s ease-in-out infinite",
         flow: "flow 4s linear infinite",
         "card-glow": "card-glow 4s ease-in-out infinite",
-        lightning: "lightning 5s ease-out infinite",
-        "bolt-flicker": "bolt-flicker 5s ease-out infinite"
+        "lightning-strike": "lightning-strike 4.5s linear infinite",
+        "strike-glow": "strike-glow 4.5s linear infinite",
+        "bolt-flicker": "bolt-flicker 4.5s linear infinite"
       }
     }
   },

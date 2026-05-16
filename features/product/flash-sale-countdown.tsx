@@ -46,22 +46,28 @@ export function FlashSaleCountdown({
         }}
       />
 
-      {/* Lightning flash overlay */}
-      <div className="pointer-events-none absolute inset-0 animate-lightning bg-white" />
-
-      {/* Lightning bolt streak */}
-      <svg
-        className="pointer-events-none absolute -top-2 right-[28%] h-20 w-12 animate-lightning"
-        viewBox="0 0 40 80"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M24 0L6 44h12L14 80l22-50H22L24 0z"
-          fill="#fff"
-          style={{filter: "drop-shadow(0 0 6px rgba(255,255,255,0.9))"}}
-        />
-      </svg>
+      {/* Lightning strike — tia sét đánh xuống */}
+      <div className="pointer-events-none absolute right-[26%] top-0 h-full w-16">
+        {/* Glow burst tại điểm sét chạm */}
+        <div className="absolute bottom-0 left-1/2 h-16 w-16 -translate-x-1/2 animate-strike-glow rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.95),rgba(255,231,168,0.4)_45%,transparent_70%)]" />
+        <svg
+          className="absolute -top-3 left-0 h-[150%] w-full overflow-visible"
+          viewBox="0 0 60 150"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M40 -6 L22 50 L36 55 L18 100 L30 104 L14 150"
+            stroke="#fff"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="260"
+            className="animate-lightning-strike"
+            style={{filter: "drop-shadow(0 0 5px #fff) drop-shadow(0 0 12px #ffe26b)"}}
+          />
+        </svg>
+      </div>
 
       {/* Row 1: label + countdown */}
       <div className="relative flex items-center justify-between gap-3">
