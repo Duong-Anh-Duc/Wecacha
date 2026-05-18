@@ -11,9 +11,9 @@ export async function OriginStorySection({locale}: {locale: Locale}) {
   return (
     <section className="relative overflow-hidden bg-parchment-50 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
       {/* Background image — right half only */}
-      <div className="absolute inset-y-0 right-0 hidden w-1/2 lg:block">
-        <Image src="/image1.jpeg" alt="" fill className="object-cover" sizes="50vw" quality={80} />
-        <div className="absolute inset-0 bg-parchment-50/60" />
+      <div className="absolute inset-y-0 right-0 hidden w-1/3 lg:block">
+        <Image src="/image1.jpeg" alt="" fill className="object-cover opacity-20" sizes="33vw" quality={80} />
+        <div className="absolute inset-0 bg-gradient-to-l from-parchment-50/50 to-parchment-50" />
       </div>
       {/* Botanical decoration */}
       <div className="pointer-events-none absolute -left-10 top-1/2 -translate-y-1/2 select-none opacity-[0.07]" aria-hidden="true">
@@ -28,13 +28,16 @@ export async function OriginStorySection({locale}: {locale: Locale}) {
         </svg>
       </div>
 
-      <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2">
-        <Reveal>
+      <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-2">
+        <Reveal className="relative z-10 lg:pr-10">
           <SectionHeading
             kicker={t("originKicker")}
             title={t("storyTitle")}
             copy={t("storyCopy")}
           />
+          <blockquote className="mt-8 border-l-2 border-ember pl-6 font-serif text-2xl italic leading-relaxed text-forest-950/80">
+            "{t("storyQuote")}"
+          </blockquote>
           <AnimatedStats
             className="mt-9"
             stats={[
@@ -63,20 +66,32 @@ export async function OriginStorySection({locale}: {locale: Locale}) {
           />
         </Reveal>
 
-        {/* Arch image */}
-        <Reveal delay={0.15} className="flex justify-center lg:justify-end">
-          <div
-            className="relative w-full max-w-[400px] overflow-hidden shadow-cinematic"
-            style={{aspectRatio: "3/4", borderRadius: "9999px 9999px 20px 20px"}}
-          >
-            <Image
-              src="/image2.jpeg"
-              alt={t("farmerAlt")}
-              fill
-              quality={95}
-              className="object-cover"
-              sizes="(min-width: 1024px) 40vw, 90vw"
-            />
+        <Reveal delay={0.15} className="relative z-0 mt-12 lg:mt-0">
+          <div className="relative w-full max-w-[550px] ml-auto">
+            {/* Main image */}
+            <div className="relative z-10 aspect-[3/4] w-4/5 ml-auto overflow-hidden rounded-[2.5rem] shadow-2xl">
+              <Image
+                src="/image2.jpeg"
+                alt={t("farmerAlt")}
+                fill
+                quality={95}
+                className="object-cover"
+                sizes="(min-width: 1024px) 40vw, 90vw"
+              />
+            </div>
+            {/* Overlapping small image */}
+            <div className="absolute bottom-16 left-0 z-20 aspect-[4/3] w-[55%] overflow-hidden rounded-[2rem] shadow-2xl border-[6px] border-parchment-50">
+              <Image
+                src="/image1.jpeg"
+                alt="Coffee processing"
+                fill
+                quality={80}
+                className="object-cover"
+                sizes="30vw"
+              />
+            </div>
+            {/* Soft glow behind */}
+            <div className="absolute -inset-10 z-0 rounded-full bg-forest-950/5 blur-3xl" />
           </div>
         </Reveal>
       </div>

@@ -124,18 +124,18 @@ export function TestimonialsCarousel({ locale }: { locale: Locale }) {
               >
                 <div
                   className={cn(
-                    "relative flex flex-col h-full rounded-[2rem] p-8 sm:p-12 transition-colors duration-500 overflow-hidden border",
+                    "relative flex flex-col h-full rounded-[2.5rem] p-8 sm:p-12 transition-colors duration-500 overflow-hidden border",
                     isActive
-                      ? "bg-[#fcfbfa] shadow-2xl border-white/50"
-                      : "bg-[#142918] border-white/10"
+                      ? "bg-white shadow-xl border-stone-200"
+                      : "bg-parchment-100/50 border-stone-300/50"
                   )}
                 >
                   {/* Subtle watermarked graphic on top right */}
                   <div className={cn(
                     "absolute -right-10 -top-10 w-64 h-64 opacity-[0.03] transition-opacity duration-500 pointer-events-none",
-                    isActive ? "opacity-[0.06]" : "opacity-[0.02]"
+                    isActive ? "opacity-[0.05]" : "opacity-[0.03]"
                   )}>
-                    <svg viewBox="0 0 100 100" fill="currentColor" className={isActive ? "text-[#142918]" : "text-white"}>
+                    <svg viewBox="0 0 100 100" fill="currentColor" className={isActive ? "text-forest-950" : "text-stone-900"}>
                       <path d="M50 0 C70 30 90 40 100 60 C80 60 70 80 50 100 C30 80 20 60 0 60 C10 40 30 30 50 0 Z" />
                     </svg>
                   </div>
@@ -148,7 +148,7 @@ export function TestimonialsCarousel({ locale }: { locale: Locale }) {
                   <blockquote
                     className={cn(
                       "flex-1 font-serif text-[1.4rem] sm:text-[1.7rem] leading-[1.6] mb-12",
-                      isActive ? "text-[#142918]" : "text-white/80"
+                      isActive ? "text-forest-950" : "text-stone-600"
                     )}
                   >
                     {localized(item.quote, locale)}
@@ -169,7 +169,7 @@ export function TestimonialsCarousel({ locale }: { locale: Locale }) {
                         <strong
                           className={cn(
                             "block text-base font-bold",
-                            isActive ? "text-[#142918]" : "text-white"
+                            isActive ? "text-forest-950" : "text-stone-700"
                           )}
                         >
                           {item.name}
@@ -177,7 +177,7 @@ export function TestimonialsCarousel({ locale }: { locale: Locale }) {
                         <span
                           className={cn(
                             "text-sm font-medium",
-                            isActive ? "text-[#142918]/60" : "text-white/50"
+                            isActive ? "text-forest-950/60" : "text-stone-500"
                           )}
                         >
                           {localized(item.role, locale)}
@@ -188,9 +188,9 @@ export function TestimonialsCarousel({ locale }: { locale: Locale }) {
                     {/* Badge */}
                     <div className={cn(
                       "flex items-center gap-2 px-4 py-2 rounded-full shadow-sm whitespace-nowrap",
-                      isActive ? "bg-white border border-[#142918]/5 text-[#142918]" : "bg-black/20 border border-white/5 text-white/80"
+                      isActive ? "bg-parchment-50 border border-stone-200 text-forest-950" : "bg-white/50 border border-stone-200/50 text-stone-600"
                     )}>
-                      <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", isActive ? "bg-[#142918] text-white" : "bg-white/10 text-white")}>
+                      <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", isActive ? "bg-forest-950 text-white" : "bg-stone-300 text-white")}>
                         <Award className="w-3.5 h-3.5" />
                       </div>
                       <span className="text-[11px] font-bold uppercase tracking-wider">{tCommon("loyalCustomer")}</span>
@@ -217,8 +217,8 @@ export function TestimonialsCarousel({ locale }: { locale: Locale }) {
                 className={cn(
                   "w-2.5 h-2.5 rounded-full transition-all duration-300",
                   isActive
-                    ? "bg-[#b5703a] scale-125 shadow-[0_0_10px_rgba(181,112,58,0.5)]"
-                    : "bg-transparent border border-white/30 hover:border-white/60"
+                    ? "bg-ember scale-125 shadow-[0_0_10px_rgba(181,112,58,0.5)]"
+                    : "bg-transparent border border-stone-400 hover:border-forest-950"
                 )}
               />
             );

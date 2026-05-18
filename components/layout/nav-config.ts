@@ -20,17 +20,17 @@ export type NavItem = {
 
 export const navItems: NavItem[] = [
   { href: "/", key: "home", icon: Coffee },
-  {
-    href: "/shop",
-    key: "shop",
-    icon: Store,
-    children: [
-      { href: "/shop", label: { vi: "Tất cả sản phẩm", en: "All Products" } },
-      { href: "/shop/category/beans", label: { vi: "Cà phê hạt", en: "Whole Beans" } },
-      { href: "/shop/category/phin", label: { vi: "Cà phê pha phin", en: "Phin Coffee" } },
-      { href: "/shop/category/gifts", label: { vi: "Bộ quà tặng", en: "Gift Sets" } }
-    ]
-  },
+  // {
+  //   href: "/shop",
+  //   key: "shop",
+  //   icon: Store,
+  //   children: [
+  //     { href: "/shop", label: { vi: "Tất cả sản phẩm", en: "All Products" } },
+  //     { href: "/shop/category/beans", label: { vi: "Cà phê hạt", en: "Whole Beans" } },
+  //     { href: "/shop/category/phin", label: { vi: "Cà phê pha phin", en: "Phin Coffee" } },
+  //     { href: "/shop/category/gifts", label: { vi: "Bộ quà tặng", en: "Gift Sets" } }
+  //   ]
+  // },
   {
     href: "/explore",
     key: "explore",

@@ -156,7 +156,8 @@ export function ProductCard({
         </div>
 
         <div className="mt-4">
-          <div className="grid grid-cols-2 gap-3 relative z-30">
+          {/* Nút mua hàng — tạm ẩn */}
+          {/* <div className="grid grid-cols-2 gap-3 relative z-30">
             <AddToCartButton
               product={product}
               locale={locale}
@@ -168,7 +169,7 @@ export function ProductCard({
               variant="forest"
               className="h-11 w-full rounded-2xl px-3 text-[13px] font-semibold"
             />
-          </div>
+          </div> */}
 
           {/* Khám phá ngay — tạm ẩn */}
           {/* <div

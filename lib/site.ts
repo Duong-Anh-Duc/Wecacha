@@ -9,12 +9,12 @@ export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
 export const siteConfig = {
   name: "Sơn La Coffee",
   email: "hello@sonlacoffee.vn",
-  phone: "+84 912 345 678",
-  zalo: "+84 912 345 678",
+  phone: "0983 538 814",
+  zalo: "0983538814",
   facebook: "https://facebook.com/sonlacoffee",
   address: {
-    vi: "Bản Áng, Mộc Châu, Sơn La",
-    en: "Ang Village, Moc Chau, Son La"
+    vi: "101 D6 Trần Huy Liệu, Giảng Võ, Ba Đình, Hà Nội",
+    en: "101 D6 Tran Huy Lieu, Giang Vo, Ba Dinh, Hanoi"
   } satisfies Record<Locale, string>,
   coordinates: {
     lat: 20.829,

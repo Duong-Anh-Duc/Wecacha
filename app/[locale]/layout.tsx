@@ -4,8 +4,10 @@ import {hasLocale, NextIntlClientProvider} from "next-intl";
 import {getMessages, getTranslations, setRequestLocale} from "next-intl/server";
 import {notFound} from "next/navigation";
 import {FloatingContact} from "@/components/layout/floating-contact";
+import {SoundButton} from "@/components/layout/sound-button";
 import {SiteFooter} from "@/components/layout/site-footer";
 import {SiteHeader} from "@/components/layout/site-header";
+import {ExperienceForm} from "@/components/sections/experience-form";
 import {SmoothScrollProvider} from "@/components/motion/smooth-scroll-provider";
 import {JsonLd} from "@/components/seo/json-ld";
 import {routing, type Locale} from "@/i18n/routing";
@@ -140,6 +142,8 @@ export default async function LocaleLayout({children, params}: Props) {
             <JsonLd data={webSiteJsonLd(locale as Locale)} />
             <SiteHeader />
             {children}
+            <ExperienceForm />
+            <SoundButton />
             <FloatingContact />
             <SiteFooter locale={locale as Locale} />
           </SmoothScrollProvider>

@@ -173,19 +173,19 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
           </motion.nav>
 
           <motion.div
-            className="relative z-10 mt-8 grid grid-cols-2 gap-3"
+            className="relative z-10 mt-8 grid grid-cols-1 gap-3"
             initial={{opacity: 0, y: 18}}
             animate={{opacity: 1, y: 0}}
             transition={{duration: 0.7, delay: 0.52, ease: drawerEase}}
           >
-            <SheetClose asChild>
+            {/* <SheetClose asChild>
               <Button asChild variant="forest" className="h-14 rounded-lg text-base shadow-warm hover:shadow-cinematic">
                 <Link href="/shop">
                   <Store className="h-5 w-5" aria-hidden="true" />
                   {t("shop")}
                 </Link>
               </Button>
-            </SheetClose>
+            </SheetClose> */}
             <SheetClose asChild>
               <Button
                 asChild

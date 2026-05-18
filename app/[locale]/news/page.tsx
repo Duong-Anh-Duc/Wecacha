@@ -6,6 +6,9 @@ import {imageLibrary} from "@/lib/content";
 import type {Locale} from "@/i18n/routing";
 import {Link} from "@/i18n/navigation";
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
+
+export const revalidate = 60; // Cache for 60s
 
 type Props = {
   params: Promise<{locale: Locale}>;
@@ -62,6 +65,15 @@ export default async function NewsIndexPage({params}: Props) {
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "News"});
   const tCommon = await getTranslations({locale, namespace: "Common"});
+  const isVi = locale === "vi";
+
+  // Lấy dữ liệu bài viết từ Supabase
+  const { data: articles } = await supabase
+    .from("news_articles")
+    .select("slug, title_vi, title_en, image_url")
+    .order("published_at", { ascending: false });
+
+  const displayArticles = articles || [];
 
   return (
     <main className="bg-parchment-50">
@@ -77,26 +89,39 @@ export default async function NewsIndexPage({params}: Props) {
       <section className="px-4 py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-8 md:grid-cols-3">
-            {[
-              { slug: "coffee-culture", title: t("coffeeCultureTitle"), img: imageLibrary.coffeePour },
-              { slug: "events", title: t("eventsTitle"), img: imageLibrary.farm },
-              { slug: "recipes", title: t("recipesTitle"), img: imageLibrary.phin }
-            ].map((cat, i) => (
-              <Reveal key={cat.slug} delay={i * 0.1}>
-                <Link href={`/news/${cat.slug}`} className="group block overflow-hidden rounded-2xl bg-white shadow-warm">
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <Image src={cat.img} alt={cat.title} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                  </div>
-                  <div className="p-8 text-center">
-                    <h3 className="font-serif text-2xl text-forest-950 transition-colors group-hover:text-ember">{cat.title}</h3>
-                    <p className="mt-3 text-sm font-semibold uppercase tracking-widest text-forest-950/50 group-hover:text-ember/70 transition-colors">
-                      {tCommon("readMore")} →
-                    </p>
-                  </div>
-                </Link>
-              </Reveal>
-            ))}
+            {displayArticles.map((article, i) => {
+              const title = isVi ? article.title_vi : article.title_en;
+              const imgUrl = article.image_url || imageLibrary.coffeePour;
+              
+              return (
+                <Reveal key={article.slug} delay={i * 0.1}>
+                  <Link href={`/news/${article.slug}`} className="group block overflow-hidden rounded-2xl bg-white shadow-warm">
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <Image 
+                        src={imgUrl} 
+                        alt={title} 
+                        fill 
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105" 
+                      />
+                    </div>
+                    <div className="p-8 text-center">
+                      <h3 className="font-serif text-2xl text-forest-950 transition-colors group-hover:text-ember">{title}</h3>
+                      <p className="mt-3 text-sm font-semibold uppercase tracking-widest text-forest-950/50 group-hover:text-ember/70 transition-colors">
+                        {tCommon("readMore")} →
+                      </p>
+                    </div>
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
+          
+          {displayArticles.length === 0 && (
+            <div className="text-center text-forest-950/50 py-12">
+              {t("empty")}
+            </div>
+          )}
         </div>
       </section>
     </main>

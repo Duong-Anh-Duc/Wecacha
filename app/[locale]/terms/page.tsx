@@ -118,7 +118,7 @@ export default async function TermsOfServicePage({params}: {params: Promise<{loc
         <Reveal delay={0.4}>
           <div className="mt-16 text-center border-t border-white/10 pt-10">
             <p className="text-white/40 text-sm">
-              Wecacha - Kiến tạo thay đổi, tiếp nối tinh hoa.
+{t("tagline")}
             </p>
           </div>
         </Reveal>

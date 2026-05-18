@@ -86,8 +86,8 @@ export function ProductBuyPanel({product}: {product: Product}) {
         </div>
       </div>
 
-      {/* Add to Cart Actions */}
-      <div className="mb-8">
+      {/* Add to Cart Actions — tạm ẩn */}
+      {/* <div className="mb-8">
         <p className="mb-3 text-[13px] font-bold text-[#142918]">{t("quantity")}</p>
         <div className="flex gap-3 lg:gap-4">
           <div className="inline-flex h-12 lg:h-14 items-center rounded-xl border border-[#142918]/20 bg-white px-2">
@@ -116,20 +116,19 @@ export function ProductBuyPanel({product}: {product: Product}) {
             label={t("addToCart")}
           />
         </div>
-        <BuyNowButton 
-          product={product} 
-          quantity={quantity} 
+        <BuyNowButton
+          product={product}
+          quantity={quantity}
           variant="default"
-          className="w-full h-12 lg:h-14 mt-4 rounded-xl bg-gradient-to-r from-[#ff5100] to-[#cc2900] text-white text-[15px] lg:text-[16px] font-bold transition-all overflow-hidden relative group animate-fire" 
+          className="w-full h-12 lg:h-14 mt-4 rounded-xl bg-gradient-to-r from-[#ff5100] to-[#cc2900] text-white text-[15px] lg:text-[16px] font-bold transition-all overflow-hidden relative group animate-fire"
         >
-          {/* Shimmer effect inside the fire button */}
           <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
           <span className="relative flex items-center justify-center gap-2">
             <CreditCard className="w-5 h-5" />
             <span>{t("buyNow")}</span>
           </span>
         </BuyNowButton>
-      </div>
+      </div> */}
 
       {/* Trust Badges */}
       <div className="flex flex-col sm:flex-row gap-4 lg:gap-4 p-4 rounded-2xl bg-white/50 border border-[#142918]/5">

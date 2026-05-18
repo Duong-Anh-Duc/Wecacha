@@ -8,10 +8,11 @@ export async function JourneysSection({locale}: {locale: Locale}) {
   const t = await getTranslations({locale, namespace: "Home"});
 
   return (
-    <section className="bg-parchment-50 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+    <section className="bg-forest-950 px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
       <div className="mx-auto max-w-7xl">
         <Reveal>
           <SectionHeading
+            light
             kicker={t("journeysKicker")}
             title={t("journeysTitle")}
             align="center"

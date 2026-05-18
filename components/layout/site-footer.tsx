@@ -39,9 +39,9 @@ export async function SiteFooter({locale}: {locale: Locale}) {
             <Link className="w-fit transition hover:text-white" href="/about">
               {nav("about")}
             </Link>
-            <Link className="w-fit transition hover:text-white" href="/shop">
+            {/* <Link className="w-fit transition hover:text-white" href="/shop">
               {nav("shop")}
-            </Link>
+            </Link> */}
             <Link className="w-fit transition hover:text-white" href="/explore">
               {nav("explore")}
             </Link>

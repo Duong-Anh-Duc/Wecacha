@@ -99,14 +99,14 @@ export function GsapStoryConclusion({
           {copy}
         </p>
         <div className="mt-12 flex justify-center">
-          <Button
+          {/* <Button
             asChild
             variant="forest"
             size="lg"
             className="h-14 min-w-[200px] rounded-full text-base"
           >
             <Link href="/shop">{tStory("tasteCta")}</Link>
-          </Button>
+          </Button> */}
         </div>
       </div>
     </section>

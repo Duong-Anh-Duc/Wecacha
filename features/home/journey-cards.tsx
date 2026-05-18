@@ -13,7 +13,7 @@ export function JourneyCards({locale}: {locale: Locale}) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div className="flex gap-3 h-[320px] sm:h-[420px] lg:h-[520px]">
+    <div className="flex gap-4 h-[400px] sm:h-[500px] lg:h-[600px]">
       {journeys.map((journey, index) => {
         const isActive = index === activeIndex;
         const title = localized(journey.title, locale);
@@ -23,7 +23,7 @@ export function JourneyCards({locale}: {locale: Locale}) {
           <div
             key={title}
             onClick={() => setActiveIndex(index)}
-            className="relative overflow-hidden rounded-md bg-forest-950 cursor-pointer"
+            className="relative overflow-hidden rounded-[2rem] bg-forest-950 cursor-pointer border border-white/10"
             style={{
               flex: isActive ? "7 1 0%" : "1 1 0%",
               opacity: isActive ? 1 : 0.45,
@@ -43,11 +43,11 @@ export function JourneyCards({locale}: {locale: Locale}) {
               <div className="absolute inset-0 bg-forest-950/55 transition-opacity duration-500" />
             )}
 
-            <div className="absolute bottom-0 left-0 right-0 p-6">
+            <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-10">
               <h3
-                className="font-serif text-white leading-tight"
+                className="font-serif text-white leading-tight whitespace-nowrap"
                 style={{
-                  fontSize: isActive ? "1.75rem" : "1rem",
+                  fontSize: isActive ? "2.5rem" : "1.25rem",
                   transition: "font-size 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
                 }}
               >
@@ -61,13 +61,13 @@ export function JourneyCards({locale}: {locale: Locale}) {
                 }}
                 className="overflow-hidden"
               >
-                <p className="mt-2 text-sm leading-6 text-white/70">{body}</p>
+                <p className="mt-4 text-base leading-relaxed text-white/80 whitespace-normal pr-4">{body}</p>
                 <Link
                   href={journey.href}
                   onClick={(e) => e.stopPropagation()}
-                  className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-ember hover:text-ember/80 transition-colors"
+                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold tracking-widest uppercase text-ember hover:text-ember/80 transition-colors"
                 >
-                  {t("explore")} <ChevronRight className="h-3 w-3" />
+                  {t("explore")} <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>

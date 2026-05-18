@@ -116,7 +116,7 @@ export default function ReturnPolicyPage({params}: {params: {locale: string}}) {
         <Reveal delay={0.4}>
           <div className="mt-16 text-center border-t border-white/10 pt-10">
             <p className="text-white/40 text-sm">
-              Sơn La Coffee - Cà phê đặc sản Việt Nam.
+{t("tagline")}
             </p>
           </div>
         </Reveal>

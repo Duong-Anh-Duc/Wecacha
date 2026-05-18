@@ -28,12 +28,12 @@ export async function AboutCtaSection({locale}: {locale: Locale}) {
             {t("ctaCopy")}
           </p>
           <div className="mt-10 flex justify-center gap-4">
-            <Link
+            {/* <Link
               href="/shop"
               className="inline-flex h-14 items-center justify-center rounded-full bg-earth-600 px-8 text-base font-bold text-white transition hover:bg-earth-700"
             >
               {t("ctaShop")}
-            </Link>
+            </Link> */}
             <Link
               href="/explore"
               className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur transition hover:bg-white/10"
