@@ -32,7 +32,7 @@ export async function SiteFooter({locale}: {locale: Locale}) {
 
         <div className="text-center sm:text-left">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-ember">{footer("pages")}</h2>
-          <nav className="mt-6 grid gap-4 text-sm text-white/68" aria-label="Footer Navigation">
+          <nav className="mt-6 flex flex-col items-center sm:items-start gap-4 text-sm text-white/68" aria-label="Footer Navigation">
             <Link className="w-fit transition hover:text-white" href="/">
               {nav("home")}
             </Link>
@@ -65,7 +65,7 @@ export async function SiteFooter({locale}: {locale: Locale}) {
 
         <div className="text-center sm:text-left">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-ember">{footer("contactHeading")}</h2>
-          <div className="mt-6 grid gap-4 text-sm text-white/68">
+          <div className="mt-6 flex flex-col items-center sm:items-start gap-4 text-sm text-white/68">
             <p className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3">
               <MapPin className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
               <span>{siteConfig.address[locale]}</span>
