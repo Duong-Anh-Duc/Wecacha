@@ -15,7 +15,7 @@ export function SoundButton() {
     // Bạn có thể đổi sang file mp3 cục bộ bằng cách đặt link "/audio/sound.mp3" nếu đã có file
     audioRef.current = new Audio("https://actions.google.com/sounds/v1/ambiences/outdoor_summer_ambience.ogg");
     audioRef.current.loop = true;
-    audioRef.current.volume = 0.5;
+    audioRef.current.volume = 1.0;
 
     return () => {
       if (audioRef.current) {
