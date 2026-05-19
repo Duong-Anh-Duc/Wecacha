@@ -16,9 +16,13 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: "Shop"});
 
+  const isVi = locale === "vi";
   return {
     title: t("title"),
     description: t("intro"),
+    keywords: isVi
+      ? "mua hạt cà phê đặc sản arabica sơn la, cà phê arabica sơn la giá tốt, wecacha shop, arabica rang mộc sơn la, hạt cà phê người thái, đặt mua cà phê tây bắc"
+      : "buy specialty arabica coffee son la, wecacha shop, arabica son la roasted beans, thai highland coffee order, northwest vietnam arabica",
     alternates: {
       canonical: `/${locale}/shop`,
       languages: {

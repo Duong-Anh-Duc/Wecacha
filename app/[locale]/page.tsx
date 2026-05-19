@@ -18,14 +18,14 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
   const {locale} = await params;
   const isVi = locale === "vi";
   const title = isVi
-    ? "Wecacha · Hạt Cà Phê Đặc Sản Arabica Sơn La – Arabica Tinh Hoa Người Thái"
+    ? "Wecacha · Hạt Cà Phê Đặc Sản Arabica Sơn La – Tinh Hoa Người Thái"
     : "Wecacha · Specialty Arabica Coffee Son La – The Essence of Thai Culture";
   const description = isVi
-    ? "Hạt cà phê đặc sản Arabica Sơn La rang mộc nguyên bản, được người Thái chăm sóc tỉ mẩn trên độ cao 1.050m. Hương hoa rừng, vị chua thanh, hậu vị ngọt dịu kéo dài. Wecacha – Arabica tinh hoa người Thái."
-    : "Specialty Arabica coffee from Son La, Vietnam — hand-harvested by Thai farmers at 1,050m altitude. Natural forest flower notes, clean acidity, sweet lingering finish. Wecacha – Arabica, the essence of Thai culture.";
+    ? "Mua hạt cà phê đặc sản Arabica Sơn La rang mộc nguyên bản – được người Thái chăm sóc tỉ mẩn trên độ cao 1.050m. Hương hoa rừng, vị chua thanh, hậu vị ngọt dịu kéo dài. Wecacha – Arabica tinh hoa người Thái Tây Bắc."
+    : "Buy specialty Arabica coffee from Son La, Vietnam — hand-harvested by Thai farmers at 1,050m altitude. Natural forest flower notes, clean acidity, sweet lingering finish. Wecacha – the essence of Thai highland culture.";
   const keywords = isVi
-    ? "hạt cà phê đặc sản arabica sơn la, cà phê arabica sơn la, arabica tây bắc, wecacha, cà phê rang mộc nguyên bản, người thái sơn la, specialty coffee việt nam"
-    : "specialty arabica coffee son la, arabica son la vietnam, thai highland arabica, wecacha coffee, unflavored roasted arabica, northwest vietnam coffee";
+    ? "hạt cà phê đặc sản arabica sơn la, cà phê arabica sơn la, arabica tinh hoa người thái, mua cà phê arabica sơn la, arabica tây bắc, wecacha, cà phê rang mộc nguyên bản, người thái sơn la, specialty coffee việt nam, cà phê sơn la ngon, arabica sơn la mua ở đâu, cà phê đặc sản tây bắc"
+    : "specialty arabica coffee son la, arabica son la vietnam, thai highland arabica, buy arabica son la, wecacha coffee, unflavored roasted arabica, northwest vietnam specialty coffee, son la arabica beans";
 
   return {
     title,
