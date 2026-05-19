@@ -92,7 +92,7 @@ function StatCard({
       initial={{opacity: 0, y: 18}}
       animate={isInView ? {opacity: 1, y: 0} : {opacity: 0, y: 18}}
       transition={{duration: 0.7, delay: index * 0.1, ease: [0.16, 1, 0.3, 1]}}
-      className="overflow-hidden border-forest-950/10 p-5 sm:border-l sm:p-6 first:sm:border-l-0"
+      className="overflow-hidden border-forest-950/10 p-5 sm:border-l sm:p-6 first:sm:border-l-0 flex flex-col items-center text-center sm:items-start sm:text-left"
     >
       <div className="mb-5 flex h-12 items-center">
         {Icon ? (
