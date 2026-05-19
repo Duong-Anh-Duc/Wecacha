@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { Reveal } from "@/components/motion/reveal";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import type { Locale } from "@/i18n/routing";
 import { Leaf, Compass, Heart, Mountain } from "lucide-react";
@@ -53,16 +52,7 @@ export function CoreValuesSection({ locale: _ }: { locale: Locale }) {
               const isOffset = i % 2 !== 0;
               return (
                 <Reveal key={titleKey} delay={i * 0.12}>
-                  <motion.div
-                    className={`group relative z-30 ${isOffset ? "lg:mt-10" : ""}`}
-                    animate={{ y: [0, -5, 0] }}
-                    transition={{
-                      duration: 5 + i * 0.6,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: i * 0.35,
-                    }}
-                  >
+                  <div className={`group relative z-30 ${isOffset ? "lg:mt-10" : ""}`}>
                     {/* Editorial numeral */}
                     <div className="absolute -top-5 left-5 z-20 select-none font-serif text-[2rem] font-bold leading-none text-[#c1a063]/45 transition-colors duration-500 group-hover:text-[#c1a063]/70 pointer-events-none">
                       {numerals[i]}
@@ -107,7 +97,7 @@ export function CoreValuesSection({ locale: _ }: { locale: Locale }) {
                         </p>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 </Reveal>
               );
             })}
