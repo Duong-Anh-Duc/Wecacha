@@ -26,6 +26,15 @@ export function CoreValuesSection({ locale: _ }: { locale: Locale }) {
         {/* Subtle paper texture */}
         <div className="absolute inset-0 z-0 bg-[url('/thai-pattern-bg.png')] opacity-[0.05] mix-blend-multiply pointer-events-none" />
 
+        {/* Left golden vine */}
+        <div className="absolute inset-y-0 left-0 z-10 w-[200px] lg:w-[350px] pointer-events-none">
+          <Image src="/golden-vines.png" alt="" fill className="object-contain object-left opacity-90 drop-shadow-2xl" />
+        </div>
+        {/* Right golden vine */}
+        <div className="absolute inset-y-0 right-0 z-10 w-[200px] lg:w-[350px] pointer-events-none">
+          <Image src="/golden-vines.png" alt="" fill className="object-contain object-right rotate-180 opacity-90 drop-shadow-2xl" />
+        </div>
+
         <div className="relative z-20 mx-auto w-full px-8 py-16 lg:px-24 xl:px-32">
           {/* Heading */}
           <Reveal>
