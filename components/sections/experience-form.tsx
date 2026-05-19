@@ -4,14 +4,18 @@ import { useState, useTransition } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { imageLibrary } from "@/lib/content";
 import { submitExperienceForm } from "@/actions/register-experience";
 
 export function ExperienceForm() {
   const t = useTranslations("ExperienceForm");
+  const pathname = usePathname();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [isPending, startTransition] = useTransition();
+
+  if (pathname.includes("/contact")) return null;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

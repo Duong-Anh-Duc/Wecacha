@@ -65,10 +65,10 @@ export default async function ExplorePage({params}: Props) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_26%_0%,rgba(68,104,54,0.5),transparent_34%),radial-gradient(circle_at_78%_18%,rgba(7,24,12,0.62),transparent_42%),linear-gradient(180deg,rgba(17,67,36,0.96),rgba(6,35,17,0.98))]" />
         <div className="absolute left-[46%] top-0 h-full w-px bg-white/5" />
         <div className="absolute left-[-5.5%] bottom-[-2%] h-[640px] w-[640px] opacity-100 [mask-image:radial-gradient(circle_at_bottom_left,black_58%,transparent_84%)]">
-          <Image src="/explore_leaves.png" alt="" fill className="object-cover contrast-110 saturate-125" />
+          <Image src="/explore_leaves.png" alt="" fill sizes="640px" className="object-cover contrast-110 saturate-125" />
         </div>
         <div className="absolute right-[-7%] bottom-[-8%] h-[620px] w-[620px] opacity-95 [mask-image:radial-gradient(circle_at_bottom_right,black_44%,transparent_76%)]">
-          <Image src="/explore_grinder.png" alt="" fill className="object-cover object-bottom" />
+          <Image src="/explore_grinder.png" alt="" fill sizes="620px" className="object-cover object-bottom" />
         </div>
       </div>
 

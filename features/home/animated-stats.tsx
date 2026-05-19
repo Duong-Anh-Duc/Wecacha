@@ -60,7 +60,7 @@ export function AnimatedStats({
     <div
       ref={ref}
       className={cn(
-        "grid overflow-hidden rounded-md border border-forest-950/10 bg-parchment-100/78 shadow-warm sm:grid-cols-3",
+        "grid grid-cols-1 overflow-hidden rounded-md border border-forest-950/10 bg-parchment-100/78 shadow-warm sm:grid-cols-3",
         className
       )}
     >

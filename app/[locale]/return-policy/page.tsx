@@ -1,3 +1,4 @@
+import {use} from "react";
 import type {Metadata} from "next";
 import {useTranslations} from "next-intl";
 import {getTranslations, setRequestLocale} from "next-intl/server";
@@ -11,8 +12,8 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({locale}));
 }
 
-export async function generateMetadata({params}: {params: {locale: Locale}}): Promise<Metadata> {
-  const {locale} = params;
+export async function generateMetadata({params}: {params: Promise<{locale: Locale}>}): Promise<Metadata> {
+  const {locale} = await params;
   const t = await getTranslations({locale, namespace: "ReturnPolicy"});
   const tNav = await getTranslations({locale, namespace: "Nav"});
   return {
@@ -30,8 +31,8 @@ export async function generateMetadata({params}: {params: {locale: Locale}}): Pr
   };
 }
 
-export default function ReturnPolicyPage({params}: {params: {locale: string}}) {
-  setRequestLocale(params.locale);
+export default function ReturnPolicyPage({params}: {params: Promise<{locale: string}>}) {
+  setRequestLocale(use(params).locale);
   const t = useTranslations("ReturnPolicy");
 
   const policies = [
@@ -66,8 +67,8 @@ export default function ReturnPolicyPage({params}: {params: {locale: string}}) {
         <div className="absolute inset-0 bg-[#030604]/60 mix-blend-multiply" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#030604]/80 via-[#030604]/50 to-[#030604]/90" />
       </div>
-      <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-[#b5703a]/10 mix-blend-screen rounded-full filter blur-[150px] pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#2a5a31]/10 mix-blend-screen rounded-full filter blur-[150px] pointer-events-none z-0" />
+      <div className="absolute top-[-10%] right-[-5%] w-[280px] h-[280px] sm:w-[600px] sm:h-[600px] bg-[#b5703a]/10 mix-blend-screen rounded-full filter blur-[100px] sm:blur-[150px] pointer-events-none z-0" />
+      <div className="absolute bottom-[-10%] left-[-5%] w-[280px] h-[280px] sm:w-[600px] sm:h-[600px] bg-[#2a5a31]/10 mix-blend-screen rounded-full filter blur-[100px] sm:blur-[150px] pointer-events-none z-0" />
       <div className="absolute inset-0 opacity-[0.05] pointer-events-none z-0" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

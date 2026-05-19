@@ -44,7 +44,7 @@ export default async function ContactPage({params}: Props) {
 
   return (
     <main className="bg-forest-950">
-      <section className="relative min-h-screen overflow-hidden px-4 pb-16 pt-36 text-white sm:px-6 lg:px-8">
+      <section className="relative min-h-screen overflow-hidden px-4 pb-12 pt-24 text-white sm:px-6 sm:pt-32 lg:px-8 lg:pt-36 lg:pb-16">
         <Image
           src={imageLibrary.village}
           alt=""
@@ -112,7 +112,7 @@ export default async function ContactPage({params}: Props) {
           <iframe
             title={t("mapIframeTitle")}
             src="https://www.google.com/maps?q=Son%20La%20Vietnam&output=embed"
-            className="h-[420px] w-full border-0"
+            className="h-[260px] w-full border-0 sm:h-[340px] lg:h-[420px]"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />

@@ -1,3 +1,4 @@
+import {use} from "react";
 import type {Metadata} from "next";
 import {useTranslations} from "next-intl";
 import {getTranslations, setRequestLocale} from "next-intl/server";
@@ -11,8 +12,8 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({locale}));
 }
 
-export async function generateMetadata({params}: {params: {locale: Locale}}): Promise<Metadata> {
-  const {locale} = params;
+export async function generateMetadata({params}: {params: Promise<{locale: Locale}>}): Promise<Metadata> {
+  const {locale} = await params;
   const t = await getTranslations({locale, namespace: "Faq"});
   const tNav = await getTranslations({locale, namespace: "Nav"});
   return {
@@ -30,8 +31,8 @@ export async function generateMetadata({params}: {params: {locale: Locale}}): Pr
   };
 }
 
-export default function FAQPage({params}: {params: {locale: string}}) {
-  setRequestLocale(params.locale);
+export default function FAQPage({params}: {params: Promise<{locale: string}>}) {
+  setRequestLocale(use(params).locale);
   const t = useTranslations("Faq");
 
   // Re-creating the accordion client-side to make it beautiful with HTML details/summary
@@ -49,11 +50,12 @@ export default function FAQPage({params}: {params: {locale: string}}) {
         {/* Cinematic Header */}
         <Reveal>
           <div className="relative w-full h-[40vh] sm:h-[50vh] rounded-[2rem] overflow-hidden mb-16 shadow-[0_30px_60px_rgba(0,0,0,0.8)] border border-white/5">
-            <Image 
-              src="/faq-hero.png" 
-              alt="FAQ Hero" 
-              fill 
-              className="object-cover" 
+            <Image
+              src="/faq-hero.png"
+              alt="FAQ Hero"
+              fill
+              priority
+              className="object-cover"
               sizes="100vw"
             />
             {/* Deep overlay */}

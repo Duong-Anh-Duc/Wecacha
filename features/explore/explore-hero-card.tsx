@@ -12,7 +12,7 @@ export async function ExploreHeroCard({locale}: {locale: Locale}) {
   return (
     <div className="lg:col-span-8">
       <Reveal>
-        <div className="group relative h-[440px] w-full overflow-hidden rounded-[2rem] shadow-[0_26px_80px_rgba(20,41,24,0.18)] sm:h-[540px] lg:h-[610px]">
+        <div className="group relative h-[300px] w-full overflow-hidden rounded-[2rem] shadow-[0_26px_80px_rgba(20,41,24,0.18)] sm:h-[440px] md:h-[540px] lg:h-[610px]">
           <Image
             src={imageLibrary.mountains}
             alt="Giới thiệu"
@@ -30,12 +30,12 @@ export async function ExploreHeroCard({locale}: {locale: Locale}) {
                 {t("storyLabel")}
               </span>
             </div>
-            <h2 className="mb-5 max-w-[12em] font-serif text-[2.55rem] leading-[1.02] tracking-tight text-white drop-shadow-md sm:text-6xl lg:text-[5.15rem]">
+            <h2 className="mb-5 max-w-[12em] font-serif text-2xl leading-[1.02] tracking-tight text-white drop-shadow-md sm:text-4xl md:text-5xl lg:text-[5.15rem]">
               {t("heroAbout")} <br />
               {t("heroTitle1")} <br />
               {t("heroTitle2")}
             </h2>
-            <p className="mb-10 max-w-[31rem] text-[15px] font-medium leading-[1.75] text-[#f4f2ea] sm:text-[17px]">
+            <p className="mb-6 max-w-[31rem] text-xs font-medium leading-[1.75] text-[#f4f2ea] sm:mb-10 sm:text-[15px] lg:text-[17px]">
               {t("heroCopy1")} <br />
               {t("heroCopy2")}
             </p>

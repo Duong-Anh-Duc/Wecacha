@@ -55,12 +55,12 @@ export function CinematicHero({
           initial={{opacity: 0, y: 38, filter: "blur(10px)"}}
           animate={{opacity: 1, y: 0, filter: "blur(0px)"}}
           transition={{duration: 1.4, ease: [0.16, 1, 0.3, 1]}}
-          className="my-auto max-w-4xl py-14 px-8 sm:px-14 rounded-[2.5rem] bg-forest-950/25 backdrop-blur-md border border-white/10 shadow-2xl"
+          className="my-auto max-w-4xl py-8 px-6 sm:py-12 sm:px-10 lg:py-14 lg:px-14 rounded-[2rem] sm:rounded-[2.5rem] bg-forest-950/25 backdrop-blur-md border border-white/10 shadow-2xl"
         >
           <p className="mb-6 text-sm font-bold tracking-widest uppercase text-ember">
             {kicker}
           </p>
-          <h1 className="text-balance font-serif text-5xl leading-[1.05] text-parchment-50 sm:text-7xl lg:text-[5.5rem]">
+          <h1 className="text-balance font-serif text-4xl leading-[1.05] text-parchment-50 sm:text-5xl md:text-7xl lg:text-[5.5rem]">
             {title}
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg sm:leading-8">
@@ -83,12 +83,6 @@ export function CinematicHero({
         </motion.div>
       </div>
 
-      <div className="absolute bottom-[80px] left-1/2 z-10 flex w-full max-w-[280px] -translate-x-1/2 flex-col items-center gap-3 text-center text-xs uppercase text-white/56">
-        <span>{scrollLabel}</span>
-        <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/22">
-          <ArrowDown className="h-4 w-4 animate-bounce" aria-hidden="true" />
-        </span>
-      </div>
     </section>
   );
 }

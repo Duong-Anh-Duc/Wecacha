@@ -22,12 +22,12 @@ export async function NewsCategories({locale}: {locale: Locale}) {
 
           {/* Decorative Overlapping Image - Left */}
           <div className="pointer-events-none absolute -left-[7rem] top-1/2 z-20 hidden h-[300px] w-[300px] -translate-y-1/2 mix-blend-multiply [mask-image:radial-gradient(circle_at_center,black_52%,transparent_76%)] lg:block">
-            <Image src="/explore_latte.png" alt="Latte" fill className="object-contain" />
+            <Image src="/explore_latte.png" alt="Latte" fill sizes="300px" className="object-contain" />
           </div>
 
           {/* Decorative Overlapping Image - Right */}
           <div className="pointer-events-none absolute -right-[5.8rem] bottom-[-3.4rem] z-20 hidden h-[390px] w-[390px] mix-blend-multiply [mask-image:radial-gradient(circle_at_center,black_54%,transparent_78%)] lg:block">
-            <Image src="/explore_v60.png" alt="V60 Dripper" fill className="object-contain object-bottom" />
+            <Image src="/explore_v60.png" alt="V60 Dripper" fill sizes="390px" className="object-contain object-bottom" />
           </div>
 
           {/* Faint sketched leaf decoration inside the card */}

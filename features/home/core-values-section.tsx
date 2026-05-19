@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { SectionHeading } from "@/components/sections/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -9,6 +8,7 @@ import type { Locale } from "@/i18n/routing";
 import { Leaf, Compass, Heart, Mountain } from "lucide-react";
 
 const icons = [Leaf, Compass, Heart, Mountain];
+const numerals = ["01", "02", "03", "04"];
 
 const values = [
   { titleKey: "coreVal1Title" as const, copyKey: "coreVal1Copy" as const, bgImage: "/core-val-1.png" },
@@ -21,91 +21,91 @@ export function CoreValuesSection({ locale: _ }: { locale: Locale }) {
   const t = useTranslations("Home");
 
   return (
-    <div className="px-2 py-8 sm:px-6 lg:px-8">
-      {/* Outer dark frame wrapper to match the screenshot's 'framed' look */}
-      <section className="relative overflow-hidden rounded-[2rem] border-[12px] border-[#1a1a1a] bg-[#ebe6d9] shadow-2xl max-w-[1400px] mx-auto">
-        {/* Inner Gold Trim */}
-        <div className="absolute inset-0 z-10 pointer-events-none border-[3px] border-[#c1a063]/60 m-2 rounded-[1.5rem]" />
-        
-        {/* Texture Overlay */}
-        <div className="absolute inset-0 z-0 bg-[url('/thai-pattern-bg.png')] opacity-[0.06] mix-blend-multiply pointer-events-none" />
+    <div className="px-3 py-10 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden rounded-[2.5rem] bg-[#ede7d8] max-w-[1400px] mx-auto shadow-[0_4px_48px_rgba(50,25,8,0.10)]">
+        {/* Subtle paper texture */}
+        <div className="absolute inset-0 z-0 bg-[url('/thai-pattern-bg.png')] opacity-[0.05] mix-blend-multiply pointer-events-none" />
 
-        {/* 3D Golden Vines Framing */}
-        <div className="absolute inset-y-0 left-0 z-20 w-[200px] lg:w-[350px] opacity-90 pointer-events-none">
-          <Image 
-            src="/golden-vines.png" 
-            alt="" 
-            fill 
-            className="object-contain object-left scale-110 drop-shadow-2xl" 
-          />
-        </div>
-        <div className="absolute inset-y-0 right-0 z-20 w-[200px] lg:w-[350px] opacity-90 pointer-events-none">
-          <Image 
-            src="/golden-vines.png" 
-            alt="" 
-            fill 
-            className="object-contain object-right scale-110 rotate-180 drop-shadow-2xl" 
-          />
-        </div>
-        
-        <div className="relative z-30 mx-auto w-full px-8 py-20 lg:px-24">
+        <div className="relative z-20 mx-auto w-full px-8 py-16 lg:px-24 xl:px-32">
+          {/* Heading */}
           <Reveal>
-            <div className="mb-10 text-center relative">
-              <h2 className="font-serif text-[2.5rem] md:text-[3.8rem] leading-[1.1] text-[#5c3a21] drop-shadow-sm">
-                {t("coreValuesTitle").split(" – ")[0]} <br />
-                <span className="text-[#5c3a21]/90">– {t("coreValuesTitle").split(" – ")[1]}</span>
+            <header className="mb-14 text-center">
+              <p className="mb-4 font-serif text-[#a0764a] text-[0.65rem] tracking-[0.35em] uppercase">
+                Triết lý cốt lõi
+              </p>
+              <h2 className="font-serif text-[1.9rem] sm:text-[2.4rem] md:text-[3.8rem] leading-[1.08] text-[#3a2010]">
+                {t("coreValuesTitle").split(" – ")[0]}
               </h2>
-            </div>
-            {/* Elegant Double Gold Divider */}
-            <div className="w-full flex items-center justify-center gap-4 mb-16 px-10">
-              <div className="h-[2px] w-full bg-[#c1a063]/40" />
-              <div className="h-[4px] w-full bg-[#c1a063]/60 rounded-full max-w-[40%]" />
-              <div className="h-[2px] w-full bg-[#c1a063]/40" />
-            </div>
+              <div className="mt-4 flex items-center justify-center gap-4">
+                <div className="h-px w-14 bg-[#c1a063]/45" />
+                <span className="font-serif italic text-[1.15rem] md:text-[1.55rem] text-[#7a5035]">
+                  {t("coreValuesTitle").split(" – ")[1]}
+                </span>
+                <div className="h-px w-14 bg-[#c1a063]/45" />
+              </div>
+            </header>
           </Reveal>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 relative z-40">
+          {/* Cards — alternate cards offset down for staggered rhythm */}
+          <div className="grid gap-5 sm:grid-cols-2 sm:items-start lg:grid-cols-4">
             {values.map(({ titleKey, copyKey, bgImage }, i) => {
               const Icon = icons[i];
+              const isOffset = i % 2 !== 0;
               return (
-                <Reveal key={titleKey} delay={i * 0.15}>
+                <Reveal key={titleKey} delay={i * 0.12}>
                   <motion.div
-                    animate={{ y: [0, -4, 0] }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
-                    className="group flex h-full flex-col bg-[#7a8b75] rounded-[2.5rem] p-3 shadow-[0_20px_40px_rgba(0,0,0,0.15)] border-[2.5px] border-[#c1a063] relative overflow-hidden transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_25px_50px_rgba(0,0,0,0.25)]"
+                    className={`group relative z-30 ${isOffset ? "lg:mt-10" : ""}`}
+                    animate={{ y: [0, -5, 0] }}
+                    transition={{
+                      duration: 5 + i * 0.6,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: i * 0.35,
+                    }}
                   >
-                    {/* Subtle inner noise texture for the green card */}
-                    <div className="absolute inset-0 bg-black/5 mix-blend-overlay pointer-events-none" />
-
-                    <div className="relative z-10">
-                      {/* Capsule-shaped Image with Gold Border */}
-                      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-[2.2rem] rounded-b-[4.5rem] border-b-[5px] border-[#c1a063] shadow-inner bg-black/20">
-                        <Image
-                          src={bgImage}
-                          alt=""
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-110 saturate-[0.9]"
-                          sizes="(max-width: 768px) 100vw, 25vw"
-                          quality={80}
-                        />
-                      </div>
-                      
-                      {/* Icon placed below image on the left */}
-                      <div className="mt-6 ml-4">
-                        <div className="text-[#e2c78a] drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-1">
-                          <Icon className="h-9 w-9" strokeWidth={1.8} aria-hidden="true" />
-                        </div>
-                      </div>
+                    {/* Editorial numeral */}
+                    <div className="absolute -top-5 left-5 z-20 select-none font-serif text-[2rem] font-bold leading-none text-[#c1a063]/45 transition-colors duration-500 group-hover:text-[#c1a063]/70 pointer-events-none">
+                      {numerals[i]}
                     </div>
 
-                    {/* Text Content */}
-                    <div className="mt-4 px-4 pb-6 flex flex-col flex-1 relative z-10">
-                      <h3 className="font-serif text-[1.3rem] leading-snug text-[#3f2512] mb-3 font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.1)]">
-                        {t(titleKey)}
-                      </h3>
-                      <p className="text-[13px] leading-[1.6] text-[#1a1a1a] font-medium flex-1">
-                        {t(copyKey)}
-                      </p>
+                    {/* Arch card */}
+                    <div className="relative flex flex-col overflow-hidden rounded-t-[9rem] rounded-b-[1.5rem] border border-[#c1a063]/15 bg-[#15201a] shadow-[0_10px_32px_rgba(0,0,0,0.22)] transition-all duration-700 group-hover:-translate-y-3 group-hover:border-[#c1a063]/45 group-hover:shadow-[0_24px_60px_rgba(0,0,0,0.36)]">
+
+                      {/* Image Area */}
+                      <div className="relative w-full">
+                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-t-[8.5rem]">
+                          <Image
+                            src={bgImage}
+                            alt=""
+                            fill
+                            className="object-cover saturate-[0.88] brightness-[0.95] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.07]"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            quality={80}
+                          />
+                          {/* Gradient: clear at top, fades into card bg at bottom */}
+                          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/0 to-[#15201a]/95" />
+                        </div>
+
+                        {/* Icon bridge between image and text */}
+                        <div className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full border border-[#c1a063]/35 bg-[#15201a] shadow-md transition-all duration-500 group-hover:border-[#c1a063] group-hover:bg-[#c1a063]">
+                          <Icon
+                            className="h-[18px] w-[18px] text-[#d4b97a] transition-colors duration-500 group-hover:text-[#15201a]"
+                            strokeWidth={1.5}
+                            aria-hidden
+                          />
+                        </div>
+                      </div>
+
+                      {/* Text */}
+                      <div className="flex flex-col items-center px-5 pb-8 pt-9 text-center">
+                        <h3 className="mb-3 font-serif text-[1.08rem] font-medium leading-snug text-[#e4cfa2] md:text-[1.15rem]">
+                          {t(titleKey)}
+                        </h3>
+                        <div className="mb-4 h-px w-8 bg-[#c1a063]/35 transition-all duration-500 group-hover:w-16 group-hover:bg-[#c1a063]/65" />
+                        <p className="text-[12.5px] font-light leading-[1.72] text-[#7e9488]">
+                          {t(copyKey)}
+                        </p>
+                      </div>
                     </div>
                   </motion.div>
                 </Reveal>

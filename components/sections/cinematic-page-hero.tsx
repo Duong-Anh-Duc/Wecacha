@@ -33,7 +33,7 @@ export function CinematicPageHero({
   return (
     <section
       className={cn(
-        "relative min-h-[78vh] overflow-hidden bg-forest-950 px-4 pb-16 pt-36 text-white sm:px-6 lg:px-8 lg:pb-24",
+        "relative min-h-[78vh] overflow-hidden bg-forest-950 px-4 pb-12 pt-24 text-white sm:px-6 sm:pt-32 lg:px-8 lg:pt-36 lg:pb-24",
         className
       )}
     >
@@ -62,10 +62,10 @@ export function CinematicPageHero({
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             {kicker}
           </p>
-          <h1 className="text-balance font-serif text-6xl leading-[0.94] text-parchment-50 sm:text-7xl lg:text-8xl">
+          <h1 className="text-balance font-serif text-4xl leading-[0.94] text-parchment-50 sm:text-6xl md:text-7xl lg:text-8xl">
             {title}
           </h1>
-          <p className="mt-7 max-w-2xl text-lg leading-8 text-white/78">
+          <p className="mt-5 max-w-2xl text-base leading-7 text-white/78 sm:mt-7 sm:text-lg sm:leading-8">
             {copy}
           </p>
         </Reveal>

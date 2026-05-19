@@ -13,7 +13,7 @@ import {Textarea} from "@/components/ui/textarea";
 
 const contactSchema = z.object({
   name: z.string().min(2),
-  email: z.string().email(),
+  phone: z.string().min(9),
   message: z.string().min(10)
 });
 
@@ -31,7 +31,7 @@ export function ContactForm() {
     resolver: zodResolver(contactSchema),
     defaultValues: {
       name: "",
-      email: "",
+      phone: "",
       message: ""
     }
   });
@@ -63,16 +63,16 @@ export function ContactForm() {
           ) : null}
         </div>
         <div>
-          <Label className="text-white" htmlFor="email">
-            {t("email")}
+          <Label className="text-white" htmlFor="phone">
+            {t("phone")}
           </Label>
           <Input
-            id="email"
-            type="email"
+            id="phone"
+            type="tel"
             className="mt-2 border-white/14 bg-white/86 text-forest-950"
-            {...register("email")}
+            {...register("phone")}
           />
-          {errors.email ? (
+          {errors.phone ? (
             <p className="mt-2 text-xs text-ember">{errorText}</p>
           ) : null}
         </div>

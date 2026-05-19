@@ -38,7 +38,7 @@ export async function ArticlesList({locale}: {locale: Locale}) {
       {listArticles.map((article, i) => (
         <Reveal key={i} delay={0.2 + i * 0.15}>
           <Link href={article.href} className="group flex h-auto flex-col items-start gap-4 rounded-[1.5rem] border border-[#142918]/5 bg-[#fdfcfb] p-2 shadow-[0_16px_50px_rgba(20,41,24,0.07)] transition-all hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(20,41,24,0.12)] sm:min-h-[172px] sm:flex-row sm:items-stretch sm:gap-5 sm:p-2.5 lg:min-h-[180px]">
-            <div className="relative h-48 w-full shrink-0 overflow-hidden rounded-[1rem] sm:h-auto sm:w-[170px] lg:w-[130px] xl:w-[160px]">
+            <div className="relative h-48 w-full shrink-0 overflow-hidden rounded-[1rem] sm:h-auto sm:w-[150px] md:w-[160px] lg:w-[170px] xl:w-[200px]">
               <Image
                 src={article.image}
                 alt={article.title}

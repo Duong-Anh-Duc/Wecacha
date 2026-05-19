@@ -28,7 +28,7 @@ export async function OriginStorySection({locale}: {locale: Locale}) {
         </svg>
       </div>
 
-      <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-2">
+      <div className="mx-auto grid max-w-7xl items-center gap-8 sm:gap-12 lg:gap-16 lg:grid-cols-2">
         <Reveal className="relative z-10 lg:pr-10">
           <SectionHeading
             kicker={t("originKicker")}
