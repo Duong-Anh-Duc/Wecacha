@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useEffect} from "react";
+import {useState} from "react";
 import {motion, AnimatePresence} from "framer-motion";
 import {MessageCircle, X} from "lucide-react";
 import {useTranslations} from "next-intl";
@@ -40,17 +40,6 @@ const contacts = [
 export function FloatingContact() {
   const t = useTranslations("Nav");
   const [open, setOpen] = useState(false);
-  const [textIndex, setTextIndex] = useState(0);
-
-  const bubbleTexts = ["haveQuestions", "contactUsBubble", "needAdvice"] as const;
-
-  useEffect(() => {
-    if (open) return;
-    const interval = setInterval(() => {
-      setTextIndex((prev) => (prev + 1) % bubbleTexts.length);
-    }, 3500); // Change text every 3.5 seconds
-    return () => clearInterval(interval);
-  }, [open, bubbleTexts.length]);
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
@@ -87,58 +76,61 @@ export function FloatingContact() {
       </AnimatePresence>
 
       {/* Main toggle button */}
-      <motion.button
-        onClick={() => setOpen((v) => !v)}
-        whileTap={{scale: 0.92}}
-        animate={!open ? {scale: [1, 1.055, 1]} : {scale: 1}}
-        transition={!open ? {duration: 1.55, repeat: Infinity, ease: "easeInOut"} : {duration: 0.2}}
-        className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-earth-600 text-white shadow-cinematic transition hover:bg-earth-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-600 focus-visible:ring-offset-4 focus-visible:ring-offset-parchment-50"
-        aria-label={t("contact")}
-      >
-        {!open ? (
-          <>
+      <div className="flex items-center gap-3">
+        <AnimatePresence>
+          {open ? (
             <motion.span
-              aria-hidden="true"
-              className="absolute inset-0 rounded-full border-2 border-earth-600/55"
-              animate={{scale: [1, 1.7], opacity: [0.75, 0]}}
-              transition={{duration: 1.45, repeat: Infinity, ease: "easeOut"}}
-            />
-            <motion.span
-              aria-hidden="true"
-              className="absolute inset-0 rounded-full border border-white/45"
-              animate={{scale: [1, 1.42], opacity: [0.5, 0]}}
-              transition={{duration: 1.45, repeat: Infinity, delay: 0.42, ease: "easeOut"}}
-            />
-            <motion.span
-              aria-hidden="true"
-              className="absolute -inset-2 rounded-full bg-earth-500/30 blur-md"
-              animate={{scale: [0.9, 1.2, 0.9], opacity: [0.38, 0.72, 0.38]}}
-              transition={{duration: 1.55, repeat: Infinity, ease: "easeInOut"}}
-            />
-            <span className="pointer-events-none absolute right-[calc(100%+1rem)] top-1/2 -translate-y-1/2 whitespace-nowrap overflow-hidden rounded-[16px] rounded-br-[4px] bg-white px-4 py-2 text-[13px] font-bold text-[#b54a1a] shadow-[0_4px_14px_rgba(0,0,0,0.15)] transition-all duration-300 origin-right animate-[pulse_3s_infinite]">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={textIndex}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="block"
-                >
-                  {t(bubbleTexts[textIndex])}
-                </motion.span>
-              </AnimatePresence>
-            </span>
-          </>
-        ) : null}
-        <motion.span
-          className="relative z-10"
-          animate={{rotate: open ? 90 : 0}}
-          transition={{duration: 0.3}}
+              initial={{ opacity: 0, x: 10, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 10, scale: 0.98 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="hidden whitespace-nowrap rounded-[16px] rounded-br-[4px] bg-white px-4 py-2 text-[13px] font-bold text-[#b54a1a] shadow-[0_4px_14px_rgba(0,0,0,0.15)] sm:block"
+            >
+              {t("contactUsBubble")}
+            </motion.span>
+          ) : null}
+        </AnimatePresence>
+
+        <motion.button
+          onClick={() => setOpen((v) => !v)}
+          whileTap={{scale: 0.92}}
+          animate={!open ? {scale: [1, 1.055, 1]} : {scale: 1}}
+          transition={!open ? {duration: 1.55, repeat: Infinity, ease: "easeInOut"} : {duration: 0.2}}
+          className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-earth-600 text-white shadow-cinematic transition hover:bg-earth-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-600 focus-visible:ring-offset-4 focus-visible:ring-offset-parchment-50"
+          aria-label={t("contact")}
+          aria-expanded={open}
         >
-          {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
-        </motion.span>
-      </motion.button>
+          {!open ? (
+            <>
+              <motion.span
+                aria-hidden="true"
+                className="absolute inset-0 rounded-full border-2 border-earth-600/55"
+                animate={{scale: [1, 1.7], opacity: [0.75, 0]}}
+                transition={{duration: 1.45, repeat: Infinity, ease: "easeOut"}}
+              />
+              <motion.span
+                aria-hidden="true"
+                className="absolute inset-0 rounded-full border border-white/45"
+                animate={{scale: [1, 1.42], opacity: [0.5, 0]}}
+                transition={{duration: 1.45, repeat: Infinity, delay: 0.42, ease: "easeOut"}}
+              />
+              <motion.span
+                aria-hidden="true"
+                className="absolute -inset-2 rounded-full bg-earth-500/30 blur-md"
+                animate={{scale: [0.9, 1.2, 0.9], opacity: [0.38, 0.72, 0.38]}}
+                transition={{duration: 1.55, repeat: Infinity, ease: "easeInOut"}}
+              />
+            </>
+          ) : null}
+          <motion.span
+            className="relative z-10"
+            animate={{rotate: open ? 90 : 0}}
+            transition={{duration: 0.3}}
+          >
+            {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+          </motion.span>
+        </motion.button>
+      </div>
     </div>
   );
 }
