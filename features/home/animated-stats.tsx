@@ -1,25 +1,26 @@
 "use client";
 
 import {useEffect, useRef, useState} from "react";
-import {Flame, Leaf, UsersRound} from "lucide-react";
+import {Award, Map, Mountain} from "lucide-react";
 import {motion, useInView, useMotionValue, useSpring} from "framer-motion";
 import {cn} from "@/lib/utils";
 
 type Stat = {
-  icon?: "leaf" | "users" | "flame";
+  icon?: "mountain" | "map" | "award";
   value: number;
   suffix?: string;
+  decimals?: number;
   label: string;
   caption: string;
 };
 
 const statIcons = {
-  leaf: Leaf,
-  users: UsersRound,
-  flame: Flame
+  mountain: Mountain,
+  map: Map,
+  award: Award
 };
 
-function CountNumber({value, suffix = ""}: {value: number; suffix?: string}) {
+function CountNumber({value, suffix = "", decimals = 0}: {value: number; suffix?: string; decimals?: number}) {
   const motionValue = useMotionValue(0);
   const springValue = useSpring(motionValue, {
     damping: 28,
@@ -29,10 +30,10 @@ function CountNumber({value, suffix = ""}: {value: number; suffix?: string}) {
 
   useEffect(() => {
     const unsubscribe = springValue.on("change", (latest) => {
-      setDisplay(Math.round(latest));
+      setDisplay(parseFloat(latest.toFixed(decimals)));
     });
     return unsubscribe;
-  }, [springValue]);
+  }, [springValue, decimals]);
 
   useEffect(() => {
     motionValue.set(value);
@@ -40,7 +41,7 @@ function CountNumber({value, suffix = ""}: {value: number; suffix?: string}) {
 
   return (
     <span>
-      {display.toLocaleString("vi-VN")}
+      {display.toLocaleString("vi-VN", {minimumFractionDigits: decimals, maximumFractionDigits: decimals})}
       {suffix}
     </span>
   );
@@ -102,7 +103,7 @@ function StatCard({
         ) : null}
       </div>
       <p className="max-w-full font-serif text-[clamp(2rem,2.6vw,3rem)] leading-[0.95] text-earth-700">
-        {isInView ? <CountNumber value={stat.value} suffix={stat.suffix} /> : "0"}
+        {isInView ? <CountNumber value={stat.value} suffix={stat.suffix} decimals={stat.decimals} /> : "0"}
       </p>
       <p className="mt-3 text-sm font-bold uppercase tracking-[0.12em] text-forest-950">
         {stat.label}

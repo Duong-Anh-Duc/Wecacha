@@ -42,23 +42,24 @@ export async function OriginStorySection({locale}: {locale: Locale}) {
             className="mt-9"
             stats={[
               {
-                icon: "leaf",
-                value: 1050,
+                icon: "mountain",
+                value: 1200,
                 suffix: "m+",
                 label: t("statAltLabel"),
                 caption: t("statAltCaption")
               },
               {
-                icon: "users",
-                value: 120,
-                suffix: "+",
+                icon: "map",
+                value: 24300,
+                suffix: " ha",
                 label: t("statFarmersLabel"),
                 caption: t("statFarmersCaption")
               },
               {
-                icon: "flame",
-                value: 48,
-                suffix: "h+",
+                icon: "award",
+                value: 47.9,
+                suffix: "%",
+                decimals: 1,
                 label: t("statRoastValue"),
                 caption: t("statRoastCaption")
               }
