@@ -11,6 +11,7 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
+import {createOrder} from "@/actions/order-actions";
 import {getCartTotals, useCartStore, type CartItem} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
@@ -44,6 +45,7 @@ export function CheckoutForm() {
   const updateBuyNowQuantity = useCartStore((state) => state.updateBuyNowQuantity);
   const clearBuyNow = useCartStore((state) => state.clearBuyNow);
   const [success, setSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [minQtyWarning, setMinQtyWarning] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
@@ -106,7 +108,33 @@ export function CheckoutForm() {
     setLoadingWards(false);
   }
 
-  function onSubmit() {
+  async function onSubmit(values: CheckoutValues) {
+    setSubmitError(null);
+    const result = await createOrder({
+      customer_name: values.fullName,
+      phone: values.phone,
+      city: values.city,
+      ward: values.ward,
+      address: values.address,
+      note: values.note,
+      subtotal: totals.subtotal,
+      shipping: totals.shipping,
+      total: totals.total,
+      items: items.map((item) => ({
+        slug: item.slug,
+        name: item.name,
+        image: item.image,
+        weight: item.weight,
+        quantity: item.quantity,
+        price: item.price
+      }))
+    });
+
+    if (!result.success) {
+      setSubmitError(result.error ?? t("orderError"));
+      return;
+    }
+
     setSuccess(true);
     if (isBuyNow) {
       clearBuyNow();
@@ -208,6 +236,11 @@ export function CheckoutForm() {
           <Button className="mt-10 bg-[#1a3020] hover:bg-[#142918] text-white rounded-xl h-14 px-8 font-medium transition-all shadow-md hover:-translate-y-0.5 w-fit" disabled={isSubmitting}>
             <ShoppingBag className="w-4 h-4 mr-2" /> {t("placeOrder")}
           </Button>
+          {submitError ? (
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              {submitError}
+            </div>
+          ) : null}
         </form>
 
         <div className="mt-12 pt-6 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-6">

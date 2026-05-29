@@ -5,9 +5,17 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Locale } from "@/i18n/routing";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export async function ArabicaProductsSection({ locale }: { locale: Locale }) {
+export async function ArabicaProductsSection({
+  locale,
+  tone = "classic"
+}: {
+  locale: Locale;
+  tone?: "classic" | "green";
+}) {
   const t = await getTranslations({ locale, namespace: "Home" });
+  const isGreen = tone === "green";
 
   const products = [
     {
@@ -29,7 +37,12 @@ export async function ArabicaProductsSection({ locale }: { locale: Locale }) {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-forest-950 text-white px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+    <section
+      className={cn(
+        "relative overflow-hidden px-4 py-24 text-white sm:px-6 lg:px-8 lg:py-32",
+        isGreen ? "bg-brand-green" : "bg-forest-950"
+      )}
+    >
       {/* Background Image with Dark Overlay */}
       <div className="absolute inset-0 z-0">
         <Image 
@@ -40,7 +53,14 @@ export async function ArabicaProductsSection({ locale }: { locale: Locale }) {
           sizes="100vw" 
           quality={80} 
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-forest-950/80 via-forest-950/60 to-forest-950/95" />
+        <div
+          className={cn(
+            "absolute inset-0",
+            isGreen
+              ? "bg-gradient-to-b from-brand-green/80 via-brand-green/60 to-brand-green/95"
+              : "bg-gradient-to-b from-forest-950/80 via-forest-950/60 to-forest-950/95"
+          )}
+        />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl">

@@ -34,6 +34,7 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
     .from("news_articles")
     .select("title_vi, title_en, intro_vi, intro_en, image_url")
     .eq("slug", slug)
+    .eq("is_visible", true)
     .single();
 
   if (!data) return { title: "Not Found" };
@@ -65,6 +66,7 @@ export default async function NewsCategoryPage({params}: Props) {
     .from("news_articles")
     .select("*")
     .eq("slug", slug)
+    .eq("is_visible", true)
     .single();
 
   if (!data) return notFound();

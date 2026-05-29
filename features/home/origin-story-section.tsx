@@ -4,9 +4,17 @@ import {SectionHeading} from "@/components/sections/section-heading";
 import {Reveal} from "@/components/motion/reveal";
 import {AnimatedStats} from "@/features/home/animated-stats";
 import type {Locale} from "@/i18n/routing";
+import {cn} from "@/lib/utils";
 
-export async function OriginStorySection({locale}: {locale: Locale}) {
+export async function OriginStorySection({
+  locale,
+  tone = "classic"
+}: {
+  locale: Locale;
+  tone?: "classic" | "green";
+}) {
   const t = await getTranslations({locale, namespace: "Home"});
+  const isGreen = tone === "green";
 
   return (
     <section className="relative overflow-hidden bg-parchment-50 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
@@ -92,7 +100,12 @@ export async function OriginStorySection({locale}: {locale: Locale}) {
               />
             </div>
             {/* Soft glow behind */}
-            <div className="absolute -inset-10 z-0 rounded-full bg-forest-950/5 blur-3xl" />
+            <div
+              className={cn(
+                "absolute -inset-10 z-0 rounded-full blur-3xl",
+                isGreen ? "bg-brand-green/5" : "bg-forest-950/5"
+              )}
+            />
           </div>
         </Reveal>
       </div>

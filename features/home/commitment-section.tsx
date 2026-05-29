@@ -4,7 +4,13 @@ import { Reveal } from "@/components/motion/reveal";
 import type { Locale } from "@/i18n/routing";
 import { CommitmentCards } from "@/features/home/commitment-cards";
 
-export async function CommitmentSection({ locale }: { locale: Locale }) {
+export async function CommitmentSection({
+  locale,
+  tone = "classic"
+}: {
+  locale: Locale;
+  tone?: "classic" | "green";
+}) {
   const t = await getTranslations({ locale, namespace: "Home" });
 
   return (
@@ -18,7 +24,7 @@ export async function CommitmentSection({ locale }: { locale: Locale }) {
           />
         </Reveal>
         <div className="mt-12">
-          <CommitmentCards />
+          <CommitmentCards tone={tone} />
         </div>
       </div>
     </section>

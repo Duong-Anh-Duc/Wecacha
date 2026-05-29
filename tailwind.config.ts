@@ -31,6 +31,9 @@ const config: Config = {
           200: "#dfceb2"
         },
         ember: "#f3a734",
+        brand: {
+          green: "#4A751D"
+        },
         white: "#FFFFFF"
       },
       fontFamily: {

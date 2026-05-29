@@ -1,11 +1,11 @@
 import {ArrowLeft} from "lucide-react";
 import {getTranslations, setRequestLocale} from "next-intl/server";
-import {ArticleForm} from "@/components/admin/article-form";
+import {ProductForm} from "@/components/admin/product-form";
 import {Link} from "@/i18n/navigation";
-import {requireAdmin} from "@/lib/admin-auth";
 import type {Locale} from "@/i18n/routing";
+import {requireAdmin} from "@/lib/admin-auth";
 
-export default async function NewArticlePage({
+export default async function NewProductPage({
   params
 }: {
   params: Promise<{locale: Locale}>;
@@ -19,21 +19,19 @@ export default async function NewArticlePage({
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link
-          href="/admin/articles"
+          href="/admin/products"
           className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-stone-600 shadow-sm transition hover:bg-stone-200 hover:text-forest-950"
         >
           <ArrowLeft className="h-4 w-4" />
-          {t("backArticles")}
+          {t("backProducts")}
         </Link>
         <div>
-          <h2 className="text-2xl font-bold text-forest-950 font-serif">{t("newArticleTitle")}</h2>
-          <p className="text-stone-500 mt-1">{t("newArticleDesc")}</p>
+          <h2 className="font-serif text-3xl text-forest-950">{t("newProductTitle")}</h2>
+          <p className="mt-1 text-stone-500">{t("newProductDesc")}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8">
-        <ArticleForm />
-      </div>
+      <ProductForm />
     </div>
   );
 }

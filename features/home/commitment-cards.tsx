@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import {cn} from "@/lib/utils";
 
 const cards = [
   {
@@ -22,9 +23,10 @@ const cards = [
   },
 ];
 
-export function CommitmentCards() {
+export function CommitmentCards({tone = "classic"}: {tone?: "classic" | "green"}) {
   const t = useTranslations("Home");
   const [activeIndex, setActiveIndex] = useState(0);
+  const isGreen = tone === "green";
 
   return (
     <div className="flex gap-4 h-[400px] sm:h-[500px] lg:h-[600px]">
@@ -35,7 +37,10 @@ export function CommitmentCards() {
           <div
             key={titleKey}
             onClick={() => setActiveIndex(index)}
-            className="relative overflow-hidden rounded-[2rem] bg-forest-950 cursor-pointer border border-white/10"
+            className={cn(
+              "relative cursor-pointer overflow-hidden rounded-[2rem] border border-white/10",
+              isGreen ? "bg-brand-green" : "bg-forest-950"
+            )}
             style={{
               flex: isActive ? "7 1 0%" : "1 1 0%",
               opacity: isActive ? 1 : 0.45,
@@ -51,9 +56,19 @@ export function CommitmentCards() {
               sizes="(min-width: 1024px) 50vw, 100vw"
               quality={80}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-forest-950/90 via-forest-950/20 to-transparent" />
+            <div
+              className={cn(
+                "absolute inset-0 bg-gradient-to-t to-transparent",
+                isGreen ? "from-brand-green/90 via-brand-green/20" : "from-forest-950/90 via-forest-950/20"
+              )}
+            />
             {!isActive && (
-              <div className="absolute inset-0 bg-forest-950/55 transition-opacity duration-500" />
+              <div
+                className={cn(
+                  "absolute inset-0 transition-opacity duration-500",
+                  isGreen ? "bg-brand-green/55" : "bg-forest-950/55"
+                )}
+              />
             )}
 
             <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-10">

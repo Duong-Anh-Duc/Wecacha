@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import {InputNumber, Select, Switch} from "antd";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { upsertArticle, deleteArticle, uploadArticleImage } from "@/actions/article-actions";
@@ -102,6 +103,9 @@ export function ArticleForm({ initialData = {} }: { initialData?: any }) {
   const t = useTranslations("Admin");
   const [isPending, startTransition] = useTransition();
   const isEditing = !!initialData.id;
+  const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
+  const [placement, setPlacement] = useState(initialData.placement ?? "news");
+  const [sortOrder, setSortOrder] = useState(Number(initialData.sort_order ?? 0));
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -136,6 +140,9 @@ export function ArticleForm({ initialData = {} }: { initialData?: any }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+      <input type="hidden" name="is_visible" value={isVisible ? "true" : "false"} />
+      <input type="hidden" name="placement" value={placement} />
+      <input type="hidden" name="sort_order" value={sortOrder} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <label className="text-sm font-medium text-stone-700">{t("fieldSlug")}</label>
@@ -146,6 +153,36 @@ export function ArticleForm({ initialData = {} }: { initialData?: any }) {
             className="w-full rounded-xl border border-stone-200 px-4 py-2.5 focus:border-ember focus:ring-1 focus:ring-ember outline-none"
             placeholder={t("fieldSlugPlaceholder")}
           />
+        </div>
+        <div className="grid grid-cols-1 gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-4 md:grid-cols-3 md:col-span-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-stone-700">{t("visibility")}</label>
+            <div className="flex h-10 items-center">
+              <Switch
+                checked={isVisible}
+                onChange={setIsVisible}
+                checkedChildren={t("visible")}
+                unCheckedChildren={t("hidden")}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-stone-700">{t("placement")}</label>
+            <Select
+              className="w-full"
+              value={placement}
+              onChange={setPlacement}
+              options={[
+                {label: t("placementHome"), value: "home"},
+                {label: t("placementNews"), value: "news"},
+                {label: t("placementBoth"), value: "both"}
+              ]}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-stone-700">{t("sortOrder")}</label>
+            <InputNumber className="w-full" value={sortOrder} onChange={(value) => setSortOrder(Number(value ?? 0))} />
+          </div>
         </div>
       </div>
 

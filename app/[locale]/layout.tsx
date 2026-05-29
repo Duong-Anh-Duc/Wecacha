@@ -13,6 +13,7 @@ import {JsonLd} from "@/components/seo/json-ld";
 import {routing, type Locale} from "@/i18n/routing";
 import {organizationJsonLd, webSiteJsonLd} from "@/lib/seo";
 import {siteUrl} from "@/lib/site";
+import "antd/dist/reset.css";
 import "@/styles/globals.css";
 
 const bodyFont = Be_Vietnam_Pro({
@@ -145,7 +146,7 @@ export default async function LocaleLayout({children, params}: Props) {
             <ExperienceForm />
             <SoundButton />
             <FloatingContact />
-            <SiteFooter locale={locale as Locale} />
+            <SiteFooter />
           </SmoothScrollProvider>
           <div className="film-grain" aria-hidden="true" />
         </NextIntlClientProvider>

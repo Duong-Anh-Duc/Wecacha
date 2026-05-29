@@ -44,6 +44,16 @@ body {
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
+body.admin-shell-active,
+body:has(.admin-shell) {
+  background: #f7f6f1;
+}
+
+body.admin-shell-active .film-grain,
+body:has(.admin-shell) .film-grain {
+  display: none;
+}
+
 ::selection {
   background: rgba(181, 101, 0, 0.32);
   color: #061f07;

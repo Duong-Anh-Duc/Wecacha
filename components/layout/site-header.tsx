@@ -22,6 +22,12 @@ export function SiteHeader() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [localeLoading, setLocaleLoading] = useState(false);
   const isHome = pathname === "/";
+  const isGreenHome = pathname === "/green";
+  const showHomeVariantToggle = isHome || isGreenHome;
+
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   useEffect(() => {
     const onScroll = () => {
@@ -70,8 +76,14 @@ export function SiteHeader() {
           lightHeader
             ? "border-b border-forest-950/0 bg-[#f4f2ea]/92 backdrop-blur-xl"
             : solid
-            ? "border-b border-white/10 bg-forest-950/95 shadow-cinematic backdrop-blur-xl"
-            : "bg-gradient-to-b from-forest-950/78 via-forest-950/34 to-transparent"
+            ? cn(
+                "border-b border-white/10 shadow-cinematic backdrop-blur-xl",
+                isGreenHome ? "bg-brand-green/95" : "bg-forest-950/95"
+              )
+            : cn(
+                "bg-gradient-to-b to-transparent",
+                isGreenHome ? "from-brand-green/78 via-brand-green/34" : "from-forest-950/78 via-forest-950/34"
+              )
         )}
       >
         {/* Scroll progress bar — tạm ẩn */}
@@ -148,7 +160,10 @@ export function SiteHeader() {
                         "overflow-hidden rounded-2xl p-1.5 shadow-cinematic",
                         lightHeader
                           ? "border border-forest-950/12 bg-[#fffaf0]"
-                          : "border border-white/10 bg-forest-950/95 backdrop-blur-xl"
+                          : cn(
+                              "border border-white/10 backdrop-blur-xl",
+                              isGreenHome ? "bg-brand-green/95" : "bg-forest-950/95"
+                            )
                       )}>
                         {item.children.map((child) => (
                           <Link
@@ -183,6 +198,14 @@ export function SiteHeader() {
               </Link>
             ) : (
               <>
+                {showHomeVariantToggle ? (
+                  <Link
+                    href={isGreenHome ? "/" : "/green"}
+                    className="inline-flex h-10 items-center justify-center rounded-full border border-white/28 bg-white/8 px-3 text-[12px] font-semibold text-white backdrop-blur transition hover:bg-white/16 sm:px-4 sm:text-[13px]"
+                  >
+                    {isGreenHome ? t("classicHome") : t("greenHome")}
+                  </Link>
+                ) : null}
                 <LocaleSwitcher locale={locale} pathname={pathname} solid={solid} onLoading={setLocaleLoading} />
                 {/* <CartDrawer solid={solid} /> */}
               </>

@@ -5,6 +5,8 @@ import {motion, AnimatePresence} from "framer-motion";
 import {MessageCircle, X} from "lucide-react";
 import {useTranslations} from "next-intl";
 import Image from "next/image";
+import {usePathname} from "next/navigation";
+import {cn} from "@/lib/utils";
 
 const contacts = [
   {
@@ -39,7 +41,13 @@ const contacts = [
 
 export function FloatingContact() {
   const t = useTranslations("Nav");
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const isGreenHome = pathname.includes("/green");
+
+  if (pathname.includes("/admin")) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
@@ -59,7 +67,12 @@ export function FloatingContact() {
                 className="group flex items-center gap-2"
               >
                 {/* Label */}
-                <span className="hidden rounded-full bg-forest-950/80 px-3 py-1 text-xs font-medium text-white backdrop-blur group-hover:block">
+                <span
+                  className={cn(
+                    "hidden rounded-full px-3 py-1 text-xs font-medium text-white backdrop-blur group-hover:block",
+                    isGreenHome ? "bg-brand-green/80" : "bg-forest-950/80"
+                  )}
+                >
                   {c.label}
                 </span>
                 {/* Icon button */}
@@ -96,7 +109,12 @@ export function FloatingContact() {
           whileTap={{scale: 0.92}}
           animate={!open ? {scale: [1, 1.055, 1]} : {scale: 1}}
           transition={!open ? {duration: 1.55, repeat: Infinity, ease: "easeInOut"} : {duration: 0.2}}
-          className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-earth-600 text-white shadow-cinematic transition hover:bg-earth-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-600 focus-visible:ring-offset-4 focus-visible:ring-offset-parchment-50"
+          className={cn(
+            "group relative flex h-14 w-14 items-center justify-center rounded-full text-white shadow-cinematic transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-offset-parchment-50",
+            isGreenHome
+              ? "bg-brand-green hover:bg-brand-green/90 focus-visible:ring-brand-green"
+              : "bg-earth-600 hover:bg-earth-700 focus-visible:ring-earth-600"
+          )}
           aria-label={t("contact")}
           aria-expanded={open}
         >
@@ -104,7 +122,10 @@ export function FloatingContact() {
             <>
               <motion.span
                 aria-hidden="true"
-                className="absolute inset-0 rounded-full border-2 border-earth-600/55"
+                className={cn(
+                  "absolute inset-0 rounded-full border-2",
+                  isGreenHome ? "border-brand-green/55" : "border-earth-600/55"
+                )}
                 animate={{scale: [1, 1.7], opacity: [0.75, 0]}}
                 transition={{duration: 1.45, repeat: Infinity, ease: "easeOut"}}
               />
@@ -116,7 +137,10 @@ export function FloatingContact() {
               />
               <motion.span
                 aria-hidden="true"
-                className="absolute -inset-2 rounded-full bg-earth-500/30 blur-md"
+                className={cn(
+                  "absolute -inset-2 rounded-full blur-md",
+                  isGreenHome ? "bg-brand-green/30" : "bg-earth-500/30"
+                )}
                 animate={{scale: [0.9, 1.2, 0.9], opacity: [0.38, 0.72, 0.38]}}
                 transition={{duration: 1.55, repeat: Infinity, ease: "easeInOut"}}
               />

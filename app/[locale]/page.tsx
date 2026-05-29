@@ -1,12 +1,5 @@
-import {getTranslations, setRequestLocale} from "next-intl/server";
-import {CinematicHero} from "@/features/home/cinematic-hero";
-import {OriginStorySection} from "@/features/home/origin-story-section";
-import {CultureSection} from "@/features/home/culture-section";
-import {CoreValuesSection} from "@/features/home/core-values-section";
-import {ArabicaProductsSection} from "@/features/home/arabica-products-section";
-import {CommitmentSection} from "@/features/home/commitment-section";
-import {JourneysSection} from "@/features/home/journeys-section";
-import {TestimonialsSection} from "@/features/home/testimonials-section";
+import {setRequestLocale} from "next-intl/server";
+import {HomePageView} from "@/features/home/home-page-view";
 import type {Metadata} from "next";
 import type {Locale} from "@/i18n/routing";
 
@@ -66,25 +59,6 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
 export default async function HomePage({params}: Props) {
   const {locale} = await params;
   setRequestLocale(locale);
-  const t = await getTranslations({locale, namespace: "Home"});
 
-  return (
-    <main>
-      <CinematicHero
-        kicker={t("kicker")}
-        title={t("heroTitle")}
-        copy={t("heroCopy")}
-        primary={t("ctaPrimary")}
-        secondary={t("ctaSecondary")}
-        scrollLabel={t("scroll")}
-      />
-      <OriginStorySection locale={locale} />
-      <CultureSection locale={locale} />
-      <CoreValuesSection locale={locale} />
-      <ArabicaProductsSection locale={locale} />
-      <CommitmentSection locale={locale} />
-      {/* <JourneysSection locale={locale} /> */}
-      {/* <TestimonialsSection locale={locale} /> */}
-    </main>
-  );
+  return <HomePageView locale={locale} tone="classic" />;
 }

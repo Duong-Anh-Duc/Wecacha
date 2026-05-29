@@ -1,25 +1,30 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import {useRef, useState, useTransition} from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { imageLibrary } from "@/lib/content";
-import { submitExperienceForm } from "@/actions/register-experience";
+import {motion} from "framer-motion";
+import {useTranslations} from "next-intl";
+import {usePathname} from "next/navigation";
+import {submitExperienceForm} from "@/actions/register-experience";
+import {Button} from "@/components/ui/button";
+import {imageLibrary} from "@/lib/content";
+import {cn} from "@/lib/utils";
+import {RegistrationSuccessModal} from "./registration-success-modal";
 
 export function ExperienceForm() {
   const t = useTranslations("ExperienceForm");
   const pathname = usePathname();
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const formRef = useRef<HTMLFormElement>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successOpen, setSuccessOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const isGreenHome = pathname.includes("/green");
 
-  if (pathname.includes("/contact")) return null;
+  if (pathname.includes("/contact") || pathname.includes("/admin")) return null;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get("name") as string,
@@ -29,15 +34,14 @@ export function ExperienceForm() {
     };
 
     startTransition(async () => {
-      setStatus("idle");
+      setErrorMessage(null);
       const result = await submitExperienceForm(data);
+
       if (result.success) {
-        setStatus("success");
-        // Tự động reset trạng thái sau 3 giây
-        setTimeout(() => setStatus("idle"), 3000);
+        formRef.current?.reset();
+        setSuccessOpen(true);
       } else {
-        setStatus("error");
-        alert(t("formError") + result.error);
+        setErrorMessage(`${t("formError")}${result.error}`);
       }
     });
   };
@@ -51,8 +55,13 @@ export function ExperienceForm() {
            fill
            className="object-cover"
          />
-         <div className="absolute inset-0 bg-forest-950/80" />
-         <div className="absolute inset-0 bg-gradient-to-t from-forest-950 via-forest-950/20 to-transparent" />
+         <div className={cn("absolute inset-0", isGreenHome ? "bg-brand-green/80" : "bg-forest-950/80")} />
+         <div
+           className={cn(
+             "absolute inset-0 bg-gradient-to-t to-transparent",
+             isGreenHome ? "from-brand-green via-brand-green/20" : "from-forest-950 via-forest-950/20"
+           )}
+         />
        </div>
 
        <div className="relative z-10 w-full px-4 text-center sm:px-6">
@@ -61,7 +70,10 @@ export function ExperienceForm() {
            whileInView={{ opacity: 1, y: 0 }}
            viewport={{ once: true, margin: "-100px" }}
            transition={{ duration: 0.8, ease: "easeOut" }}
-           className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-forest-950/40 p-8 shadow-cinematic backdrop-blur-xl sm:p-12 text-left"
+           className={cn(
+             "mx-auto max-w-3xl overflow-hidden rounded-3xl border border-white/10 p-8 text-left shadow-cinematic backdrop-blur-xl sm:p-12",
+             isGreenHome ? "bg-brand-green/40" : "bg-forest-950/40"
+           )}
          >
            <div className="text-center">
              <h2 className="font-serif text-4xl sm:text-5xl text-parchment-50">
@@ -72,7 +84,7 @@ export function ExperienceForm() {
              </p>
            </div>
 
-           <form onSubmit={handleSubmit} className="mt-10 grid gap-5">
+           <form ref={formRef} onSubmit={handleSubmit} className="mt-10 grid gap-5">
              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                <div>
                  <label htmlFor="exp-name" className="mb-2 block text-sm font-semibold text-white/90">
@@ -123,17 +135,36 @@ export function ExperienceForm() {
                  placeholder={t("notePlaceholder")}
                />
              </div>
+             {errorMessage ? (
+               <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                 {errorMessage}
+               </div>
+             ) : null}
              <Button
                type="submit"
                variant="forest"
                disabled={isPending}
-               className="mt-2 h-14 w-full rounded-xl text-base font-bold shadow-warm transition-transform hover:-translate-y-0.5 hover:shadow-cinematic disabled:opacity-70 disabled:cursor-not-allowed"
+               className={cn(
+                 "mt-2 h-14 w-full rounded-xl text-base font-bold shadow-warm transition-transform hover:-translate-y-0.5 hover:shadow-cinematic disabled:cursor-not-allowed disabled:opacity-70",
+                 isGreenHome && "border-brand-green/50 bg-brand-green/20 hover:bg-brand-green/30"
+               )}
              >
-               {isPending ? t("loading") : status === "success" ? t("success") : t("submit")}
+               {isPending ? t("loading") : t("submit")}
              </Button>
            </form>
          </motion.div>
        </div>
+
+       <RegistrationSuccessModal
+         open={successOpen}
+         onClose={() => setSuccessOpen(false)}
+         closeLabel={t("successClose")}
+         badge={t("successBadge")}
+         title={t("successTitle")}
+         copy={t("successCopy")}
+         hint={t("successHint")}
+         actionLabel={t("successAction")}
+       />
     </section>
   );
 }

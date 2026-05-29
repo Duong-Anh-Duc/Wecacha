@@ -71,6 +71,9 @@ export default async function NewsIndexPage({params}: Props) {
   const { data: articles } = await supabase
     .from("news_articles")
     .select("slug, title_vi, title_en, image_url")
+    .eq("is_visible", true)
+    .in("placement", ["news", "both"])
+    .order("sort_order", { ascending: true })
     .order("published_at", { ascending: false });
 
   const displayArticles = articles || [];

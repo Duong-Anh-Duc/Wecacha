@@ -25,6 +25,7 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
   const locale = useLocale() as Locale;
   const nextLocale = locale === "vi" ? "en" : "vi";
   const router = useRouter();
+  const isGreenHome = pathname === "/green";
 
   function handleMobileSwitch() {
     onLoading(true);
@@ -43,7 +44,12 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
       </SheetTrigger>
       <SheetContent
         side="right"
-        className="w-[min(94vw,430px)] overflow-hidden rounded-l-[30px] border-l border-parchment-300/80 bg-[radial-gradient(circle_at_18%_8%,rgba(181,101,0,0.08),transparent_28%),linear-gradient(135deg,#fffaf0_0%,#f8efd9_56%,#fff8ea_100%)] p-0"
+        className={cn(
+          "w-[min(94vw,430px)] overflow-hidden rounded-l-[30px] p-0",
+          isGreenHome
+            ? "border-l border-brand-green/40 bg-[radial-gradient(circle_at_18%_8%,rgba(74,117,29,0.18),transparent_28%),linear-gradient(135deg,#edf4e2_0%,#dce9c9_56%,#f4f8eb_100%)]"
+            : "border-l border-parchment-300/80 bg-[radial-gradient(circle_at_18%_8%,rgba(181,101,0,0.08),transparent_28%),linear-gradient(135deg,#fffaf0_0%,#f8efd9_56%,#fff8ea_100%)]"
+        )}
       >
         <motion.div
           className="pointer-events-none absolute -bottom-8 -right-11 h-72 w-52 opacity-55"
@@ -54,7 +60,10 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
           <CoffeeBotanical className="h-full w-full" />
         </motion.div>
         <motion.div
-          className="pointer-events-none absolute -left-16 top-10 h-52 w-52 rounded-full bg-earth-500/8 blur-3xl"
+          className={cn(
+            "pointer-events-none absolute -left-16 top-10 h-52 w-52 rounded-full blur-3xl",
+            isGreenHome ? "bg-brand-green/12" : "bg-earth-500/8"
+          )}
           animate={{scale: [1, 1.14, 1], opacity: [0.55, 0.9, 0.55]}}
           transition={{duration: 5.5, repeat: Infinity, ease: "easeInOut"}}
         />
@@ -64,7 +73,7 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
           animate={{opacity: 1, y: 0}}
           transition={{duration: 0.7, ease: drawerEase}}
         >
-          <SheetHeader className="border-b border-earth-700/14 pb-7 pr-12">
+          <SheetHeader className={cn("pb-7 pr-12", isGreenHome ? "border-b border-brand-green/18" : "border-b border-earth-700/14")}>
             <SheetTitle className="sr-only">Wecacha Sơn La Coffee</SheetTitle>
             <motion.div
               initial={{opacity: 0, y: 14}}
@@ -86,10 +95,10 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
                   />
                 </span>
                 <span className="min-w-0">
-                  <span className="block truncate font-serif text-[2.45rem] leading-none text-forest-950">
+                  <span className={cn("block truncate font-serif text-[2.45rem] leading-none", isGreenHome ? "text-brand-green" : "text-forest-950")}>
                     Wecacha
                   </span>
-                  <span className="mt-3 block text-[12px] font-bold uppercase tracking-[0.32em] text-forest-950/78">
+                  <span className={cn("mt-3 block text-[12px] font-bold uppercase tracking-[0.32em]", isGreenHome ? "text-brand-green/78" : "text-forest-950/78")}>
                     Sơn La Coffee
                   </span>
                 </span>
@@ -127,15 +136,16 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
                     href={item.href}
                     className={cn(
                       "group flex min-h-[86px] w-full items-center gap-5 px-2 text-forest-950 transition duration-500 outline-none",
-                      "hover:bg-forest-950/[0.03] focus-visible:bg-forest-950/[0.03]",
-                      active && "text-earth-700",
+                      isGreenHome ? "hover:bg-brand-green/[0.06] focus-visible:bg-brand-green/[0.06]" : "hover:bg-forest-950/[0.03] focus-visible:bg-forest-950/[0.03]",
+                      active && (isGreenHome ? "text-brand-green" : "text-earth-700"),
                       item.children && "min-h-[72px]"
                     )}
                   >
                     <span
                       className={cn(
-                        "flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-forest-950/6 text-forest-800 transition duration-500 group-hover:scale-110 group-hover:bg-earth-600/10 group-hover:text-earth-700",
-                        active && "bg-earth-600/10 text-earth-700"
+                        "flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-forest-800 transition duration-500 group-hover:scale-110",
+                        isGreenHome ? "bg-brand-green/8 group-hover:bg-brand-green/16 group-hover:text-brand-green" : "bg-forest-950/6 group-hover:bg-earth-600/10 group-hover:text-earth-700",
+                        active && (isGreenHome ? "bg-brand-green/16 text-brand-green" : "bg-earth-600/10 text-earth-700")
                       )}
                     >
                       <Icon className="h-7 w-7 transition duration-500 group-hover:-rotate-6" aria-hidden="true" />
@@ -146,7 +156,7 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
                     <ArrowUpRight
                       className={cn(
                         "h-6 w-6 shrink-0 rotate-45 opacity-75 transition duration-500 group-hover:translate-x-1.5 group-hover:-translate-y-1.5",
-                        active && "rotate-0 text-earth-700"
+                        active && (isGreenHome ? "rotate-0 text-brand-green" : "rotate-0 text-earth-700")
                       )}
                       aria-hidden="true"
                     />
@@ -159,7 +169,10 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
                       <SheetClose asChild key={child.href}>
                         <Link
                           href={child.href}
-                          className="rounded-lg px-4 py-2.5 text-sm font-semibold text-forest-950/60 transition hover:bg-forest-950/5 hover:text-earth-700"
+                          className={cn(
+                            "rounded-lg px-4 py-2.5 text-sm font-semibold text-forest-950/60 transition",
+                            isGreenHome ? "hover:bg-brand-green/8 hover:text-brand-green" : "hover:bg-forest-950/5 hover:text-earth-700"
+                          )}
                         >
                           {child.label[locale as "vi" | "en"]}
                         </Link>
@@ -190,7 +203,10 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
               <Button
                 asChild
                 variant="light"
-                className="h-14 rounded-lg border-forest-800/45 bg-parchment-50/62 text-base text-forest-800"
+                className={cn(
+                  "h-14 rounded-lg bg-parchment-50/62 text-base text-forest-800",
+                  isGreenHome ? "border-brand-green/45 text-brand-green" : "border-forest-800/45"
+                )}
               >
                 <Link href="/contact">
                   <PhoneCall className="h-5 w-5" aria-hidden="true" />
@@ -222,7 +238,10 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
             <SheetClose asChild>
               <button
                 onClick={handleMobileSwitch}
-                className="inline-flex h-[52px] items-center gap-3 rounded-full border border-earth-700/12 bg-parchment-50/72 px-6 py-3 text-[15px] font-bold text-forest-800 shadow-[0_12px_36px_rgba(76,52,20,0.06)] transition duration-500 hover:-translate-y-0.5 hover:bg-parchment-50 hover:shadow-warm"
+                className={cn(
+                  "inline-flex h-[52px] items-center gap-3 rounded-full bg-parchment-50/72 px-6 py-3 text-[15px] font-bold shadow-[0_12px_36px_rgba(76,52,20,0.06)] transition duration-500 hover:-translate-y-0.5 hover:bg-parchment-50 hover:shadow-warm",
+                  isGreenHome ? "border border-brand-green/18 text-brand-green" : "border border-earth-700/12 text-forest-800"
+                )}
               >
                 <span className="text-[22px] leading-none">{localeFlag[nextLocale]}</span>
                 {localeNames[nextLocale]}

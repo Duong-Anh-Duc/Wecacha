@@ -4,13 +4,21 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export function SoundButton() {
   const t = useTranslations("Common");
+  const pathname = usePathname();
   const [isPlaying, setIsPlaying] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const tooltipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isGreenHome = pathname.includes("/green");
+
+  if (pathname.includes("/admin")) {
+    return null;
+  }
 
   useEffect(() => {
     // Sử dụng âm thanh thiên nhiên từ kho âm thanh miễn phí
@@ -54,13 +62,21 @@ export function SoundButton() {
     <div className="fixed bottom-6 left-6 z-50 flex items-center gap-3">
       <button
         onClick={toggleSound}
-        className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-earth-600 text-white shadow-cinematic transition-all hover:scale-105 hover:bg-earth-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-600 focus-visible:ring-offset-4 focus-visible:ring-offset-parchment-50"
+        className={cn(
+          "group relative flex h-14 w-14 items-center justify-center rounded-full text-white shadow-cinematic transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-offset-parchment-50",
+          isGreenHome
+            ? "bg-brand-green hover:bg-brand-green/90 focus-visible:ring-brand-green"
+            : "bg-earth-600 hover:bg-earth-700 focus-visible:ring-earth-600"
+        )}
         aria-label={isPlaying ? t("playingMountain") : t("listenMountain")}
       >
         {!isPlaying && (
           <motion.span
              aria-hidden="true"
-             className="absolute inset-0 rounded-full border-2 border-earth-600/55"
+             className={cn(
+               "absolute inset-0 rounded-full border-2",
+               isGreenHome ? "border-brand-green/55" : "border-earth-600/55"
+             )}
              animate={{scale: [1, 1.4], opacity: [0.75, 0]}}
              transition={{duration: 2, repeat: Infinity, ease: "easeOut"}}
            />

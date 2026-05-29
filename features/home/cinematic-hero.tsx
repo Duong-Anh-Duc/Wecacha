@@ -5,6 +5,7 @@ import {ArrowDown, Play, ShoppingBag} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Link} from "@/i18n/navigation";
 import {heroVideo, imageLibrary} from "@/lib/content";
+import {cn} from "@/lib/utils";
 
 type Props = {
   kicker: string;
@@ -13,6 +14,7 @@ type Props = {
   primary: string;
   secondary: string;
   scrollLabel: string;
+  tone?: "classic" | "green";
 };
 
 export function CinematicHero({
@@ -21,14 +23,21 @@ export function CinematicHero({
   copy,
   primary,
   secondary,
-  scrollLabel
+  scrollLabel,
+  tone = "classic"
 }: Props) {
   const {scrollY} = useScroll();
   const y = useTransform(scrollY, [0, 800], [0, 60]);
   const scale = useTransform(scrollY, [0, 800], [1, 1.06]);
+  const isGreen = tone === "green";
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-forest-950 text-white">
+    <section
+      className={cn(
+        "relative min-h-screen overflow-hidden text-white",
+        isGreen ? "bg-brand-green" : "bg-forest-950"
+      )}
+    >
       <motion.div
         className="absolute inset-0 will-change-transform"
         style={{y, scale}}
@@ -55,7 +64,10 @@ export function CinematicHero({
           initial={{opacity: 0, y: 38, filter: "blur(10px)"}}
           animate={{opacity: 1, y: 0, filter: "blur(0px)"}}
           transition={{duration: 1.4, ease: [0.16, 1, 0.3, 1]}}
-          className="my-auto max-w-4xl py-8 px-6 sm:py-12 sm:px-10 lg:py-14 lg:px-14 rounded-[2rem] sm:rounded-[2.5rem] bg-forest-950/25 backdrop-blur-md border border-white/10 shadow-2xl"
+          className={cn(
+            "my-auto max-w-4xl rounded-[2rem] border border-white/10 px-6 py-8 shadow-2xl backdrop-blur-md sm:rounded-[2.5rem] sm:px-10 sm:py-12 lg:px-14 lg:py-14",
+            isGreen ? "bg-brand-green/25" : "bg-forest-950/25"
+          )}
         >
           <p className="mb-6 text-sm font-bold tracking-widest uppercase text-ember">
             {kicker}

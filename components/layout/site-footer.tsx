@@ -1,16 +1,31 @@
+"use client";
+
 import {Facebook, Mail, MapPin, Mountain, Phone} from "lucide-react";
-import {getTranslations} from "next-intl/server";
-import {Link} from "@/i18n/navigation";
+import {useLocale, useTranslations} from "next-intl";
+import {Link, usePathname} from "@/i18n/navigation";
+import {cn} from "@/lib/utils";
 import type {Locale} from "@/i18n/routing";
 import {siteConfig} from "@/lib/site";
 
-export async function SiteFooter({locale}: {locale: Locale}) {
-  const nav = await getTranslations({locale, namespace: "Nav"});
-  const home = await getTranslations({locale, namespace: "Home"});
-  const footer = await getTranslations({locale, namespace: "Footer"});
+export function SiteFooter() {
+  const locale = useLocale() as Locale;
+  const pathname = usePathname();
+  const nav = useTranslations("Nav");
+  const home = useTranslations("Home");
+  const footer = useTranslations("Footer");
+  const isGreenHome = pathname === "/green";
+
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
-    <footer className="relative overflow-hidden bg-forest-950 text-white">
+    <footer
+      className={cn(
+        "relative overflow-hidden text-white",
+        isGreenHome ? "bg-brand-green" : "bg-forest-950"
+      )}
+    >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(181,101,0,0.28),transparent_24rem)]" />
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-8 lg:py-18">
         <div className="flex flex-col items-center sm:items-start text-center sm:text-left">

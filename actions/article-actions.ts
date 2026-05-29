@@ -1,7 +1,8 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { revalidatePath } from "next/cache";
+import {revalidatePath} from "next/cache";
+import {uploadImageToCloudinary} from "@/lib/cloudinary";
+import {createClient} from "@/lib/supabase/server";
 
 export async function upsertArticle(data: any) {
   try {
@@ -16,6 +17,9 @@ export async function upsertArticle(data: any) {
       content_en: data.content_en,
       image_url: data.image_url || null,
       secondary_image_url: data.secondary_image_url || null,
+      is_visible: data.is_visible === "on" || data.is_visible === "true",
+      placement: data.placement || "news",
+      sort_order: Number(data.sort_order || 0),
     };
 
     if (data.id) {
@@ -50,22 +54,12 @@ export async function deleteArticle(id: string) {
 
 export async function uploadArticleImage(formData: FormData) {
   try {
-    const supabase = await createClient();
     const file = formData.get("file") as File;
-    if (!file || !file.size) return { error: "No file provided" };
-
-    const ext = file.name.split(".").pop() ?? "jpg";
-    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-
-    const { error } = await supabase.storage
-      .from("articles")
-      .upload(fileName, file, { contentType: file.type, upsert: false });
-
-    if (error) throw error;
-
-    const { data } = supabase.storage.from("articles").getPublicUrl(fileName);
-    return { url: data.publicUrl };
+    const upload = await uploadImageToCloudinary(file, {
+      folder: "wecacha/articles"
+    });
+    return {url: upload.secureUrl};
   } catch (err: any) {
-    return { error: err.message };
+    return {error: err.message};
   }
 }

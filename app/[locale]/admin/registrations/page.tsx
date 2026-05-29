@@ -1,80 +1,63 @@
-import { supabase } from "@/lib/supabase";
-import { getTranslations } from "next-intl/server";
+import {ArrowLeft} from "lucide-react";
+import {getTranslations, setRequestLocale} from "next-intl/server";
+import {RegistrationsTable, type RegistrationRow} from "@/components/admin/registrations-table";
+import {Link} from "@/i18n/navigation";
+import type {Locale} from "@/i18n/routing";
+import {requireAdmin} from "@/lib/admin-auth";
 
 export const revalidate = 0;
 
-type Registration = {
-  id: string;
-  created_at: string;
-  name: string;
-  phone: string;
-  address: string | null;
-  note: string | null;
-};
+export default async function RegistrationsPage({
+  params
+}: {
+  params: Promise<{locale: Locale}>;
+}) {
+  const {locale} = await params;
+  setRequestLocale(locale);
 
-export default async function RegistrationsPage() {
   const t = await getTranslations("Admin");
+  const {supabase} = await requireAdmin(locale);
 
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from("experience_registrations")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .select("id, created_at, name, phone, address, note, status, admin_note")
+    .order("created_at", {ascending: false});
 
   if (error) {
     return (
-      <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-200">
+      <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-600">
         {t("loadError")} {error.message}
       </div>
     );
   }
 
-  const registrations = (data as Registration[]) || [];
+  const registrations = (data as RegistrationRow[]) ?? [];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-forest-950 font-serif">{t("registrationsTitle")}</h2>
-        <p className="text-stone-500 mt-1">{t("registrationsDesc")}</p>
-      </div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex items-start gap-4">
+          <Link
+            href="/admin"
+            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-stone-600 shadow-sm transition hover:bg-stone-200 hover:text-forest-950"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t("backDashboard")}
+          </Link>
+          <div>
+            <h2 className="font-serif text-3xl text-forest-950">{t("registrationsTitle")}</h2>
+            <p className="mt-1 max-w-2xl text-sm leading-7 text-stone-500">
+              {t("registrationsDesc")}
+            </p>
+          </div>
+        </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-stone-600">
-            <thead className="bg-stone-50 text-stone-500 uppercase font-medium">
-              <tr>
-                <th className="px-6 py-4">{t("colName")}</th>
-                <th className="px-6 py-4">{t("colPhone")}</th>
-                <th className="px-6 py-4">{t("colAddress")}</th>
-                <th className="px-6 py-4">{t("colNote")}</th>
-                <th className="px-6 py-4">{t("colRegisteredAt")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-100">
-              {registrations.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-stone-400">
-                    {t("noRegistrations")}
-                  </td>
-                </tr>
-              ) : (
-                registrations.map((reg) => (
-                  <tr key={reg.id} className="hover:bg-stone-50/50 transition">
-                    <td className="px-6 py-4 font-medium text-forest-950">{reg.name}</td>
-                    <td className="px-6 py-4">{reg.phone}</td>
-                    <td className="px-6 py-4">{reg.address || <span className="text-stone-400 italic">{t("noValue")}</span>}</td>
-                    <td className="px-6 py-4 max-w-xs truncate" title={reg.note || ""}>
-                      {reg.note || <span className="text-stone-400 italic">{t("noValue")}</span>}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {new Date(reg.created_at).toLocaleString("vi-VN")}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+        <div className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-500 shadow-sm">
+          {t("registrationsCount", {count: registrations.length})}
         </div>
       </div>
+
+      <RegistrationsTable registrations={registrations} locale={locale} />
     </div>
   );
 }
