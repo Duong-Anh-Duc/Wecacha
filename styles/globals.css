@@ -47,6 +47,7 @@ body {
 body.admin-shell-active,
 body:has(.admin-shell) {
   background: #f7f6f1;
+  overflow: hidden;
 }
 
 body.admin-shell-active .film-grain,

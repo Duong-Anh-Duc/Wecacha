@@ -68,11 +68,17 @@ create table if not exists public.products (
   notes_en text[] not null default '{}',
   brew_guide_vi text[] not null default '{}',
   brew_guide_en text[] not null default '{}',
+  journey_vi jsonb not null default '[]'::jsonb,
+  journey_en jsonb not null default '[]'::jsonb,
   images text[] not null default '{}',
   featured boolean not null default false,
   is_visible boolean not null default true,
   sort_order integer not null default 0
 );
+
+alter table public.products
+  add column if not exists journey_vi jsonb not null default '[]'::jsonb,
+  add column if not exists journey_en jsonb not null default '[]'::jsonb;
 
 do $$
 begin

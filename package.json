@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "seed:cms": "node scripts/import-cms-seed.mjs",
+    "seed:site-content": "node scripts/import-site-content-seed.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
