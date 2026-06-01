@@ -1,5 +1,6 @@
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {OrdersTable, type OrderRow} from "@/components/admin/orders-table";
+import {RealtimeRefresh} from "@/components/admin/realtime-refresh";
 import type {Locale} from "@/i18n/routing";
 import {requireAdmin} from "@/lib/admin-auth";
 
@@ -17,7 +18,7 @@ export default async function OrdersAdminPage({
 
   const {data, error} = await supabase
     .from("orders")
-    .select("id, created_at, status, customer_name, phone, city, ward, address, note, admin_note, subtotal, shipping, total, order_items(id, product_slug, product_name, quantity, price, line_total)")
+    .select("id, created_at, status, customer_name, phone, city, ward, address, note, admin_note, subtotal, shipping, total, order_items(id, product_slug, product_name, image, weight, quantity, price, line_total)")
     .order("created_at", {ascending: false});
 
   if (error) {
@@ -38,6 +39,11 @@ export default async function OrdersAdminPage({
       </div>
 
       <OrdersTable orders={orders} locale={locale} />
+      <RealtimeRefresh
+        table="orders"
+        channelName="admin-orders-realtime"
+        insertMessage={t("realtimeNewOrder")}
+      />
     </div>
   );
 }

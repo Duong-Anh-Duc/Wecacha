@@ -2,7 +2,7 @@
 
 import {useEffect, useMemo, useState, useTransition} from "react";
 import {App, Button, Dropdown, Input, Modal, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
-import {EditOutlined, PhoneOutlined, SearchOutlined, SyncOutlined} from "@ant-design/icons";
+import {EditOutlined, EyeOutlined, SearchOutlined, SyncOutlined} from "@ant-design/icons";
 import {useTranslations} from "next-intl";
 import {updateRegistrationWorkflow} from "@/actions/registration-actions";
 
@@ -35,6 +35,7 @@ export function RegistrationsTable({
   const [rows, setRows] = useState(registrations);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [viewing, setViewing] = useState<RegistrationRow | null>(null);
   const [editing, setEditing] = useState<RegistrationRow | null>(null);
   const [draftNote, setDraftNote] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -202,12 +203,12 @@ export function RegistrationsTable({
       align: "right",
       render: (_, row) => (
         <Space>
-          <Tooltip title={t("callCustomer")}>
+          <Tooltip title={t("viewDetails")}>
             <Button
               type="text"
-              href={`tel:${row.phone}`}
-              icon={<PhoneOutlined />}
-              className="text-[#4A751D] hover:!bg-transparent hover:!text-forest-950"
+              icon={<EyeOutlined />}
+              onClick={() => setViewing(row)}
+              className="text-blue-500 hover:!bg-transparent hover:!text-blue-700"
             />
           </Tooltip>
           <Tooltip title={t("changeStatus")}>
@@ -288,6 +289,50 @@ export function RegistrationsTable({
           showTotal: (total) => t("tableTotal", {total})
         }}
       />
+
+      <Modal
+        title={t("viewDetails")}
+        open={Boolean(viewing)}
+        onCancel={() => setViewing(null)}
+        footer={null}
+      >
+        {viewing ? (
+          <div className="space-y-4">
+            <div className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-4 text-sm">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colName")}</p>
+                <p className="mt-1 font-semibold text-forest-950">{viewing.name}</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colPhone")}</p>
+                  <Typography.Text copyable className="mt-1 text-stone-700">
+                    {viewing.phone}
+                  </Typography.Text>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("status")}</p>
+                  <Tag className="mt-1" color={statusColors[viewing.status]}>
+                    {statusLabel(viewing.status)}
+                  </Tag>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colAddress")}</p>
+                <p className="mt-1 text-stone-700">{viewing.address || t("noValue")}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colNote")}</p>
+                <p className="mt-1 italic text-stone-700">{viewing.note || t("noValue")}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("adminNote")}</p>
+                <p className="mt-1 text-stone-700">{viewing.admin_note || t("noValue")}</p>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
 
       <Modal
         title={t("editRegistrationTitle")}

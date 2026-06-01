@@ -1,10 +1,12 @@
 "use client";
 
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState, useTransition} from "react";
 import Image from "next/image";
-import {Button, Input, Select, Space, Table, Tag, Tooltip, type TableColumnsType} from "antd";
+import {App, Button, Input, Select, Space, Table, Tag, Tooltip, type TableColumnsType} from "antd";
 import {EditOutlined, EyeInvisibleOutlined, EyeOutlined, SearchOutlined} from "@ant-design/icons";
+import {GripVertical} from "lucide-react";
 import {useTranslations} from "next-intl";
+import {updateProductSortOrder} from "@/actions/product-actions";
 import {Link} from "@/i18n/navigation";
 import {formatCurrency} from "@/lib/content/helpers";
 import {ProductPreviewButton} from "./product-preview-button";
@@ -38,19 +40,27 @@ export function ProductsTable({
 }) {
   const t = useTranslations("Admin");
   const tShop = useTranslations("Shop");
+  const {message} = App.useApp();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
+  const [orderedProducts, setOrderedProducts] = useState(products);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
+
+  useEffect(() => {
+    setOrderedProducts(products);
+  }, [products]);
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
-    return products.filter((product) => {
+    return orderedProducts.filter((product) => {
       const matchesCategory = category === "all" || product.category === category;
       const haystack = [product.name_vi, product.slug, product.category].join(" ").toLowerCase();
       return matchesCategory && (!normalized || haystack.includes(normalized));
     });
-  }, [category, products, query]);
+  }, [category, orderedProducts, query]);
 
   function categoryLabel(value: string) {
     const category = categories.find((item) => item.slug === value);
@@ -62,7 +72,48 @@ export function ProductsTable({
     return value;
   }
 
+  function handleDrop(targetId: string) {
+    if (!draggingId || draggingId === targetId) {
+      setDraggingId(null);
+      return;
+    }
+
+    const fromIndex = orderedProducts.findIndex((product) => product.id === draggingId);
+    const toIndex = orderedProducts.findIndex((product) => product.id === targetId);
+    if (fromIndex < 0 || toIndex < 0) {
+      setDraggingId(null);
+      return;
+    }
+
+    const nextProducts = [...orderedProducts];
+    const [movedProduct] = nextProducts.splice(fromIndex, 1);
+    nextProducts.splice(toIndex, 0, movedProduct);
+    setOrderedProducts(nextProducts);
+    setDraggingId(null);
+
+    startTransition(async () => {
+      const result = await updateProductSortOrder(nextProducts.map((product) => product.id));
+      if (result.success) {
+        message.success(t("reorderSuccess"));
+      } else {
+        setOrderedProducts(products);
+        message.error(`${t("reorderError")}${result.error}`);
+      }
+    });
+  }
+
   const columns: TableColumnsType<ProductRow> = [
+    {
+      title: "",
+      key: "drag",
+      width: 46,
+      align: "center",
+      render: () => (
+        <Tooltip title={t("dragToReorder")}>
+          <GripVertical className="mx-auto h-4 w-4 cursor-grab text-stone-400" />
+        </Tooltip>
+      )
+    },
     {
       title: t("colIndex"),
       key: "index",
@@ -186,7 +237,15 @@ export function ProductsTable({
         rowKey="id"
         columns={columns}
         dataSource={filtered}
-        scroll={{x: 1160}}
+        scroll={{x: 1200}}
+        rowClassName={(row) => (row.id === draggingId ? "opacity-50" : "cursor-grab")}
+        onRow={(row) => ({
+          draggable: !isPending,
+          onDragStart: () => setDraggingId(row.id),
+          onDragOver: (event) => event.preventDefault(),
+          onDrop: () => handleDrop(row.id),
+          onDragEnd: () => setDraggingId(null)
+        })}
         onChange={(nextPagination) => {
           setPagination({
             current: nextPagination.current ?? 1,

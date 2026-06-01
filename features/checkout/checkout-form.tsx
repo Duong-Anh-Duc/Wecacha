@@ -1,8 +1,8 @@
 "use client";
 
-import {useState, useEffect} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {CheckCircle2, User, Phone, MapPin, Map, FileText, ShoppingBag, Truck, ShieldCheck, Headset, ChevronDown, Loader2, Minus, Plus, Trash2, AlertCircle} from "lucide-react";
+import {User, Phone, MapPin, Map, FileText, ShoppingBag, Truck, ShieldCheck, Headset, ChevronDown, Loader2, Minus, Plus, Trash2, AlertCircle, PartyPopper, Sparkles} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {useSearchParams} from "next/navigation";
 import {useForm} from "react-hook-form";
@@ -21,16 +21,14 @@ import Image from "next/image";
 type Province = {code: number; name: string};
 type Ward = {code: number; name: string};
 
-const checkoutSchema = z.object({
-  fullName: z.string().min(2),
-  phone: z.string().min(8),
-  address: z.string().min(6),
-  city: z.string().min(2),
-  ward: z.string().min(2),
-  note: z.string().optional()
-});
-
-type CheckoutValues = z.infer<typeof checkoutSchema>;
+type CheckoutValues = {
+  fullName: string;
+  phone: string;
+  address: string;
+  city: string;
+  ward: string;
+  note?: string;
+};
 
 export function CheckoutForm() {
   const locale = useLocale() as Locale;
@@ -51,6 +49,21 @@ export function CheckoutForm() {
   const [wards, setWards] = useState<Ward[]>([]);
   const [loadingProvinces, setLoadingProvinces] = useState(true);
   const [loadingWards, setLoadingWards] = useState(false);
+  const checkoutSchema = useMemo(
+    () =>
+      z.object({
+        fullName: z.string().trim().min(2, t("fullNameError")),
+        phone: z
+          .string()
+          .trim()
+          .regex(/^(0|\+84)\d{8,10}$/, t("phoneError")),
+        address: z.string().trim().min(6, t("addressError")),
+        city: z.string().trim().min(2, t("cityError")),
+        ward: z.string().trim().min(2, t("wardError")),
+        note: z.string().optional()
+      }),
+    [t]
+  );
 
   // Buy Now mode: chỉ thanh toán đúng 1 sản phẩm, không liên quan giỏ hàng
   const isBuyNow = searchParams.get("mode") === "buynow" && Boolean(buyNowItem);
@@ -63,8 +76,6 @@ export function CheckoutForm() {
     setValue,
     formState: {errors, isSubmitting}
   } = useForm<CheckoutValues>({resolver: zodResolver(checkoutSchema)});
-
-  const errorText = t("fieldError");
 
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/v2/?depth=1")
@@ -145,12 +156,25 @@ export function CheckoutForm() {
 
   if (success) {
     return (
-      <div className="rounded-[2rem] border border-[#142918]/10 bg-white p-12 text-center shadow-[0_20px_50px_rgba(20,41,24,0.05)]">
-        <CheckCircle2 className="mx-auto h-16 w-16 text-[#2a5a31]" aria-hidden="true" />
-        <h2 className="mt-6 font-serif text-4xl text-[#142918]">{t("success")}</h2>
-        <Button asChild className="mt-8 bg-[#142918] text-white hover:bg-[#2a5a31] rounded-xl px-8 py-6" variant="default">
-          <Link href="/">{common("continueShopping")}</Link>
-        </Button>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#142918]/35 px-4 py-8 backdrop-blur-sm">
+        <div className="relative w-full max-w-xl overflow-hidden rounded-[2rem] border border-[#f0dfb8] bg-[#fffdf7] p-8 text-center shadow-[0_30px_90px_rgba(20,41,24,0.28)] sm:p-10">
+          <div className="pointer-events-none absolute -left-10 -top-10 h-28 w-28 rounded-full bg-[#f0b34f]/20" />
+          <div className="pointer-events-none absolute -right-12 top-12 h-32 w-32 rounded-full bg-[#4a751d]/10" />
+          <Sparkles className="absolute left-8 top-8 h-6 w-6 text-[#f0b34f]" aria-hidden="true" />
+          <Sparkles className="absolute bottom-8 right-8 h-5 w-5 text-[#4a751d]" aria-hidden="true" />
+
+          <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#f8e4b6] text-[#b5703a] shadow-inner">
+            <PartyPopper className="h-10 w-10" aria-hidden="true" />
+          </div>
+
+          <h2 className="relative mt-6 font-serif text-3xl text-[#142918] sm:text-4xl">{t("success")}</h2>
+          <p className="relative mx-auto mt-3 max-w-md text-sm leading-6 text-[#142918]/65 sm:text-base">
+            {t("successDesc")}
+          </p>
+          <Button asChild className="relative mt-8 rounded-xl bg-[#142918] px-8 py-6 text-white hover:bg-[#2a5a31]" variant="default">
+            <Link href="/">{common("continueShopping")}</Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -169,19 +193,19 @@ export function CheckoutForm() {
 
           <div className="grid gap-6 sm:grid-cols-2">
             {/* Họ tên */}
-            <Field label={t("fullName")} required error={errors.fullName && errorText}>
+            <Field label={t("fullName")} required error={errors.fullName?.message}>
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               <Input placeholder={t("fullNamePlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("fullName")} />
             </Field>
 
             {/* Số điện thoại */}
-            <Field label={t("phone")} required error={errors.phone && errorText}>
+            <Field label={t("phone")} required error={errors.phone?.message}>
               <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               <Input placeholder={t("phonePlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("phone")} />
             </Field>
 
             {/* Tỉnh / Thành phố */}
-            <Field label={t("city")} required error={errors.city && errorText}>
+            <Field label={t("city")} required error={errors.city?.message}>
               <Map className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               {loadingProvinces
                 ? <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
@@ -201,7 +225,7 @@ export function CheckoutForm() {
             </Field>
 
             {/* Xã / Phường */}
-            <Field label={t("ward")} required error={errors.ward && errorText}>
+            <Field label={t("ward")} required error={errors.ward?.message}>
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               {loadingWards
                 ? <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
@@ -221,13 +245,13 @@ export function CheckoutForm() {
             </Field>
 
             {/* Địa chỉ cụ thể */}
-            <Field label={t("address")} required error={errors.address && errorText} className="sm:col-span-2">
+            <Field label={t("address")} required error={errors.address?.message} className="sm:col-span-2">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               <Input placeholder={t("addressPlaceholder")} className="pl-11 h-12 rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] text-[14px]" {...register("address")} />
             </Field>
 
             {/* Ghi chú */}
-            <Field className="sm:col-span-2" label={t("noteOptional")} error={errors.note && errorText}>
+            <Field className="sm:col-span-2" label={t("noteOptional")} error={errors.note?.message}>
               <FileText className="absolute left-4 top-4 w-4 h-4 text-gray-400 pointer-events-none z-10" />
               <Textarea placeholder={t("notePlaceholder")} className="pl-11 pt-4 min-h-[120px] rounded-xl border-[#e5e0d8] bg-white focus-visible:ring-[#1a3020] resize-none text-[14px]" {...register("note")} />
             </Field>

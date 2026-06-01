@@ -146,16 +146,6 @@ export function ProductForm({
       className="max-w-5xl"
     >
       <Card className="mb-6" title={t("productBasics")}>
-        <div className="grid gap-4 md:grid-cols-1">
-          <Form.Item name="category" label={t("category")} rules={[{required: true}]}>
-            <Select
-              options={categoryOptions.map((category) => ({
-                label: category.name_vi,
-                value: category.slug
-              }))}
-            />
-          </Form.Item>
-        </div>
         <div className="grid gap-4 md:grid-cols-2">
           <Form.Item name="name_vi" label={t("fieldNameVI")} rules={[{required: true}]}>
             <Input />
@@ -168,6 +158,16 @@ export function ProductForm({
           </Form.Item>
           <Form.Item name="short_en" label={t("fieldShortEN")}>
             <Input.TextArea autoSize={{minRows: 2, maxRows: 4}} />
+          </Form.Item>
+        </div>
+        <div className="grid gap-4 md:grid-cols-1">
+          <Form.Item name="category" label={t("category")} rules={[{required: true}]}>
+            <Select
+              options={categoryOptions.map((category) => ({
+                label: category.name_vi,
+                value: category.slug
+              }))}
+            />
           </Form.Item>
         </div>
         <div className="flex flex-wrap gap-6">

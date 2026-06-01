@@ -27,19 +27,35 @@ import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {cn} from "@/lib/utils";
 
+const adminTheme = {
+  cssVar: {key: "wecacha-admin"},
+  token: {
+    colorPrimary: "#b56500",
+    colorInfo: "#4A751D",
+    borderRadius: 12,
+    fontFamily: "var(--font-sans)"
+  },
+  components: {
+    Table: {
+      headerBg: "#fafaf8",
+      headerColor: "#57534e",
+      rowHoverBg: "#fafaf8"
+    },
+    Button: {
+      primaryShadow: "none"
+    }
+  }
+};
+
 export default function AdminLayout({children}: {children: ReactNode}) {
   const pathname = usePathname();
   const locale = useLocale() as Locale;
   const t = useTranslations("Admin");
   const isLoginPage = pathname.includes("/admin/login");
-  const [isMounted, setIsMounted] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const [showRouteLoading, setShowRouteLoading] = useState(false);
 
   useEffect(() => {
     if (isLoginPage) {
@@ -58,8 +74,22 @@ export default function AdminLayout({children}: {children: ReactNode}) {
     setPendingHref(null);
   }, [pathname]);
 
+  useEffect(() => {
+    if (!pendingHref) {
+      setShowRouteLoading(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setShowRouteLoading(true), 250);
+    return () => window.clearTimeout(timer);
+  }, [pendingHref]);
+
   if (isLoginPage) {
-    return children;
+    return (
+      <ConfigProvider locale={viVN} theme={adminTheme}>
+        <AntApp>{children}</AntApp>
+      </ConfigProvider>
+    );
   }
 
   const isDashboard = pathname.endsWith("/admin");
@@ -121,6 +151,7 @@ export default function AdminLayout({children}: {children: ReactNode}) {
   const currentNav = navItems.find((item) => item.active) ?? navItems[0];
 
   const handleLogout = async () => {
+    setIsLogoutConfirmOpen(false);
     await logoutAdmin(locale);
   };
 
@@ -132,38 +163,12 @@ export default function AdminLayout({children}: {children: ReactNode}) {
     }
   };
 
-  const isRouteLoading = Boolean(pendingHref);
-
-  if (!isMounted) {
-    return (
-      <div className="flex h-dvh items-center justify-center bg-[#fafafa] text-sm font-semibold text-stone-500">
-        {t("routeLoading")}
-      </div>
-    );
-  }
+  const isRouteLoading = showRouteLoading;
 
   return (
     <ConfigProvider
       locale={viVN}
-      theme={{
-        cssVar: {key: "wecacha-admin"},
-        token: {
-          colorPrimary: "#b56500",
-          colorInfo: "#4A751D",
-          borderRadius: 12,
-          fontFamily: "var(--font-sans)"
-        },
-        components: {
-          Table: {
-            headerBg: "#fafaf8",
-            headerColor: "#57534e",
-            rowHoverBg: "#fafaf8"
-          },
-          Button: {
-            primaryShadow: "none"
-          }
-        }
-      }}
+      theme={adminTheme}
     >
       <AntApp>
         <div className="admin-shell flex h-dvh overflow-hidden bg-[#fafafa]">

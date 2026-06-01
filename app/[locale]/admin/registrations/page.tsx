@@ -1,5 +1,6 @@
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {RegistrationsTable, type RegistrationRow} from "@/components/admin/registrations-table";
+import {RealtimeRefresh} from "@/components/admin/realtime-refresh";
 import type {Locale} from "@/i18n/routing";
 import {requireAdmin} from "@/lib/admin-auth";
 
@@ -47,6 +48,11 @@ export default async function RegistrationsPage({
       </div>
 
       <RegistrationsTable registrations={registrations} locale={locale} />
+      <RealtimeRefresh
+        table="experience_registrations"
+        channelName="admin-registrations-realtime"
+        insertMessage={t("realtimeNewRegistration")}
+      />
     </div>
   );
 }

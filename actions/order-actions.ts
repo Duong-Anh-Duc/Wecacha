@@ -1,8 +1,8 @@
 "use server";
 
 import {revalidatePath} from "next/cache";
-import {supabase} from "@/lib/supabase";
 import {getAdminSession} from "@/lib/admin-auth";
+import {createAdminClient} from "@/lib/supabase/admin";
 
 type OrderItemInput = {
   slug: string;
@@ -27,6 +27,13 @@ export async function createOrder(data: {
 }) {
   if (!data.items.length) {
     return {success: false, error: "Cart is empty"};
+  }
+
+  let supabase;
+  try {
+    supabase = createAdminClient();
+  } catch {
+    return {success: false, error: "Order service is not configured"};
   }
 
   const {data: order, error} = await supabase

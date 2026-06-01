@@ -1,26 +1,32 @@
 "use client";
 
-import {useActionState, useEffect} from "react";
-import {message} from "antd";
+import {useActionState, useEffect, useRef} from "react";
+import {App} from "antd";
 import {Coffee, Lock} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
-import {useSearchParams} from "next/navigation";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {loginAdmin} from "@/actions/auth-actions";
 import type {Locale} from "@/i18n/routing";
 
 export function AdminLoginForm() {
   const locale = useLocale() as Locale;
   const t = useTranslations("Admin");
+  const {message} = App.useApp();
+  const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const didShowLogoutToast = useRef(false);
 
   const boundLogin = loginAdmin.bind(null, locale);
   const [state, action, isPending] = useActionState(boundLogin, undefined);
 
   useEffect(() => {
-    if (searchParams.get("loggedOut") === "1") {
+    if (searchParams.get("loggedOut") === "1" && !didShowLogoutToast.current) {
+      didShowLogoutToast.current = true;
       message.success(t("logoutSuccess"));
+      router.replace(pathname, {scroll: false});
     }
-  }, [searchParams, t]);
+  }, [message, pathname, router, searchParams, t]);
 
   return (
     <div

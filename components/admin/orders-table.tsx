@@ -2,7 +2,8 @@
 
 import {useMemo, useState, useTransition} from "react";
 import {App, Button, Drawer, Input, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
-import {EditOutlined, PhoneOutlined, SearchOutlined, SaveOutlined} from "@ant-design/icons";
+import {EditOutlined, EyeOutlined, SearchOutlined, SaveOutlined} from "@ant-design/icons";
+import Image from "next/image";
 import {useTranslations} from "next-intl";
 import {updateOrderWorkflow} from "@/actions/order-actions";
 import {formatCurrency} from "@/lib/content/helpers";
@@ -25,6 +26,8 @@ export type OrderRow = {
     id: string;
     product_slug: string;
     product_name: string;
+    image: string | null;
+    weight: string | null;
     quantity: number;
     price: number;
     line_total: number;
@@ -44,6 +47,7 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
   const {message} = App.useApp();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [viewing, setViewing] = useState<OrderRow | null>(null);
   const [editing, setEditing] = useState<OrderRow | null>(null);
   const [draftStatus, setDraftStatus] = useState<OrderRow["status"]>("new");
   const [draftNote, setDraftNote] = useState("");
@@ -178,12 +182,12 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
       align: "right",
       render: (_, row) => (
         <Space>
-          <Tooltip title={t("callCustomer")}>
+          <Tooltip title={t("viewDetails")}>
             <Button
               type="text"
-              href={`tel:${row.phone}`}
-              icon={<PhoneOutlined />}
-              className="text-[#4A751D] hover:!bg-transparent hover:!text-forest-950"
+              icon={<EyeOutlined />}
+              onClick={() => setViewing(row)}
+              className="text-blue-500 hover:!bg-transparent hover:!text-blue-700"
             />
           </Tooltip>
           <Tooltip title={t("edit")}>
@@ -247,6 +251,77 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
       />
 
       <Drawer
+        title={viewing ? `${t("viewDetails")} - ${viewing.customer_name}` : t("viewDetails")}
+        open={Boolean(viewing)}
+        onClose={() => setViewing(null)}
+        size="large"
+      >
+        {viewing ? (
+          <div className="space-y-5">
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 text-sm">
+              <p className="font-semibold text-forest-950">{viewing.customer_name}</p>
+              <Typography.Text copyable className="mt-1 text-stone-600">
+                {viewing.phone}
+              </Typography.Text>
+              <p className="mt-2 text-stone-600">{`${viewing.address}, ${viewing.ward}, ${viewing.city}`}</p>
+              <div className="mt-3">
+                <Tag color={statusColors[viewing.status]}>{statusLabel(viewing.status)}</Tag>
+              </div>
+              {viewing.note ? <p className="mt-3 italic text-stone-600">{viewing.note}</p> : null}
+              {viewing.admin_note ? (
+                <div className="mt-3 rounded-xl bg-white p-3 text-stone-600">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">{t("adminNote")}</p>
+                  <p className="mt-1">{viewing.admin_note}</p>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="rounded-2xl border border-stone-200 p-4">
+              <p className="font-semibold text-forest-950">{t("orderItems")}</p>
+              <div className="mt-3 space-y-3">
+                {viewing.order_items?.map((item) => (
+                  <div key={item.id} className="flex items-start justify-between gap-3 text-sm">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-stone-200 bg-stone-100">
+                        {item.image ? (
+                          <Image src={item.image} alt={item.product_name} fill sizes="56px" className="object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-stone-400">
+                            {t("noProductImage")}
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-forest-950">{item.product_name}</p>
+                        <p className="text-stone-500">
+                          x{item.quantity}
+                          {item.weight ? ` · ${item.weight}` : ""}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="font-semibold text-forest-950">
+                      {formatCurrency(item.line_total, locale as "vi" | "en")}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-stone-200 p-4 text-sm">
+              <div className="flex justify-between text-stone-500">
+                <span>{t("shippingFee")}</span>
+                <span>{formatCurrency(viewing.shipping, locale as "vi" | "en")}</span>
+              </div>
+              <div className="mt-3 flex justify-between text-base font-semibold text-forest-950">
+                <span>{t("total")}</span>
+                <span>{formatCurrency(viewing.total, locale as "vi" | "en")}</span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </Drawer>
+
+      <Drawer
         title={editing ? editing.customer_name : t("orders")}
         open={Boolean(editing)}
         onClose={() => setEditing(null)}
@@ -289,9 +364,23 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
               <div className="mt-3 space-y-3">
                 {editing.order_items?.map((item) => (
                   <div key={item.id} className="flex items-start justify-between gap-3 text-sm">
-                    <div>
-                      <p className="font-medium text-forest-950">{item.product_name}</p>
-                      <p className="text-stone-500">x{item.quantity}</p>
+                    <div className="flex min-w-0 items-start gap-3">
+                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-stone-200 bg-stone-100">
+                        {item.image ? (
+                          <Image src={item.image} alt={item.product_name} fill sizes="56px" className="object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-stone-400">
+                            {t("noProductImage")}
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-forest-950">{item.product_name}</p>
+                        <p className="text-stone-500">
+                          x{item.quantity}
+                          {item.weight ? ` · ${item.weight}` : ""}
+                        </p>
+                      </div>
                     </div>
                     <p className="font-semibold text-forest-950">{formatCurrency(item.line_total, locale as "vi" | "en")}</p>
                   </div>

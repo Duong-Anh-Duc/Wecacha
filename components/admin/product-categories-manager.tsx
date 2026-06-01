@@ -1,7 +1,7 @@
 "use client";
 
 import {useState, useTransition} from "react";
-import {App, Button, Form, Input, Modal, Popconfirm, Space, Switch, Table, Tooltip, type TableColumnsType} from "antd";
+import {App, Button, Form, Input, Modal, Popconfirm, Space, Switch, Table, Tag, Tooltip, type TableColumnsType} from "antd";
 import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import {useTranslations} from "next-intl";
 import {useRouter} from "next/navigation";
@@ -108,10 +108,14 @@ export function ProductCategoriesManager({categories}: {categories: ProductCateg
       render: (value) => value
     },
     {
-      title: t("visibility"),
+      title: t("status"),
       dataIndex: "is_visible",
       width: 150,
-      render: (value) => value ? t("visible") : t("hidden")
+      render: (value) => (
+        <Tag color={value ? "green" : "default"}>
+          {value ? t("visible") : t("hidden")}
+        </Tag>
+      )
     },
     {
       title: t("colActions"),
@@ -141,11 +145,7 @@ export function ProductCategoriesManager({categories}: {categories: ProductCateg
 
   return (
     <div className="space-y-4 rounded-2xl border border-stone-200 bg-white p-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h3 className=" text-2xl text-forest-950">{t("categoriesTitle")}</h3>
-          <p className="mt-1 text-sm text-stone-500">{t("categoriesDesc")}</p>
-        </div>
+      <div className="flex justify-end">
         <Button type="primary" icon={<PlusOutlined />} onClick={startCreate}>
           {t("addCategory")}
         </Button>
@@ -178,7 +178,7 @@ export function ProductCategoriesManager({categories}: {categories: ProductCateg
           <Form.Item name="name_en" label={t("categoryNameEN")}>
             <Input />
           </Form.Item>
-          <Form.Item name="is_visible" label={t("visibility")} valuePropName="checked">
+          <Form.Item name="is_visible" label={t("status")} valuePropName="checked">
             <Switch checkedChildren={t("visible")} unCheckedChildren={t("hidden")} />
           </Form.Item>
         </Form>
