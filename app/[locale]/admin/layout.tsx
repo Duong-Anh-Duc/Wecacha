@@ -32,9 +32,14 @@ export default function AdminLayout({children}: {children: ReactNode}) {
   const locale = useLocale() as Locale;
   const t = useTranslations("Admin");
   const isLoginPage = pathname.includes("/admin/login");
+  const [isMounted, setIsMounted] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isLoginPage) {
@@ -129,6 +134,14 @@ export default function AdminLayout({children}: {children: ReactNode}) {
 
   const isRouteLoading = Boolean(pendingHref);
 
+  if (!isMounted) {
+    return (
+      <div className="flex h-dvh items-center justify-center bg-[#fafafa] text-sm font-semibold text-stone-500">
+        {t("routeLoading")}
+      </div>
+    );
+  }
+
   return (
     <ConfigProvider
       locale={viVN}
@@ -156,21 +169,21 @@ export default function AdminLayout({children}: {children: ReactNode}) {
         <div className="admin-shell flex h-dvh overflow-hidden bg-[#fafafa]">
       <aside
         className={cn(
-          "relative hidden h-full shrink-0 border-r border-[#ffffff]/5 bg-gradient-to-b from-[#081a07] via-[#051404] to-[#020901] text-stone-300 transition-[width] duration-300 ease-in-out lg:flex lg:flex-col shadow-[4px_0_24px_rgba(0,0,0,0.15)] z-20",
+          "relative hidden h-full shrink-0 border-r border-[#ffffff]/5 bg-[#51702c] text-white transition-[width] duration-300 ease-in-out lg:flex lg:flex-col shadow-[4px_0_24px_rgba(0,0,0,0.08)] z-20",
           isSidebarCollapsed ? "w-20" : "w-72"
         )}
       >
         <div
           className={cn(
-            "flex items-center border-b border-stone-800/40 py-6 px-6 bg-[#041203]/40 backdrop-blur-sm",
+            "flex items-center border-b border-white/10 py-6 px-6 bg-black/10",
             isSidebarCollapsed && "justify-center px-3"
           )}
         >
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-ember to-amber-700 shadow-md">
-              <Coffee className="h-5 w-5 text-white" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm transition-transform hover:scale-105">
+              <Coffee className="h-5 w-5 text-[#51702c]" />
             </div>
-            <span className={cn("truncate font-serif text-xl font-bold text-parchment-50 tracking-wider", isSidebarCollapsed && "sr-only")}>
+            <span className={cn("truncate text-xl font-bold text-parchment-50 tracking-wider", isSidebarCollapsed && "sr-only")}>
               {t("cms")}
             </span>
           </div>
@@ -344,8 +357,8 @@ function AdminNavLink({
             ? "h-12 justify-center px-0 text-sm font-semibold"
             : "px-4 py-3 text-sm font-bold",
         active
-          ? "bg-gradient-to-r from-[#b56500] to-[#d68524] text-white shadow-[0_4px_16px_rgba(181,101,0,0.25)] scale-[1.02]"
-          : "text-stone-400 hover:bg-white/5 hover:text-white pl-4.5 hover:pl-5"
+          ? "bg-white text-[#51702c] shadow-[0_4px_12px_rgba(0,0,0,0.06)] scale-[1.01]"
+          : "text-white/75 hover:bg-white/8 hover:text-white pl-4.5 hover:pl-5"
       )}
     >
       {icon}

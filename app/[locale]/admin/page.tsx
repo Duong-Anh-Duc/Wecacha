@@ -502,7 +502,7 @@ export default async function AdminDashboardPage({
         {/* Quality completion card */}
         <section className="overflow-hidden rounded-3xl border border-stone-220/80 bg-white/90 backdrop-blur-md shadow-[0_10px_35px_rgba(0,0,0,0.015)] flex flex-col justify-between">
           <div className="flex flex-col border-b border-stone-100/80 bg-stone-50/40 px-6 py-5">
-            <h3 className="font-serif text-xl font-bold text-forest-950">{t("qualityTitle")}</h3>
+            <h3 className=" text-xl font-bold text-forest-950">{t("qualityTitle")}</h3>
             <p className="mt-1 text-xs font-semibold text-stone-400">{t("qualityDesc")}</p>
           </div>
 

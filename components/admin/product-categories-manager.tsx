@@ -143,7 +143,7 @@ export function ProductCategoriesManager({categories}: {categories: ProductCateg
     <div className="space-y-4 rounded-2xl border border-stone-200 bg-white p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="font-serif text-2xl text-forest-950">{t("categoriesTitle")}</h3>
+          <h3 className=" text-2xl text-forest-950">{t("categoriesTitle")}</h3>
           <p className="mt-1 text-sm text-stone-500">{t("categoriesDesc")}</p>
         </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={startCreate}>

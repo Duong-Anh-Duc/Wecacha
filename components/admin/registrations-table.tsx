@@ -1,8 +1,8 @@
 "use client";
 
-import {useMemo, useState, useTransition} from "react";
-import {App, Button, Input, Modal, Radio, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
-import {EditOutlined, PhoneOutlined, SearchOutlined} from "@ant-design/icons";
+import {useEffect, useMemo, useState, useTransition} from "react";
+import {App, Button, Dropdown, Input, Modal, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
+import {EditOutlined, PhoneOutlined, SearchOutlined, SyncOutlined} from "@ant-design/icons";
 import {useTranslations} from "next-intl";
 import {updateRegistrationWorkflow} from "@/actions/registration-actions";
 
@@ -32,13 +32,17 @@ export function RegistrationsTable({
 }) {
   const t = useTranslations("Admin");
   const {message} = App.useApp();
+  const [rows, setRows] = useState(registrations);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [editing, setEditing] = useState<RegistrationRow | null>(null);
-  const [draftStatus, setDraftStatus] = useState<RegistrationRow["status"]>("new");
   const [draftNote, setDraftNote] = useState("");
   const [isPending, startTransition] = useTransition();
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
+
+  useEffect(() => {
+    setRows(registrations);
+  }, [registrations]);
 
   const dateFormatter = useMemo(
     () =>
@@ -56,7 +60,7 @@ export function RegistrationsTable({
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
-    return registrations.filter((item) => {
+    return rows.filter((item) => {
       const matchesStatus = statusFilter === "all" || item.status === statusFilter;
       const haystack = [item.name, item.phone, item.address, item.note, item.admin_note]
         .filter(Boolean)
@@ -65,30 +69,63 @@ export function RegistrationsTable({
 
       return matchesStatus && (!normalized || haystack.includes(normalized));
     });
-  }, [query, registrations, statusFilter]);
+  }, [query, rows, statusFilter]);
 
   function startEdit(row: RegistrationRow) {
     setEditing(row);
-    setDraftStatus(row.status);
     setDraftNote(row.admin_note ?? "");
   }
 
-  function save() {
-    if (!editing) return;
-
+  function persistWorkflow({
+    row,
+    nextStatus,
+    nextAdminNote,
+    closeModal = false,
+    successMessage = t("saveSuccess")
+  }: {
+    row: RegistrationRow;
+    nextStatus: RegistrationRow["status"];
+    nextAdminNote: string;
+    closeModal?: boolean;
+    successMessage?: string;
+  }) {
     const formData = new FormData();
-    formData.set("id", editing.id);
-    formData.set("status", draftStatus);
-    formData.set("admin_note", draftNote);
+    formData.set("id", row.id);
+    formData.set("status", nextStatus);
+    formData.set("admin_note", nextAdminNote);
 
     startTransition(async () => {
       const result = await updateRegistrationWorkflow(formData);
       if (result.success) {
-        message.success(t("saveSuccess"));
-        setEditing(null);
+        setRows((currentRows) =>
+          currentRows.map((item) =>
+            item.id === row.id ? {...item, status: nextStatus, admin_note: nextAdminNote || null} : item
+          )
+        );
+        message.success(successMessage);
+        if (closeModal) setEditing(null);
       } else {
         message.error(`${t("saveError")}${result.error}`);
       }
+    });
+  }
+
+  function save() {
+    if (!editing) return;
+    persistWorkflow({
+      row: editing,
+      nextStatus: editing.status,
+      nextAdminNote: draftNote,
+      closeModal: true
+    });
+  }
+
+  function saveStatus(row: RegistrationRow, nextStatus: RegistrationRow["status"]) {
+    persistWorkflow({
+      row,
+      nextStatus,
+      nextAdminNote: row.admin_note ?? "",
+      successMessage: t("statusUpdateSuccess")
     });
   }
 
@@ -173,6 +210,27 @@ export function RegistrationsTable({
               className="text-[#4A751D] hover:!bg-transparent hover:!text-forest-950"
             />
           </Tooltip>
+          <Tooltip title={t("changeStatus")}>
+            <Dropdown
+              trigger={["click"]}
+              disabled={isPending}
+              menu={{
+                selectedKeys: [row.status],
+                onClick: ({key}) => saveStatus(row, key as RegistrationRow["status"]),
+                items: [
+                  {key: "new", label: statusLabel("new")},
+                  {key: "contacted", label: statusLabel("contacted")},
+                  {key: "closed", label: statusLabel("closed")}
+                ]
+              }}
+            >
+              <Button
+                type="text"
+                icon={<SyncOutlined />}
+                className="text-[#4A751D] hover:!bg-transparent hover:!text-forest-950"
+              />
+            </Dropdown>
+          </Tooltip>
           <Tooltip title={t("edit")}>
             <Button
               type="text"
@@ -242,27 +300,31 @@ export function RegistrationsTable({
       >
         {editing ? (
           <div className="space-y-5">
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 text-sm text-stone-600">
-              <p className="font-semibold text-forest-950">{editing.name}</p>
-              <p>{editing.phone}</p>
-              {editing.address ? <p>{editing.address}</p> : null}
-              {editing.note ? <p className="mt-2 italic">{editing.note}</p> : null}
-            </div>
-
-            <div>
-              <p className="mb-2 text-sm font-semibold text-stone-700">{t("status")}</p>
-              <Radio.Group
-                block
-                optionType="button"
-                buttonStyle="solid"
-                value={draftStatus}
-                onChange={(event) => setDraftStatus(event.target.value)}
-                options={[
-                  {label: t("statusNew"), value: "new"},
-                  {label: t("statusContacted"), value: "contacted"},
-                  {label: t("statusClosed"), value: "closed"}
-                ]}
-              />
+            <div className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-4 text-sm">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colName")}</p>
+                <p className="mt-1 font-semibold text-forest-950">{editing.name}</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colPhone")}</p>
+                  <p className="mt-1 text-stone-700">{editing.phone}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("status")}</p>
+                  <Tag className="mt-1" color={statusColors[editing.status]}>
+                    {statusLabel(editing.status)}
+                  </Tag>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colAddress")}</p>
+                <p className="mt-1 text-stone-700">{editing.address || t("noValue")}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colNote")}</p>
+                <p className="mt-1 italic text-stone-700">{editing.note || t("noValue")}</p>
+              </div>
             </div>
 
             <div>

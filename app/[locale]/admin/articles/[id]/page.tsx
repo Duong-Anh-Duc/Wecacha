@@ -41,7 +41,7 @@ export default async function EditArticlePage({
         </Link>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-forest-950 font-serif">{t("editArticleTitle")}</h2>
+            <h2 className="text-2xl font-bold text-forest-950">{t("editArticleTitle")}</h2>
             <p className="text-stone-500 mt-1">{t("editArticleDesc")}</p>
           </div>
           <ArticlePreviewButton article={data} />

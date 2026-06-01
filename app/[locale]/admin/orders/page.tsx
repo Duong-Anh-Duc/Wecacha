@@ -33,7 +33,7 @@ export default async function OrdersAdminPage({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="font-serif text-3xl text-forest-950">{t("ordersTitle")}</h2>
+        <h2 className=" text-3xl text-forest-950">{t("ordersTitle")}</h2>
         <p className="mt-1 text-stone-500">{t("ordersDesc")}</p>
       </div>
 

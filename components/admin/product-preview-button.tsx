@@ -76,7 +76,7 @@ export function ProductPreviewButton({
             </div>
 
             <div>
-              <h3 className="font-serif text-3xl leading-tight text-forest-950">{product.name_vi}</h3>
+              <h3 className=" text-3xl leading-tight text-forest-950">{product.name_vi}</h3>
               {product.short_vi ? (
                 <p className="mt-2 text-sm leading-6 text-stone-600">{product.short_vi}</p>
               ) : null}

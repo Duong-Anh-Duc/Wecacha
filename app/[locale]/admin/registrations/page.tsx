@@ -35,7 +35,7 @@ export default async function RegistrationsPage({
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h2 className="font-serif text-3xl text-forest-950">{t("registrationsTitle")}</h2>
+          <h2 className=" text-3xl text-forest-950">{t("registrationsTitle")}</h2>
           <p className="mt-1 max-w-2xl text-sm leading-7 text-stone-500">
             {t("registrationsDesc")}
           </p>

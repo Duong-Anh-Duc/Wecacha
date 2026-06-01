@@ -66,7 +66,7 @@ export function ArticlePreviewButton({
           ) : null}
 
           <div>
-            <h3 className="font-serif text-3xl leading-tight text-forest-950">{article.title_vi}</h3>
+            <h3 className=" text-3xl leading-tight text-forest-950">{article.title_vi}</h3>
             {article.intro_vi ? <p className="mt-3 text-sm leading-6 text-stone-600">{article.intro_vi}</p> : null}
           </div>
 

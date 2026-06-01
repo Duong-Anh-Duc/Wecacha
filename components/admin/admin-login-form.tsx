@@ -35,7 +35,7 @@ export function AdminLoginForm() {
           <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full border border-ember/20 bg-ember/10">
             <Coffee className="h-8 w-8 text-ember" />
           </div>
-          <h1 className="font-serif text-3xl text-parchment-50">{t("loginTitle")}</h1>
+          <h1 className=" text-3xl text-parchment-50">{t("loginTitle")}</h1>
           <p className="mt-2 text-sm text-white/50">{t("loginDesc")}</p>
         </div>
 

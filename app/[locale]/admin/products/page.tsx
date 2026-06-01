@@ -44,7 +44,7 @@ export default async function ProductsAdminPage({
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="font-serif text-3xl text-forest-950">{t("productsTitle")}</h2>
+          <h2 className=" text-3xl text-forest-950">{t("productsTitle")}</h2>
           <p className="mt-1 text-stone-500">{t("productsDesc")}</p>
         </div>
         <Link

@@ -30,7 +30,7 @@ export default async function NewProductPage({
           {t("backProducts")}
         </Link>
         <div>
-          <h2 className="font-serif text-3xl text-forest-950">{t("newProductTitle")}</h2>
+          <h2 className=" text-3xl text-forest-950">{t("newProductTitle")}</h2>
           <p className="mt-1 text-stone-500">{t("newProductDesc")}</p>
         </div>
       </div>

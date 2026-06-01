@@ -26,7 +26,7 @@ export default async function NewArticlePage({
           {t("backArticles")}
         </Link>
         <div>
-          <h2 className="text-2xl font-bold text-forest-950 font-serif">{t("newArticleTitle")}</h2>
+          <h2 className="text-2xl font-bold text-forest-950">{t("newArticleTitle")}</h2>
           <p className="text-stone-500 mt-1">{t("newArticleDesc")}</p>
         </div>
       </div>
