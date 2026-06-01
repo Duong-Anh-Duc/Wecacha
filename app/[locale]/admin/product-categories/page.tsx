@@ -1,5 +1,6 @@
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {ProductCategoriesManager, type ProductCategoryRow} from "@/components/admin/product-categories-manager";
+import {RefreshButton} from "@/components/admin/refresh-button";
 import type {Locale} from "@/i18n/routing";
 import {requireAdmin} from "@/lib/admin-auth";
 
@@ -30,9 +31,12 @@ export default async function ProductCategoriesPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className=" text-3xl text-forest-950">{t("categoriesTitle")}</h2>
-        <p className="mt-1 text-stone-500">{t("categoriesPageDesc")}</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className=" text-3xl text-forest-950">{t("categoriesTitle")}</h2>
+          <p className="mt-1 text-stone-500">{t("categoriesPageDesc")}</p>
+        </div>
+        <RefreshButton />
       </div>
 
       <ProductCategoriesManager categories={(data as ProductCategoryRow[]) ?? []} />

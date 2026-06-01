@@ -1,5 +1,6 @@
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {RegistrationsTable, type RegistrationRow} from "@/components/admin/registrations-table";
+import {RefreshButton} from "@/components/admin/refresh-button";
 import {RealtimeRefresh} from "@/components/admin/realtime-refresh";
 import type {Locale} from "@/i18n/routing";
 import {requireAdmin} from "@/lib/admin-auth";
@@ -42,8 +43,11 @@ export default async function RegistrationsPage({
           </p>
         </div>
 
-        <div className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-500 shadow-sm">
-          {t("registrationsCount", {count: registrations.length})}
+        <div className="flex flex-wrap items-center gap-3">
+          <RefreshButton />
+          <div className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-500 shadow-sm">
+            {t("registrationsCount", {count: registrations.length})}
+          </div>
         </div>
       </div>
 

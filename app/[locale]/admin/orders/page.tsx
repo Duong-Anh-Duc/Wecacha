@@ -1,5 +1,6 @@
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {OrdersTable, type OrderRow} from "@/components/admin/orders-table";
+import {RefreshButton} from "@/components/admin/refresh-button";
 import {RealtimeRefresh} from "@/components/admin/realtime-refresh";
 import type {Locale} from "@/i18n/routing";
 import {requireAdmin} from "@/lib/admin-auth";
@@ -33,9 +34,12 @@ export default async function OrdersAdminPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className=" text-3xl text-forest-950">{t("ordersTitle")}</h2>
-        <p className="mt-1 text-stone-500">{t("ordersDesc")}</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className=" text-3xl text-forest-950">{t("ordersTitle")}</h2>
+          <p className="mt-1 text-stone-500">{t("ordersDesc")}</p>
+        </div>
+        <RefreshButton />
       </div>
 
       <OrdersTable orders={orders} locale={locale} />

@@ -20,6 +20,6 @@ export async function loginAdmin(locale: string, _prevState: unknown, formData: 
 
 export async function logoutAdmin(locale: string) {
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  await supabase.auth.signOut({scope: "local"});
   redirect(`/${locale}/admin/login?loggedOut=1`);
 }

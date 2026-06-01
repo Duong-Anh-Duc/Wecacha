@@ -1,6 +1,7 @@
 import {Plus} from "lucide-react";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {ArticlesTable, type ArticleRow} from "@/components/admin/articles-table";
+import {RefreshButton} from "@/components/admin/refresh-button";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {requireAdmin} from "@/lib/admin-auth";
@@ -40,13 +41,16 @@ export default async function ArticlesPage({
           <h2 className=" text-3xl text-forest-950">{t("articlesTitle")}</h2>
           <p className="mt-1 text-stone-500">{t("articlesDesc")}</p>
         </div>
-        <Link
-          href="/admin/articles/new"
-          className="inline-flex items-center gap-2 rounded-xl bg-ember px-4 py-2.5 font-medium text-white shadow-sm transition hover:bg-ember/90"
-        >
-          <Plus className="h-5 w-5" />
-          {t("addArticle")}
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <RefreshButton />
+          <Link
+            href="/admin/articles/new"
+            className="inline-flex items-center gap-2 rounded-xl bg-ember px-4 py-2.5 font-medium text-white shadow-sm transition hover:bg-ember/90"
+          >
+            <Plus className="h-5 w-5" />
+            {t("addArticle")}
+          </Link>
+        </div>
       </div>
 
       <ArticlesTable articles={articles} locale={locale} />

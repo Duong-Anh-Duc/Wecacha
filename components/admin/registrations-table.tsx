@@ -1,8 +1,8 @@
 "use client";
 
 import {useEffect, useMemo, useState, useTransition} from "react";
-import {App, Button, Dropdown, Input, Modal, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
-import {EditOutlined, EyeOutlined, SearchOutlined, SyncOutlined} from "@ant-design/icons";
+import {App, Button, Input, Modal, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
+import {EyeOutlined, SearchOutlined} from "@ant-design/icons";
 import {useTranslations} from "next-intl";
 import {updateRegistrationWorkflow} from "@/actions/registration-actions";
 
@@ -31,12 +31,11 @@ export function RegistrationsTable({
   locale: string;
 }) {
   const t = useTranslations("Admin");
-  const {message} = App.useApp();
+  const {message, modal} = App.useApp();
   const [rows, setRows] = useState(registrations);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [viewing, setViewing] = useState<RegistrationRow | null>(null);
-  const [editing, setEditing] = useState<RegistrationRow | null>(null);
   const [draftNote, setDraftNote] = useState("");
   const [isPending, startTransition] = useTransition();
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
@@ -72,11 +71,6 @@ export function RegistrationsTable({
     });
   }, [query, rows, statusFilter]);
 
-  function startEdit(row: RegistrationRow) {
-    setEditing(row);
-    setDraftNote(row.admin_note ?? "");
-  }
-
   function persistWorkflow({
     row,
     nextStatus,
@@ -103,19 +97,22 @@ export function RegistrationsTable({
             item.id === row.id ? {...item, status: nextStatus, admin_note: nextAdminNote || null} : item
           )
         );
+        setViewing((current) =>
+          current?.id === row.id ? {...current, status: nextStatus, admin_note: nextAdminNote || null} : current
+        );
         message.success(successMessage);
-        if (closeModal) setEditing(null);
+        if (closeModal) setViewing(null);
       } else {
         message.error(`${t("saveError")}${result.error}`);
       }
     });
   }
 
-  function save() {
-    if (!editing) return;
+  function saveViewingNote() {
+    if (!viewing) return;
     persistWorkflow({
-      row: editing,
-      nextStatus: editing.status,
+      row: viewing,
+      nextStatus: viewing.status,
       nextAdminNote: draftNote,
       closeModal: true
     });
@@ -127,6 +124,18 @@ export function RegistrationsTable({
       nextStatus,
       nextAdminNote: row.admin_note ?? "",
       successMessage: t("statusUpdateSuccess")
+    });
+  }
+
+  function confirmStatusChange(row: RegistrationRow, nextStatus: RegistrationRow["status"]) {
+    if (row.status === nextStatus) return;
+
+    modal.confirm({
+      title: t("changeStatusConfirmTitle"),
+      content: t("changeStatusConfirmDesc"),
+      okText: t("save"),
+      cancelText: t("cancel"),
+      onOk: () => saveStatus(row, nextStatus)
     });
   }
 
@@ -162,17 +171,6 @@ export function RegistrationsTable({
       )
     },
     {
-      title: t("status"),
-      dataIndex: "status",
-      filters: [
-        {text: t("statusNew"), value: "new"},
-        {text: t("statusContacted"), value: "contacted"},
-        {text: t("statusClosed"), value: "closed"}
-      ],
-      onFilter: (value, row) => row.status === value,
-      render: (_, row) => <Tag color={statusColors[row.status]}>{statusLabel(row.status)}</Tag>
-    },
-    {
       title: t("colAddress"),
       dataIndex: "address",
       ellipsis: true,
@@ -185,17 +183,50 @@ export function RegistrationsTable({
       render: (value) => value || <span className="italic text-stone-400">{t("noValue")}</span>
     },
     {
-      title: t("adminNote"),
-      dataIndex: "admin_note",
-      width: 280,
-      render: (value) => value || <span className="italic text-stone-400">{t("noValue")}</span>
-    },
-    {
       title: t("colRegisteredAt"),
       dataIndex: "created_at",
       sorter: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
       defaultSortOrder: "descend",
       render: (value) => dateFormatter.format(new Date(value))
+    },
+    {
+      title: t("status"),
+      dataIndex: "status",
+      width: 160,
+      filters: [
+        {text: t("statusNew"), value: "new"},
+        {text: t("statusContacted"), value: "contacted"},
+        {text: t("statusClosed"), value: "closed"}
+      ],
+      onFilter: (value, row) => row.status === value,
+      render: (_, row) => (
+        <Select
+          size="small"
+          value={row.status}
+          disabled={isPending}
+          onChange={(value: RegistrationRow["status"]) => confirmStatusChange(row, value)}
+          className="min-w-36"
+          labelRender={({value}) => (
+            <Tag color={statusColors[value as RegistrationRow["status"]]} className="m-0">
+              {statusLabel(value as RegistrationRow["status"])}
+            </Tag>
+          )}
+          options={[
+            {
+              label: <Tag color={statusColors.new}>{statusLabel("new")}</Tag>,
+              value: "new"
+            },
+            {
+              label: <Tag color={statusColors.contacted}>{statusLabel("contacted")}</Tag>,
+              value: "contacted"
+            },
+            {
+              label: <Tag color={statusColors.closed}>{statusLabel("closed")}</Tag>,
+              value: "closed"
+            }
+          ]}
+        />
+      )
     },
     {
       title: t("colActions"),
@@ -207,37 +238,11 @@ export function RegistrationsTable({
             <Button
               type="text"
               icon={<EyeOutlined />}
-              onClick={() => setViewing(row)}
-              className="text-blue-500 hover:!bg-transparent hover:!text-blue-700"
-            />
-          </Tooltip>
-          <Tooltip title={t("changeStatus")}>
-            <Dropdown
-              trigger={["click"]}
-              disabled={isPending}
-              menu={{
-                selectedKeys: [row.status],
-                onClick: ({key}) => saveStatus(row, key as RegistrationRow["status"]),
-                items: [
-                  {key: "new", label: statusLabel("new")},
-                  {key: "contacted", label: statusLabel("contacted")},
-                  {key: "closed", label: statusLabel("closed")}
-                ]
+              onClick={() => {
+                setViewing(row);
+                setDraftNote(row.admin_note ?? "");
               }}
-            >
-              <Button
-                type="text"
-                icon={<SyncOutlined />}
-                className="text-[#4A751D] hover:!bg-transparent hover:!text-forest-950"
-              />
-            </Dropdown>
-          </Tooltip>
-          <Tooltip title={t("edit")}>
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => startEdit(row)}
-              className="text-ember hover:!bg-transparent hover:!text-forest-950"
+              className="text-blue-500 hover:!bg-transparent hover:!text-blue-700"
             />
           </Tooltip>
         </Space>
@@ -275,7 +280,7 @@ export function RegistrationsTable({
         rowKey="id"
         columns={columns}
         dataSource={filtered}
-        scroll={{x: 1260}}
+        scroll={{x: 1040}}
         onChange={(nextPagination) => {
           setPagination({
             current: nextPagination.current ?? 1,
@@ -294,7 +299,10 @@ export function RegistrationsTable({
         title={t("viewDetails")}
         open={Boolean(viewing)}
         onCancel={() => setViewing(null)}
-        footer={null}
+        onOk={saveViewingNote}
+        okText={t("save")}
+        cancelText={t("cancel")}
+        confirmLoading={isPending}
       >
         {viewing ? (
           <div className="space-y-4">
@@ -327,59 +335,14 @@ export function RegistrationsTable({
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("adminNote")}</p>
-                <p className="mt-1 text-stone-700">{viewing.admin_note || t("noValue")}</p>
+                <Input.TextArea
+                  className="mt-2"
+                  rows={4}
+                  value={draftNote}
+                  onChange={(event) => setDraftNote(event.target.value)}
+                  placeholder={t("adminNotePlaceholder")}
+                />
               </div>
-            </div>
-          </div>
-        ) : null}
-      </Modal>
-
-      <Modal
-        title={t("editRegistrationTitle")}
-        open={Boolean(editing)}
-        onOk={save}
-        onCancel={() => setEditing(null)}
-        okText={t("save")}
-        cancelText={t("cancel")}
-        confirmLoading={isPending}
-      >
-        {editing ? (
-          <div className="space-y-5">
-            <div className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-4 text-sm">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colName")}</p>
-                <p className="mt-1 font-semibold text-forest-950">{editing.name}</p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colPhone")}</p>
-                  <p className="mt-1 text-stone-700">{editing.phone}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("status")}</p>
-                  <Tag className="mt-1" color={statusColors[editing.status]}>
-                    {statusLabel(editing.status)}
-                  </Tag>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colAddress")}</p>
-                <p className="mt-1 text-stone-700">{editing.address || t("noValue")}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">{t("colNote")}</p>
-                <p className="mt-1 italic text-stone-700">{editing.note || t("noValue")}</p>
-              </div>
-            </div>
-
-            <div>
-              <p className="mb-2 text-sm font-semibold text-stone-700">{t("adminNote")}</p>
-              <Input.TextArea
-                rows={4}
-                value={draftNote}
-                onChange={(event) => setDraftNote(event.target.value)}
-                placeholder={t("adminNotePlaceholder")}
-              />
             </div>
           </div>
         ) : null}
