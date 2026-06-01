@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 
 export async function loginAdmin(locale: string, _prevState: unknown, formData: FormData) {
   const supabase = await createClient();
-  const email = formData.get("email") as string;
+  const login = String(formData.get("email") ?? "").trim();
+  const email = login.includes("@") ? login : `${login}@gmail.com`;
   const password = formData.get("password") as string;
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -20,5 +21,5 @@ export async function loginAdmin(locale: string, _prevState: unknown, formData: 
 export async function logoutAdmin(locale: string) {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect(`/${locale}/admin/login`);
+  redirect(`/${locale}/admin/login?loggedOut=1`);
 }

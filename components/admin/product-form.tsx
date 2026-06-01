@@ -34,14 +34,25 @@ type ProductFormData = {
   images?: string[];
   featured?: boolean;
   is_visible?: boolean;
-  sort_order?: number;
+};
+
+export type ProductCategoryOption = {
+  slug: string;
+  name_vi: string;
+  name_en: string;
 };
 
 function textFromList(value?: string[] | null) {
   return (value ?? []).join("\n");
 }
 
-export function ProductForm({initialData = {}}: {initialData?: ProductFormData}) {
+export function ProductForm({
+  initialData = {},
+  categories
+}: {
+  initialData?: ProductFormData;
+  categories: ProductCategoryOption[];
+}) {
   const t = useTranslations("Admin");
   const tShop = useTranslations("Shop");
   const router = useRouter();
@@ -51,6 +62,14 @@ export function ProductForm({initialData = {}}: {initialData?: ProductFormData})
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
   const [featured, setFeatured] = useState(Boolean(initialData.featured));
   const isEditing = Boolean(initialData.id);
+  const categoryOptions = categories.length > 0
+    ? categories
+    : [
+        {slug: "beans", name_vi: tShop("beans"), name_en: tShop("beans")},
+        {slug: "ground", name_vi: tShop("ground"), name_en: tShop("ground")},
+        {slug: "phin", name_vi: tShop("phin"), name_en: tShop("phin")},
+        {slug: "gifts", name_vi: tShop("gifts"), name_en: tShop("gifts")}
+      ];
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -71,6 +90,7 @@ export function ProductForm({initialData = {}}: {initialData?: ProductFormData})
   function handleSubmit(values: Record<string, unknown>) {
     const formData = new FormData();
     if (initialData.id) formData.set("id", initialData.id);
+    if (initialData.slug) formData.set("slug", initialData.slug);
     Object.entries(values).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         formData.set(key, String(value));
@@ -120,29 +140,20 @@ export function ProductForm({initialData = {}}: {initialData?: ProductFormData})
         notes_en: textFromList(initialData.notes_en),
         brew_guide_vi: textFromList(initialData.brew_guide_vi),
         brew_guide_en: textFromList(initialData.brew_guide_en),
-        category: initialData.category ?? "beans",
-        sort_order: initialData.sort_order ?? 0
+        category: initialData.category ?? "beans"
       }}
       onFinish={handleSubmit}
       className="max-w-5xl"
     >
       <Card className="mb-6" title={t("productBasics")}>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Form.Item name="slug" label={t("fieldSlug")} rules={[{required: true}]}>
-            <Input placeholder="mist-valley-arabica" />
-          </Form.Item>
+        <div className="grid gap-4 md:grid-cols-1">
           <Form.Item name="category" label={t("category")} rules={[{required: true}]}>
             <Select
-              options={[
-                {label: tShop("beans"), value: "beans"},
-                {label: tShop("ground"), value: "ground"},
-                {label: tShop("phin"), value: "phin"},
-                {label: tShop("gifts"), value: "gifts"}
-              ]}
+              options={categoryOptions.map((category) => ({
+                label: category.name_vi,
+                value: category.slug
+              }))}
             />
-          </Form.Item>
-          <Form.Item name="sort_order" label={t("sortOrder")}>
-            <InputNumber className="w-full" />
           </Form.Item>
         </div>
         <div className="grid gap-4 md:grid-cols-2">

@@ -19,7 +19,7 @@ export default async function ArticlesPage({
 
   const {data, error} = await supabase
     .from("news_articles")
-    .select("id, slug, title_vi, created_at, published_at, is_visible, placement, sort_order")
+    .select("id, slug, title_vi, intro_vi, content_vi, image_url, created_at, published_at, is_visible, placement, sort_order")
     .order("sort_order", {ascending: true})
     .order("published_at", {ascending: false});
 

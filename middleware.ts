@@ -8,6 +8,12 @@ const intlMiddleware = createIntlMiddleware(routing);
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  if (pathname === "/en/admin" || pathname.startsWith("/en/admin/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.replace(/^\/en\/admin/, "/vi/admin");
+    return NextResponse.redirect(url);
+  }
+
   // Admin pages call requireAdmin() server-side. Avoid doing a second Supabase auth
   // network request in middleware on every client navigation.
   const adminMatch = pathname.match(/^\/(vi|en)(\/admin)(\/.*)?$/);

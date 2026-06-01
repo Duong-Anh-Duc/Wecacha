@@ -156,8 +156,7 @@ export function ProductCard({
         </div>
 
         <div className="mt-4">
-          {/* Nút mua hàng — tạm ẩn */}
-          {/* <div className="grid grid-cols-2 gap-3 relative z-30">
+          <div className="grid grid-cols-2 gap-3 relative z-30">
             <AddToCartButton
               product={product}
               locale={locale}
@@ -169,10 +168,9 @@ export function ProductCard({
               variant="forest"
               className="h-11 w-full rounded-2xl px-3 text-[13px] font-semibold"
             />
-          </div> */}
+          </div>
 
-          {/* Khám phá ngay — tạm ẩn */}
-          {/* <div
+          <div
             className="mt-3 flex h-11 items-center justify-between rounded-xl px-2 text-sm font-bold text-ember animate-pulse drop-shadow-[0_0_6px_rgba(243,167,52,0.4)] transition duration-300 group-hover:bg-parchment-50/8 group-hover:text-amber-400 group/explore"
           >
             <span className="inline-flex items-center gap-2">
@@ -180,7 +178,7 @@ export function ProductCard({
               {tProduct("exploreNow")} {localized(product.name, locale)}
             </span>
             <ArrowRight className="h-4 w-4 transition duration-300 group-hover/explore:translate-x-2" aria-hidden="true" />
-          </div> */}
+          </div>
         </div>
         
         {/* Stretched link to make the entire card clickable */}

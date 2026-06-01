@@ -2,6 +2,7 @@
 
 import {useEffect, useState, type ReactNode} from "react";
 import {App as AntApp, ConfigProvider, Dropdown, Modal} from "antd";
+import viVN from "antd/locale/vi_VN";
 import {
   ChevronDown,
   Coffee,
@@ -10,10 +11,12 @@ import {
   LayoutDashboard,
   LoaderCircle,
   LogOut,
+  Menu,
   Package,
   PanelLeftClose,
   PanelLeftOpen,
   ShoppingBag,
+  Tags,
   UserRound,
   Users
 } from "lucide-react";
@@ -57,8 +60,60 @@ export default function AdminLayout({children}: {children: ReactNode}) {
   const isDashboard = pathname.endsWith("/admin");
   const isRegistrations = pathname.includes("/admin/registrations");
   const isArticles = pathname.includes("/admin/articles");
+  const isProductCategories = pathname.includes("/admin/product-categories");
   const isProducts = pathname.includes("/admin/products");
   const isOrders = pathname.includes("/admin/orders");
+  const navItems = [
+    {
+      key: "dashboard",
+      href: "/admin",
+      label: t("dashboard"),
+      active: isDashboard,
+      icon: <LayoutDashboard className="h-5 w-5" />,
+      mobileIcon: <LayoutDashboard className="h-4 w-4" />
+    },
+    {
+      key: "registrations",
+      href: "/admin/registrations",
+      label: t("registrations"),
+      active: isRegistrations,
+      icon: <Users className="h-5 w-5" />,
+      mobileIcon: <Users className="h-4 w-4" />
+    },
+    {
+      key: "articles",
+      href: "/admin/articles",
+      label: t("articles"),
+      active: isArticles,
+      icon: <FileText className="h-5 w-5" />,
+      mobileIcon: <FileText className="h-4 w-4" />
+    },
+    {
+      key: "products",
+      href: "/admin/products",
+      label: t("products"),
+      active: isProducts,
+      icon: <Package className="h-5 w-5" />,
+      mobileIcon: <Package className="h-4 w-4" />
+    },
+    {
+      key: "productCategories",
+      href: "/admin/product-categories",
+      label: t("productCategories"),
+      active: isProductCategories,
+      icon: <Tags className="h-5 w-5" />,
+      mobileIcon: <Tags className="h-4 w-4" />
+    },
+    {
+      key: "orders",
+      href: "/admin/orders",
+      label: t("orders"),
+      active: isOrders,
+      icon: <ShoppingBag className="h-5 w-5" />,
+      mobileIcon: <ShoppingBag className="h-4 w-4" />
+    }
+  ];
+  const currentNav = navItems.find((item) => item.active) ?? navItems[0];
 
   const handleLogout = async () => {
     await logoutAdmin(locale);
@@ -76,7 +131,9 @@ export default function AdminLayout({children}: {children: ReactNode}) {
 
   return (
     <ConfigProvider
+      locale={viVN}
       theme={{
+        cssVar: {key: "wecacha-admin"},
         token: {
           colorPrimary: "#b56500",
           colorInfo: "#4A751D",
@@ -96,75 +153,48 @@ export default function AdminLayout({children}: {children: ReactNode}) {
       }}
     >
       <AntApp>
-        <div className="admin-shell flex h-dvh overflow-hidden bg-[#f7f6f1]">
+        <div className="admin-shell flex h-dvh overflow-hidden bg-[#fafafa]">
       <aside
         className={cn(
-          "relative hidden h-full shrink-0 border-r border-white/10 bg-forest-950 text-stone-300 transition-[width] duration-200 ease-out lg:flex lg:flex-col",
+          "relative hidden h-full shrink-0 border-r border-[#ffffff]/5 bg-gradient-to-b from-[#081a07] via-[#051404] to-[#020901] text-stone-300 transition-[width] duration-300 ease-in-out lg:flex lg:flex-col shadow-[4px_0_24px_rgba(0,0,0,0.15)] z-20",
           isSidebarCollapsed ? "w-20" : "w-72"
         )}
       >
         <div
           className={cn(
-            "flex items-center border-b border-white/10 py-6 text-parchment-50 px-6",
+            "flex items-center border-b border-stone-800/40 py-6 px-6 bg-[#041203]/40 backdrop-blur-sm",
             isSidebarCollapsed && "justify-center px-3"
           )}
         >
           <div className="flex min-w-0 items-center gap-3">
-            <Coffee className="h-6 w-6 shrink-0 text-ember" />
-            <span className={cn("truncate font-serif text-xl font-bold", isSidebarCollapsed && "sr-only")}>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-ember to-amber-700 shadow-md">
+              <Coffee className="h-5 w-5 text-white" />
+            </div>
+            <span className={cn("truncate font-serif text-xl font-bold text-parchment-50 tracking-wider", isSidebarCollapsed && "sr-only")}>
               {t("cms")}
             </span>
           </div>
         </div>
 
-        <nav className="flex-1 space-y-2 p-4">
-          <AdminNavLink
-            href="/admin"
-            label={t("dashboard")}
-            active={isDashboard}
-            collapsed={isSidebarCollapsed}
-            onNavigateStart={handleNavigateStart}
-            icon={<LayoutDashboard className="h-5 w-5" />}
-          />
-          <AdminNavLink
-            href="/admin/registrations"
-            label={t("registrations")}
-            active={isRegistrations}
-            collapsed={isSidebarCollapsed}
-            onNavigateStart={handleNavigateStart}
-            icon={<Users className="h-5 w-5" />}
-          />
-          <AdminNavLink
-            href="/admin/articles"
-            label={t("articles")}
-            active={isArticles}
-            collapsed={isSidebarCollapsed}
-            onNavigateStart={handleNavigateStart}
-            icon={<FileText className="h-5 w-5" />}
-          />
-          <AdminNavLink
-            href="/admin/products"
-            label={t("products")}
-            active={isProducts}
-            collapsed={isSidebarCollapsed}
-            onNavigateStart={handleNavigateStart}
-            icon={<Package className="h-5 w-5" />}
-          />
-          <AdminNavLink
-            href="/admin/orders"
-            label={t("orders")}
-            active={isOrders}
-            collapsed={isSidebarCollapsed}
-            onNavigateStart={handleNavigateStart}
-            icon={<ShoppingBag className="h-5 w-5" />}
-          />
+        <nav className="flex-1 space-y-2 p-4 pt-6">
+          {navItems.map((item) => (
+            <AdminNavLink
+              key={item.key}
+              href={item.href}
+              label={item.label}
+              active={item.active}
+              collapsed={isSidebarCollapsed}
+              onNavigateStart={handleNavigateStart}
+              icon={item.icon}
+            />
+          ))}
         </nav>
 
       </aside>
 
       <main className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-stone-200 bg-white px-5 shadow-sm sm:px-8">
-          <div className="flex items-center gap-3">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-stone-200/60 bg-white/95 backdrop-blur-md px-5 shadow-[0_1px_3px_rgba(0,0,0,0.01)] sm:px-8 z-10">
+          <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
               onClick={() => setIsSidebarCollapsed((value) => !value)}
@@ -174,55 +204,40 @@ export default function AdminLayout({children}: {children: ReactNode}) {
               {isSidebarCollapsed ? <PanelLeftOpen className="h-4.5 w-4.5" /> : <PanelLeftClose className="h-4.5 w-4.5" />}
             </button>
 
-            <h1 className="flex items-center gap-2 text-lg font-bold text-forest-950">
-              <LayoutDashboard className="h-5 w-5 text-ember" />
-              {t("systemTitle")}
+            <h1 className="flex min-w-0 items-center gap-2 text-[14px] font-black tracking-wider text-forest-950 uppercase">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-ember/10 text-ember">
+                <LayoutDashboard className="h-4 w-4" />
+              </span>
+              <span className="truncate">{t("systemTitle")}</span>
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 lg:hidden">
-              <AdminNavLink
-                href="/admin"
-                label={t("dashboard")}
-                active={isDashboard}
-                compact
-                onNavigateStart={handleNavigateStart}
-                icon={<LayoutDashboard className="h-4 w-4" />}
-              />
-              <AdminNavLink
-                href="/admin/registrations"
-                label={t("registrations")}
-                active={isRegistrations}
-                compact
-                onNavigateStart={handleNavigateStart}
-                icon={<Users className="h-4 w-4" />}
-              />
-              <AdminNavLink
-                href="/admin/articles"
-                label={t("articles")}
-                active={isArticles}
-                compact
-                onNavigateStart={handleNavigateStart}
-                icon={<FileText className="h-4 w-4" />}
-              />
-              <AdminNavLink
-                href="/admin/products"
-                label={t("products")}
-                active={isProducts}
-                compact
-                onNavigateStart={handleNavigateStart}
-                icon={<Package className="h-4 w-4" />}
-              />
-              <AdminNavLink
-                href="/admin/orders"
-                label={t("orders")}
-                active={isOrders}
-                compact
-                onNavigateStart={handleNavigateStart}
-                icon={<ShoppingBag className="h-4 w-4" />}
-              />
-            </div>
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
+            <Dropdown
+              trigger={["click"]}
+              placement="bottomRight"
+              menu={{
+                items: navItems.map((item) => ({
+                  key: item.key,
+                  icon: item.mobileIcon,
+                  label: (
+                    <Link href={item.href} onClick={() => handleNavigateStart(item.href)}>
+                      {item.label}
+                    </Link>
+                  )
+                }))
+              }}
+            >
+              <button
+                type="button"
+                className="inline-flex h-10 min-w-0 items-center gap-2 rounded-full border border-stone-200 bg-[#fafaf8] px-3 text-sm font-semibold text-forest-950 transition-colors hover:border-ember/40 hover:text-ember lg:hidden"
+                aria-label={t("adminMenu")}
+              >
+                <Menu className="h-4 w-4 shrink-0" />
+                <span className="max-w-[32vw] truncate sm:max-w-[220px]">{currentNav.label}</span>
+                <ChevronDown className="h-4 w-4 shrink-0 text-stone-400" />
+              </button>
+            </Dropdown>
 
             <Dropdown
               trigger={["click"]}
@@ -271,7 +286,7 @@ export default function AdminLayout({children}: {children: ReactNode}) {
           </div>
         ) : null}
 
-        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-[#f7f6f1] p-5 sm:p-8">
+        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-[#fafafa] p-5 sm:p-8">
           {children}
         </div>
       </main>
@@ -322,15 +337,15 @@ function AdminNavLink({
         onNavigateStart?.(href);
       }}
       className={cn(
-        "flex items-center gap-3 rounded-xl transition-colors",
+        "flex items-center gap-3 rounded-xl transition-all duration-300",
         compact
-          ? "h-10 px-3 text-xs font-semibold"
+          ? "h-10 px-3 text-[11px] font-extrabold uppercase tracking-wider"
           : collapsed
-            ? "h-12 justify-center px-0 text-sm font-medium"
-            : "px-4 py-3 text-sm font-medium",
+            ? "h-12 justify-center px-0 text-sm font-semibold"
+            : "px-4 py-3 text-sm font-bold",
         active
-          ? "bg-ember text-white"
-          : "text-stone-300 hover:bg-white/10 hover:text-white"
+          ? "bg-gradient-to-r from-[#b56500] to-[#d68524] text-white shadow-[0_4px_16px_rgba(181,101,0,0.25)] scale-[1.02]"
+          : "text-stone-400 hover:bg-white/5 hover:text-white pl-4.5 hover:pl-5"
       )}
     >
       {icon}

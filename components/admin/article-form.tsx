@@ -112,6 +112,7 @@ export function ArticleForm({ initialData = {} }: { initialData?: any }) {
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
     if (isEditing) data.id = initialData.id;
+    if (initialData.slug) data.slug = initialData.slug;
 
     startTransition(async () => {
       const result = await upsertArticle(data);
@@ -143,18 +144,7 @@ export function ArticleForm({ initialData = {} }: { initialData?: any }) {
       <input type="hidden" name="is_visible" value={isVisible ? "true" : "false"} />
       <input type="hidden" name="placement" value={placement} />
       <input type="hidden" name="sort_order" value={sortOrder} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-stone-700">{t("fieldSlug")}</label>
-          <input
-            name="slug"
-            defaultValue={initialData.slug}
-            required
-            className="w-full rounded-xl border border-stone-200 px-4 py-2.5 focus:border-ember focus:ring-1 focus:ring-ember outline-none"
-            placeholder={t("fieldSlugPlaceholder")}
-          />
-        </div>
-        <div className="grid grid-cols-1 gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-4 md:grid-cols-3 md:col-span-2">
+      <div className="grid grid-cols-1 gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-4 md:grid-cols-3">
           <div className="space-y-2">
             <label className="text-sm font-medium text-stone-700">{t("visibility")}</label>
             <div className="flex h-10 items-center">
@@ -183,7 +173,6 @@ export function ArticleForm({ initialData = {} }: { initialData?: any }) {
             <label className="text-sm font-medium text-stone-700">{t("sortOrder")}</label>
             <InputNumber className="w-full" value={sortOrder} onChange={(value) => setSortOrder(Number(value ?? 0))} />
           </div>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

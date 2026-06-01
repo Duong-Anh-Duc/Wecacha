@@ -1,8 +1,8 @@
 "use client";
 
 import {useMemo, useState, useTransition} from "react";
-import {App, Button, Input, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
-import {EditOutlined, PhoneOutlined, SearchOutlined, SaveOutlined} from "@ant-design/icons";
+import {App, Button, Input, Modal, Radio, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
+import {EditOutlined, PhoneOutlined, SearchOutlined} from "@ant-design/icons";
 import {useTranslations} from "next-intl";
 import {updateRegistrationWorkflow} from "@/actions/registration-actions";
 
@@ -34,8 +34,9 @@ export function RegistrationsTable({
   const {message} = App.useApp();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [drafts, setDrafts] = useState<Record<string, {status: RegistrationRow["status"]; admin_note: string}>>({});
+  const [editing, setEditing] = useState<RegistrationRow | null>(null);
+  const [draftStatus, setDraftStatus] = useState<RegistrationRow["status"]>("new");
+  const [draftNote, setDraftNote] = useState("");
   const [isPending, startTransition] = useTransition();
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
 
@@ -67,42 +68,24 @@ export function RegistrationsTable({
   }, [query, registrations, statusFilter]);
 
   function startEdit(row: RegistrationRow) {
-    setEditingId(row.id);
-    setDrafts((current) => ({
-      ...current,
-      [row.id]: {
-        status: row.status,
-        admin_note: row.admin_note ?? ""
-      }
-    }));
+    setEditing(row);
+    setDraftStatus(row.status);
+    setDraftNote(row.admin_note ?? "");
   }
 
-  function updateDraft(id: string, patch: Partial<{status: RegistrationRow["status"]; admin_note: string}>) {
-    setDrafts((current) => ({
-      ...current,
-      [id]: {
-        status: current[id]?.status ?? "new",
-        admin_note: current[id]?.admin_note ?? "",
-        ...patch
-      }
-    }));
-  }
+  function save() {
+    if (!editing) return;
 
-  function save(row: RegistrationRow) {
-    const draft = drafts[row.id] ?? {
-      status: row.status,
-      admin_note: row.admin_note ?? ""
-    };
     const formData = new FormData();
-    formData.set("id", row.id);
-    formData.set("status", draft.status);
-    formData.set("admin_note", draft.admin_note);
+    formData.set("id", editing.id);
+    formData.set("status", draftStatus);
+    formData.set("admin_note", draftNote);
 
     startTransition(async () => {
       const result = await updateRegistrationWorkflow(formData);
       if (result.success) {
         message.success(t("saveSuccess"));
-        setEditingId(null);
+        setEditing(null);
       } else {
         message.error(`${t("saveError")}${result.error}`);
       }
@@ -149,21 +132,7 @@ export function RegistrationsTable({
         {text: t("statusClosed"), value: "closed"}
       ],
       onFilter: (value, row) => row.status === value,
-      render: (_, row) =>
-        editingId === row.id ? (
-          <Select
-            className="min-w-36"
-            value={drafts[row.id]?.status ?? row.status}
-            onChange={(value) => updateDraft(row.id, {status: value})}
-            options={[
-              {label: t("statusNew"), value: "new"},
-              {label: t("statusContacted"), value: "contacted"},
-              {label: t("statusClosed"), value: "closed"}
-            ]}
-          />
-        ) : (
-          <Tag color={statusColors[row.status]}>{statusLabel(row.status)}</Tag>
-        )
+      render: (_, row) => <Tag color={statusColors[row.status]}>{statusLabel(row.status)}</Tag>
     },
     {
       title: t("colAddress"),
@@ -181,17 +150,7 @@ export function RegistrationsTable({
       title: t("adminNote"),
       dataIndex: "admin_note",
       width: 280,
-      render: (_, row) =>
-        editingId === row.id ? (
-          <Input.TextArea
-            autoSize={{minRows: 2, maxRows: 4}}
-            value={drafts[row.id]?.admin_note ?? row.admin_note ?? ""}
-            onChange={(event) => updateDraft(row.id, {admin_note: event.target.value})}
-            placeholder={t("adminNotePlaceholder")}
-          />
-        ) : (
-          row.admin_note || <span className="italic text-stone-400">{t("noValue")}</span>
-        )
+      render: (value) => value || <span className="italic text-stone-400">{t("noValue")}</span>
     },
     {
       title: t("colRegisteredAt"),
@@ -204,36 +163,26 @@ export function RegistrationsTable({
       title: t("colActions"),
       key: "actions",
       align: "right",
-      render: (_, row) =>
-        editingId === row.id ? (
-          <Button
-            type="primary"
-            icon={<SaveOutlined />}
-            loading={isPending}
-            onClick={() => save(row)}
-          >
-            {t("save")}
-          </Button>
-        ) : (
-          <Space>
-            <Tooltip title={t("callCustomer")}>
-              <Button
-                type="text"
-                href={`tel:${row.phone}`}
-                icon={<PhoneOutlined />}
-                className="text-[#4A751D] hover:!bg-transparent hover:!text-forest-950"
-              />
-            </Tooltip>
-            <Tooltip title={t("edit")}>
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                onClick={() => startEdit(row)}
-                className="text-ember hover:!bg-transparent hover:!text-forest-950"
-              />
-            </Tooltip>
-          </Space>
-        )
+      render: (_, row) => (
+        <Space>
+          <Tooltip title={t("callCustomer")}>
+            <Button
+              type="text"
+              href={`tel:${row.phone}`}
+              icon={<PhoneOutlined />}
+              className="text-[#4A751D] hover:!bg-transparent hover:!text-forest-950"
+            />
+          </Tooltip>
+          <Tooltip title={t("edit")}>
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => startEdit(row)}
+              className="text-ember hover:!bg-transparent hover:!text-forest-950"
+            />
+          </Tooltip>
+        </Space>
+      )
     }
   ];
 
@@ -281,6 +230,53 @@ export function RegistrationsTable({
           showTotal: (total) => t("tableTotal", {total})
         }}
       />
+
+      <Modal
+        title={t("editRegistrationTitle")}
+        open={Boolean(editing)}
+        onOk={save}
+        onCancel={() => setEditing(null)}
+        okText={t("save")}
+        cancelText={t("cancel")}
+        confirmLoading={isPending}
+      >
+        {editing ? (
+          <div className="space-y-5">
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 text-sm text-stone-600">
+              <p className="font-semibold text-forest-950">{editing.name}</p>
+              <p>{editing.phone}</p>
+              {editing.address ? <p>{editing.address}</p> : null}
+              {editing.note ? <p className="mt-2 italic">{editing.note}</p> : null}
+            </div>
+
+            <div>
+              <p className="mb-2 text-sm font-semibold text-stone-700">{t("status")}</p>
+              <Radio.Group
+                block
+                optionType="button"
+                buttonStyle="solid"
+                value={draftStatus}
+                onChange={(event) => setDraftStatus(event.target.value)}
+                options={[
+                  {label: t("statusNew"), value: "new"},
+                  {label: t("statusContacted"), value: "contacted"},
+                  {label: t("statusClosed"), value: "closed"}
+                ]}
+              />
+            </div>
+
+            <div>
+              <p className="mb-2 text-sm font-semibold text-stone-700">{t("adminNote")}</p>
+              <Input.TextArea
+                rows={4}
+                value={draftNote}
+                onChange={(event) => setDraftNote(event.target.value)}
+                placeholder={t("adminNotePlaceholder")}
+              />
+            </div>
+          </div>
+        ) : null}
+      </Modal>
     </div>
   );
 }

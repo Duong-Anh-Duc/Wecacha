@@ -1,15 +1,21 @@
 "use client";
 
-import {useMemo, useState} from "react";
-import {Button, Input, Select, Space, Table, Tag, Tooltip, type TableColumnsType} from "antd";
+import {useEffect, useMemo, useState, useTransition} from "react";
+import {App, Button, Input, Select, Space, Table, Tag, Tooltip, type TableColumnsType} from "antd";
 import {EditOutlined, EyeInvisibleOutlined, EyeOutlined, SearchOutlined} from "@ant-design/icons";
+import {GripVertical} from "lucide-react";
 import {useTranslations} from "next-intl";
+import {updateArticleSortOrder} from "@/actions/article-actions";
 import {Link} from "@/i18n/navigation";
+import {ArticlePreviewButton} from "./article-preview-button";
 
 export type ArticleRow = {
   id: string;
   slug: string;
   title_vi: string;
+  intro_vi?: string | null;
+  content_vi?: string | null;
+  image_url?: string | null;
   created_at: string;
   published_at: string | null;
   is_visible: boolean;
@@ -25,9 +31,17 @@ export function ArticlesTable({
   locale: string;
 }) {
   const t = useTranslations("Admin");
+  const {message} = App.useApp();
   const [query, setQuery] = useState("");
   const [placement, setPlacement] = useState("all");
+  const [orderedArticles, setOrderedArticles] = useState(articles);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
+
+  useEffect(() => {
+    setOrderedArticles(articles);
+  }, [articles]);
 
   const dateFormatter = useMemo(
     () =>
@@ -43,12 +57,12 @@ export function ArticlesTable({
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
-    return articles.filter((article) => {
+    return orderedArticles.filter((article) => {
       const matchesPlacement = placement === "all" || article.placement === placement;
       const haystack = [article.title_vi, article.slug, article.placement].join(" ").toLowerCase();
       return matchesPlacement && (!normalized || haystack.includes(normalized));
     });
-  }, [articles, placement, query]);
+  }, [orderedArticles, placement, query]);
 
   function placementLabel(value: ArticleRow["placement"]) {
     if (value === "home") return t("placementHome");
@@ -56,7 +70,48 @@ export function ArticlesTable({
     return t("placementNews");
   }
 
+  function handleDrop(targetId: string) {
+    if (!draggingId || draggingId === targetId) {
+      setDraggingId(null);
+      return;
+    }
+
+    const fromIndex = orderedArticles.findIndex((article) => article.id === draggingId);
+    const toIndex = orderedArticles.findIndex((article) => article.id === targetId);
+    if (fromIndex < 0 || toIndex < 0) {
+      setDraggingId(null);
+      return;
+    }
+
+    const nextArticles = [...orderedArticles];
+    const [movedArticle] = nextArticles.splice(fromIndex, 1);
+    nextArticles.splice(toIndex, 0, movedArticle);
+    setOrderedArticles(nextArticles);
+    setDraggingId(null);
+
+    startTransition(async () => {
+      const result = await updateArticleSortOrder(nextArticles.map((article) => article.id));
+      if (result.success) {
+        message.success(t("reorderArticlesSuccess"));
+      } else {
+        setOrderedArticles(articles);
+        message.error(`${t("reorderArticlesError")}${result.error}`);
+      }
+    });
+  }
+
   const columns: TableColumnsType<ArticleRow> = [
+    {
+      title: "",
+      key: "drag",
+      width: 46,
+      align: "center",
+      render: () => (
+        <Tooltip title={t("dragToReorder")}>
+          <GripVertical className="mx-auto h-4 w-4 cursor-grab text-stone-400" />
+        </Tooltip>
+      )
+    },
     {
       title: t("colIndex"),
       key: "index",
@@ -107,8 +162,9 @@ export function ArticlesTable({
     {
       title: t("sortOrder"),
       dataIndex: "sort_order",
-      sorter: (a, b) => a.sort_order - b.sort_order,
-      defaultSortOrder: "ascend"
+      render: (_value, _row, index) => (
+        <span className="font-medium text-stone-500">{index + 1}</span>
+      )
     },
     {
       title: t("colCreatedAt"),
@@ -121,15 +177,20 @@ export function ArticlesTable({
       key: "actions",
       align: "right",
       render: (_, row) => (
-        <Tooltip title={t("edit")}>
-          <Link href={`/admin/articles/${row.id}`}>
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              className="text-ember hover:!bg-transparent hover:!text-forest-950"
-            />
-          </Link>
-        </Tooltip>
+        <Space>
+          <Tooltip title={t("previewArticle")}>
+            <ArticlePreviewButton article={row} compact />
+          </Tooltip>
+          <Tooltip title={t("edit")}>
+            <Link href={`/admin/articles/${row.id}`}>
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                className="text-ember hover:!bg-transparent hover:!text-forest-950"
+              />
+            </Link>
+          </Tooltip>
+        </Space>
       )
     }
   ];
@@ -165,6 +226,14 @@ export function ArticlesTable({
         columns={columns}
         dataSource={filtered}
         scroll={{x: 1060}}
+        rowClassName={(row) => (row.id === draggingId ? "opacity-50" : "cursor-grab")}
+        onRow={(row) => ({
+          draggable: !isPending,
+          onDragStart: () => setDraggingId(row.id),
+          onDragOver: (event) => event.preventDefault(),
+          onDrop: () => handleDrop(row.id),
+          onDragEnd: () => setDraggingId(null)
+        })}
         onChange={(nextPagination) => {
           setPagination({
             current: nextPagination.current ?? 1,

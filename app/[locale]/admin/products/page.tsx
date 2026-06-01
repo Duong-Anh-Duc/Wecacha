@@ -17,21 +17,28 @@ export default async function ProductsAdminPage({
   const t = await getTranslations("Admin");
   const {supabase} = await requireAdmin(locale);
 
-  const {data, error} = await supabase
-    .from("products")
-    .select("id, slug, category, name_vi, price, original_price, weight, images, featured, is_visible, sort_order, created_at")
-    .order("sort_order", {ascending: true})
-    .order("created_at", {ascending: false});
+  const [productsResult, categoriesResult] = await Promise.all([
+    supabase
+      .from("products")
+      .select("id, slug, category, name_vi, short_vi, description_vi, price, original_price, weight, images, featured, is_visible, sort_order, created_at")
+      .order("sort_order", {ascending: true})
+      .order("created_at", {ascending: false}),
+    supabase
+      .from("product_categories")
+      .select("slug, name_vi, name_en, sort_order, is_visible")
+      .order("sort_order", {ascending: true})
+  ]);
 
-  if (error) {
+  if (productsResult.error) {
     return (
       <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-600">
-        {t("loadError")} {error.message}
+        {t("loadError")} {productsResult.error.message}
       </div>
     );
   }
 
-  const products = (data as ProductRow[]) ?? [];
+  const products = (productsResult.data as ProductRow[]) ?? [];
+  const categories = categoriesResult.error ? [] : categoriesResult.data ?? [];
 
   return (
     <div className="space-y-6">
@@ -49,7 +56,7 @@ export default async function ProductsAdminPage({
         </Link>
       </div>
 
-      <ProductsTable products={products} locale={locale} />
+      <ProductsTable products={products} locale={locale} categories={categories} />
     </div>
   );
 }

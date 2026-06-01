@@ -250,7 +250,7 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
         title={editing ? editing.customer_name : t("orders")}
         open={Boolean(editing)}
         onClose={() => setEditing(null)}
-        width={520}
+        size="large"
         extra={
           <Button type="primary" icon={<SaveOutlined />} loading={isPending} onClick={save}>
             {t("save")}

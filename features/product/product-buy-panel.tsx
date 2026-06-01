@@ -5,7 +5,7 @@ import {Minus, Plus, Star, ShieldCheck, Truck, Headphones, Droplet, Coffee, Aler
 import {useLocale, useTranslations} from "next-intl";
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
-// import {FlashSaleCountdown} from "@/features/product/flash-sale-countdown";
+import {FlashSaleCountdown} from "@/features/product/flash-sale-countdown";
 import type {Locale} from "@/i18n/routing";
 import type {Product} from "@/lib/content/types";
 import {formatCurrency, localized} from "@/lib/content/helpers";
@@ -67,8 +67,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
         )}
       </div>
 
-      {/* Flash Sale Countdown — tạm ẩn */}
-      {/* {product.originalPrice && <FlashSaleCountdown />} */}
+      {product.originalPrice && <FlashSaleCountdown />}
 
       {/* Feature Pills */}
       <div className="grid grid-cols-3 gap-2 lg:gap-3 mb-8">
@@ -86,8 +85,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
         </div>
       </div>
 
-      {/* Add to Cart Actions — tạm ẩn */}
-      {/* <div className="mb-8">
+      <div className="mb-8">
         <p className="mb-3 text-[13px] font-bold text-[#142918]">{t("quantity")}</p>
         <div className="flex gap-3 lg:gap-4">
           <div className="inline-flex h-12 lg:h-14 items-center rounded-xl border border-[#142918]/20 bg-white px-2">
@@ -128,7 +126,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
             <span>{t("buyNow")}</span>
           </span>
         </BuyNowButton>
-      </div> */}
+      </div>
 
       {/* Trust Badges */}
       <div className="flex flex-col sm:flex-row gap-4 lg:gap-4 p-4 rounded-2xl bg-white/50 border border-[#142918]/5">

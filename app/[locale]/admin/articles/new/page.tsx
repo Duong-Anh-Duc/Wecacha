@@ -17,10 +17,10 @@ export default async function NewArticlePage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="space-y-4">
         <Link
           href="/admin/articles"
-          className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-stone-600 shadow-sm transition hover:bg-stone-200 hover:text-forest-950"
+          className="inline-flex h-11 w-fit shrink-0 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-stone-600 shadow-sm transition hover:bg-stone-200 hover:text-forest-950"
         >
           <ArrowLeft className="h-4 w-4" />
           {t("backArticles")}

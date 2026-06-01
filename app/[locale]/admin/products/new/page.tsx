@@ -12,15 +12,19 @@ export default async function NewProductPage({
 }) {
   const {locale} = await params;
   setRequestLocale(locale);
-  await requireAdmin(locale);
+  const {supabase} = await requireAdmin(locale);
   const t = await getTranslations("Admin");
+  const {data: categories} = await supabase
+    .from("product_categories")
+    .select("slug, name_vi, name_en")
+    .order("sort_order", {ascending: true});
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="space-y-4">
         <Link
           href="/admin/products"
-          className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-stone-600 shadow-sm transition hover:bg-stone-200 hover:text-forest-950"
+          className="inline-flex h-11 w-fit shrink-0 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-stone-600 shadow-sm transition hover:bg-stone-200 hover:text-forest-950"
         >
           <ArrowLeft className="h-4 w-4" />
           {t("backProducts")}
@@ -31,7 +35,7 @@ export default async function NewProductPage({
         </div>
       </div>
 
-      <ProductForm />
+      <ProductForm categories={categories ?? []} />
     </div>
   );
 }

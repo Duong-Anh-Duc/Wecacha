@@ -2,7 +2,7 @@ import type {Locale} from "@/i18n/routing";
 
 export type Localized<T = string> = Record<Locale, T>;
 
-export type ProductCategory = "beans" | "ground" | "phin" | "gifts";
+export type ProductCategory = string;
 
 export type Product = {
   slug: string;

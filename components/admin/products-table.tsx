@@ -7,12 +7,16 @@ import {EditOutlined, EyeInvisibleOutlined, EyeOutlined, SearchOutlined} from "@
 import {useTranslations} from "next-intl";
 import {Link} from "@/i18n/navigation";
 import {formatCurrency} from "@/lib/content/helpers";
+import {ProductPreviewButton} from "./product-preview-button";
+import type {ProductCategoryOption} from "./product-form";
 
 export type ProductRow = {
   id: string;
   slug: string;
   category: string;
   name_vi: string;
+  short_vi?: string | null;
+  description_vi?: string | null;
   price: number;
   original_price: number | null;
   weight: string;
@@ -23,7 +27,15 @@ export type ProductRow = {
   created_at: string;
 };
 
-export function ProductsTable({products, locale}: {products: ProductRow[]; locale: string}) {
+export function ProductsTable({
+  products,
+  locale,
+  categories
+}: {
+  products: ProductRow[];
+  locale: string;
+  categories: ProductCategoryOption[];
+}) {
   const t = useTranslations("Admin");
   const tShop = useTranslations("Shop");
   const [query, setQuery] = useState("");
@@ -41,10 +53,13 @@ export function ProductsTable({products, locale}: {products: ProductRow[]; local
   }, [category, products, query]);
 
   function categoryLabel(value: string) {
+    const category = categories.find((item) => item.slug === value);
+    if (category) return category.name_vi;
     if (value === "ground") return tShop("ground");
     if (value === "phin") return tShop("phin");
     if (value === "gifts") return tShop("gifts");
-    return tShop("beans");
+    if (value === "beans") return tShop("beans");
+    return value;
   }
 
   const columns: TableColumnsType<ProductRow> = [
@@ -80,12 +95,7 @@ export function ProductsTable({products, locale}: {products: ProductRow[]; local
     {
       title: t("category"),
       dataIndex: "category",
-      filters: [
-        {text: tShop("beans"), value: "beans"},
-        {text: tShop("ground"), value: "ground"},
-        {text: tShop("phin"), value: "phin"},
-        {text: tShop("gifts"), value: "gifts"}
-      ],
+      filters: categories.map((category) => ({text: category.name_vi, value: category.slug})),
       onFilter: (value, row) => row.category === value,
       render: (value) => <Tag>{categoryLabel(value)}</Tag>
     },
@@ -122,8 +132,9 @@ export function ProductsTable({products, locale}: {products: ProductRow[]; local
     {
       title: t("sortOrder"),
       dataIndex: "sort_order",
-      sorter: (a, b) => a.sort_order - b.sort_order,
-      defaultSortOrder: "ascend"
+      render: (_value, _row, index) => (
+        <span className="font-medium text-stone-500">{index + 1}</span>
+      )
     },
     {
       title: t("colActions"),
@@ -131,6 +142,9 @@ export function ProductsTable({products, locale}: {products: ProductRow[]; local
       align: "right",
       render: (_, row) => (
         <Space>
+          <Tooltip title={t("previewProduct")}>
+            <ProductPreviewButton product={row} categories={categories} locale={locale} compact />
+          </Tooltip>
           <Tooltip title={t("edit")}>
             <Link href={`/admin/products/${row.id}`}>
               <Button
@@ -164,10 +178,7 @@ export function ProductsTable({products, locale}: {products: ProductRow[]; local
           className="min-w-52"
           options={[
             {label: t("allCategories"), value: "all"},
-            {label: tShop("beans"), value: "beans"},
-            {label: tShop("ground"), value: "ground"},
-            {label: tShop("phin"), value: "phin"},
-            {label: tShop("gifts"), value: "gifts"}
+            ...categories.map((item) => ({label: item.name_vi, value: item.slug}))
           ]}
         />
       </div>

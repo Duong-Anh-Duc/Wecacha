@@ -215,41 +215,48 @@ export default async function AdminDashboardPage({
   const chartAreaPath = `${chartLinePath} L ${points[points.length - 1].x} 170 L ${points[0].x} 170 Z`;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-1">
+    <div className="space-y-8 max-w-7xl mx-auto px-1 bg-[#fafafa]">
       {/* Header section */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-earth-700">
-            {t("dashboardEyebrow")}
-          </p>
-          <h2 className="mt-2 font-serif text-4xl text-forest-950">
-            {t("dashboard")}
-          </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-500">
-            {t("dashboardDesc")}
-          </p>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white p-6 rounded-2xl border border-stone-200/50 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-[#4A751D] border border-emerald-100/50">
+            <div className="grid grid-cols-2 gap-0.5 w-3.5 h-3.5">
+              <div className="rounded-[1px] bg-[#4A751D] w-1.5 h-1.5" />
+              <div className="rounded-[1px] bg-[#4A751D] w-1.5 h-1.5" />
+              <div className="rounded-[1px] bg-[#4A751D] w-1.5 h-1.5" />
+              <div className="rounded-[1px] bg-[#4A751D] w-1.5 h-1.5" />
+            </div>
+          </div>
+          <div>
+            <h2 className="font-sans text-2xl font-black tracking-tight text-forest-950">
+              {t("dashboard")}
+            </h2>
+            <p className="mt-1 text-xs font-semibold text-stone-500">
+              {t("dashboardDesc")}
+            </p>
+          </div>
         </div>
 
         {/* Dropdown 7 days */}
-        <div className="inline-flex h-11 items-center gap-2 self-start rounded-xl border border-stone-200 bg-white px-4 text-sm font-semibold text-stone-700 shadow-sm cursor-default">
-          <Calendar className="h-4 w-4 text-stone-500" />
+        <div className="inline-flex h-9 items-center gap-2 self-start rounded-xl border border-stone-250/70 bg-white px-3.5 text-xs font-bold text-stone-700 shadow-sm transition-all duration-200 hover:border-stone-300 hover:bg-stone-50/50 cursor-pointer">
+          <Calendar className="h-3.5 w-3.5 text-stone-500" />
           <span>{t("metricLast7Days")}</span>
-          <ChevronDown className="h-4 w-4 text-stone-400" />
+          <ChevronDown className="h-3.5 w-3.5 text-stone-400" />
         </div>
       </div>
 
       {/* Row 1 cards: Grid metrics */}
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
-          icon={<UsersRound className="h-6 w-6" />}
+          icon={<UsersRound className="h-5 w-5" />}
           label={t("metricTotal")}
           value={totalCount}
           caption={t("metricTotalCaption").replace(/\.$/, "")}
-          iconColorClass="text-[#b56500]"
+          iconColorClass="text-[#4A751D]"
           sparklineData={recentActivity.map(d => d.count)}
         />
         <SummaryCard
-          icon={<Send className="h-6 w-6" />}
+          icon={<Send className="h-5 w-5" />}
           label={t("metricToday")}
           value={todayCount}
           caption={t("metricTodayCaption").replace(/\.$/, "")}
@@ -257,19 +264,19 @@ export default async function AdminDashboardPage({
           sparklineData={recentActivity.map((d, i) => (i === 6 ? todayCount : 0))}
         />
         <SummaryCard
-          icon={<CalendarDays className="h-6 w-6" />}
+          icon={<CalendarDays className="h-5 w-5" />}
           label={t("metricLast7Days")}
           value={weekCount}
           caption={t("metricLast7DaysCaption").replace(/\.$/, "")}
-          iconColorClass="text-[#8B5A2B]"
+          iconColorClass="text-[#4A751D]"
           sparklineData={recentActivity.map(d => d.count)}
         />
         <SummaryCard
-          icon={<MapPinHouse className="h-6 w-6" />}
+          icon={<MapPinHouse className="h-5 w-5" />}
           label={t("metricAddress")}
           value={withAddressCount}
           caption={t("metricAddressCaption").replace(/\.$/, "")}
-          iconColorClass="text-[#b87d4b]"
+          iconColorClass="text-[#4A751D]"
           sparklineData={addressTrend}
         />
       </div>
@@ -277,21 +284,21 @@ export default async function AdminDashboardPage({
       {/* Row 2: CMS Metrics */}
       <div className="grid gap-6 sm:grid-cols-3">
         <CmsCard
-          icon={<FileText className="h-6 w-6" />}
+          icon={<FileText className="h-5 w-5" />}
           label={t("articles")}
           value={articlesCount ?? 0}
           caption={t("metricArticlesCaption").replace(/\.$/, "")}
           iconColor="text-[#4A751D]"
         />
         <CmsCard
-          icon={<Package className="h-6 w-6" />}
+          icon={<Package className="h-5 w-5" />}
           label={t("products")}
           value={productsCount ?? 0}
           caption={t("metricProductsCaption").replace(/\.$/, "")}
           iconColor="text-[#4A751D]"
         />
         <CmsCard
-          icon={<ShoppingBag className="h-6 w-6" />}
+          icon={<ShoppingBag className="h-5 w-5" />}
           label={t("orders")}
           value={ordersCount ?? 0}
           caption={t("metricOrdersCaption").replace(/\.$/, "")}
@@ -302,15 +309,15 @@ export default async function AdminDashboardPage({
       {/* Row 3: Chart & Quality meters */}
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
         {/* Chart card */}
-        <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b border-stone-100 px-6 py-5">
+        <section className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.015)] flex flex-col justify-between">
+          <div className="flex items-center justify-between border-b border-stone-100 px-6 py-4.5">
             <div>
-              <h3 className="font-serif text-2xl text-forest-950">{t("activityTitle")}</h3>
-              <p className="mt-1 text-xs text-stone-500">{t("activityDesc")}</p>
+              <h3 className="font-sans text-base font-bold text-stone-900">{t("activityTitle")}</h3>
+              <p className="mt-0.5 text-xs text-stone-400 font-semibold">{t("activityDesc")}</p>
             </div>
 
             {/* Small Select dropdown in card header */}
-            <div className="rounded-xl border border-stone-200 bg-stone-50/50 px-3 py-1.5 text-xs font-semibold text-stone-600 flex items-center gap-1.5">
+            <div className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-[11px] font-bold text-stone-600 flex items-center gap-1.5 transition hover:bg-stone-50 cursor-pointer shadow-sm">
               <span>{t("metricLast7Days")}</span>
               <ChevronDown className="h-3 w-3 text-stone-400" />
             </div>
@@ -322,18 +329,56 @@ export default async function AdminDashboardPage({
               <svg className="w-full h-full text-brand-green" viewBox="0 0 700 220" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="chart-area-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#4A751D" stopOpacity="0.16" />
+                    <stop offset="0%" stopColor="#4A751D" stopOpacity="0.18" />
                     <stop offset="100%" stopColor="#4A751D" stopOpacity="0.0" />
                   </linearGradient>
+                  <style>{`
+                    @keyframes pulse-ring {
+                      0% { transform: scale(0.7); opacity: 0.9; }
+                      80%, 100% { transform: scale(2.2); opacity: 0; }
+                    }
+                    .pulse-indicator {
+                      animation: pulse-ring 2s cubic-bezier(0.25, 0, 0, 1) infinite;
+                    }
+                  `}</style>
                 </defs>
+
+                {/* Horizontal reference Gridlines */}
+                <line x1="50" y1="115" x2="650" y2="115" stroke="#f4f3ed" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="50" y1="60" x2="650" y2="60" stroke="#f4f3ed" strokeWidth="1" strokeDasharray="4 4" />
 
                 {/* Horizontal X-Axis line */}
                 <line x1="50" y1="170" x2="650" y2="170" stroke="#e7e5e4" strokeWidth="1.5" />
+
+                {/* Vertical helper gridlines under each point */}
+                {points.map((p) => (
+                  <line
+                    key={`grid-vert-${p.key}`}
+                    x1={p.x}
+                    y1={p.y}
+                    x2={p.x}
+                    y2={170}
+                    stroke="#f4f3ed"
+                    strokeWidth="1.2"
+                    strokeDasharray="2 3"
+                  />
+                ))}
 
                 {/* Area path */}
                 <path
                   d={chartAreaPath}
                   fill="url(#chart-area-grad)"
+                />
+
+                {/* Glow behind main curve line */}
+                <path
+                  d={chartLinePath}
+                  fill="none"
+                  stroke="#4A751D"
+                  strokeWidth="5"
+                  strokeOpacity="0.15"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
 
                 {/* Curve Line path */}
@@ -347,60 +392,118 @@ export default async function AdminDashboardPage({
                 />
 
                 {/* Points & Labels */}
-                {points.map((p) => (
-                  <g key={p.key}>
-                    {/* Circle Dot */}
-                    <circle
-                      cx={p.x}
-                      cy={p.y}
-                      r="6"
-                      fill="#4A751D"
-                      stroke="white"
-                      strokeWidth="2"
-                      className="shadow-sm transition-transform hover:scale-125 cursor-pointer"
-                    />
+                {points.map((p) => {
+                  const isPeak = p.count > 0 && p.key === peakDay.key;
+                  return (
+                    <g key={p.key} className="group/point">
+                      {/* Vertical interaction column */}
+                      <line
+                        x1={p.x}
+                        y1={30}
+                        x2={p.x}
+                        y2={170}
+                        stroke="transparent"
+                        strokeWidth="20"
+                        className="cursor-pointer"
+                      />
 
-                    {/* Count value */}
-                    <text
-                      x={p.x}
-                      y={p.y - 12}
-                      textAnchor="middle"
-                      className="text-xs font-bold fill-forest-950 font-sans"
-                    >
-                      {p.count}
-                    </text>
+                      {/* Pulse Ring for Peak point */}
+                      {isPeak && (
+                        <circle
+                          cx={p.x}
+                          cy={p.y}
+                          r="12"
+                          fill="#4A751D"
+                          fillOpacity="0.25"
+                          className="pulse-indicator"
+                          style={{ transformOrigin: `${p.x}px ${p.y}px` }}
+                        />
+                      )}
 
-                    {/* Weekday label */}
-                    <text
-                      x={p.x}
-                      y={192}
-                      textAnchor="middle"
-                      className="text-xs font-medium fill-stone-500 font-sans"
-                    >
-                      {getWeekdayLabel(p.key, locale)}
-                    </text>
+                      {/* Outer halo */}
+                      <circle
+                        cx={p.x}
+                        cy={p.y}
+                        r="8"
+                        fill="#4A751D"
+                        fillOpacity="0.12"
+                        className="transition-all duration-300 group-hover/point:scale-150 group-hover/point:fill-opacity-25"
+                      />
 
-                    {/* Date label */}
-                    <text
-                      x={p.x}
-                      y={208}
-                      textAnchor="middle"
-                      className="text-[11px] font-semibold fill-stone-400 font-sans"
-                    >
-                      {getDateLabel(p.key)}
-                    </text>
-                  </g>
-                ))}
+                      {/* Inner circle dot */}
+                      <circle
+                        cx={p.x}
+                        cy={p.y}
+                        r="4.5"
+                        fill="#4A751D"
+                        stroke="white"
+                        strokeWidth="2"
+                        className="shadow-sm transition-all duration-300 group-hover/point:scale-110"
+                      />
+
+                      {/* Count value tooltip on hover */}
+                      <g className="opacity-0 group-hover/point:opacity-100 transition-opacity duration-300 pointer-events-none">
+                        <rect
+                          x={p.x - 18}
+                          y={p.y - 32}
+                          width="36"
+                          height="20"
+                          rx="6"
+                          fill="#162C11"
+                          className="shadow-md"
+                        />
+                        <text
+                          x={p.x}
+                          y={p.y - 18}
+                          textAnchor="middle"
+                          className="text-[10px] font-bold fill-white font-sans"
+                        >
+                          {p.count}
+                        </text>
+                      </g>
+
+                      {/* Normal count display when not hovered */}
+                      <text
+                        x={p.x}
+                        y={p.y - 12}
+                        textAnchor="middle"
+                        className="text-xs font-bold fill-forest-950 font-sans group-hover/point:opacity-0 transition-opacity duration-200"
+                      >
+                        {p.count}
+                      </text>
+
+                      {/* Weekday label */}
+                      <text
+                        x={p.x}
+                        y={192}
+                        textAnchor="middle"
+                        className="text-xs font-bold fill-stone-500 font-sans transition-colors group-hover/point:fill-forest-900"
+                      >
+                        {getWeekdayLabel(p.key, locale)}
+                      </text>
+
+                      {/* Date label */}
+                      <text
+                        x={p.x}
+                        y={208}
+                        textAnchor="middle"
+                        className="text-[10px] font-bold fill-stone-400 font-sans transition-colors group-hover/point:fill-forest-600"
+                      >
+                        {getDateLabel(p.key)}
+                      </text>
+                    </g>
+                  );
+                })}
               </svg>
             </div>
           </div>
         </section>
 
         {/* Quality completion card */}
-        <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm flex flex-col justify-between">
-          <div className="border-b border-stone-100 px-6 py-5">
-            <h3 className="font-serif text-2xl text-forest-950">{t("qualityTitle")}</h3>
-            <p className="mt-1 text-xs text-stone-500">{t("qualityDesc")}</p>
+        <section className="overflow-hidden rounded-3xl border border-stone-220/80 bg-white/90 backdrop-blur-md shadow-[0_10px_35px_rgba(0,0,0,0.015)] flex flex-col justify-between">
+          <div className="flex flex-col border-b border-stone-100/80 bg-stone-50/40 px-6 py-5">
+            <h3 className="font-serif text-xl font-bold text-forest-950">{t("qualityTitle")}</h3>
+            <p className="mt-1 text-xs font-semibold text-stone-400">{t("qualityDesc")}</p>
           </div>
 
           <div className="space-y-6 px-6 py-6 flex-1">
@@ -408,23 +511,24 @@ export default async function AdminDashboardPage({
               label={t("qualityAddress")}
               value={withAddressCount}
               total={totalCount}
-              accent="bg-[#4A751D]"
+              accent="bg-gradient-to-r from-forest-800 to-[#609c24]"
             />
             <CompletionMeter
               label={t("qualityNote")}
               value={withNoteCount}
               total={totalCount}
-              accent="bg-[#4A751D]"
+              accent="bg-gradient-to-r from-forest-800 to-[#609c24]"
             />
 
             <div className="grid gap-4 pt-2 sm:grid-cols-2 xl:grid-cols-1">
               <QualityInsightCard
+                icon={<AlertCircle className="h-4.5 w-4.5 text-amber-600 animate-pulse" />}
                 label={t("needsAddress")}
                 value={missingAddressCount}
                 caption={t("needsAddressDesc")}
               />
               <QualityInsightCard
-                icon={<Clock className="h-4.5 w-4.5 text-stone-500" />}
+                icon={<Clock className="h-4.5 w-4.5 text-[#4A751D] shrink-0" />}
                 label={t("latestCapture")}
                 value={latestRegistrations[0] ? formatLatestTime(latestRegistrations[0].created_at) : "--"}
                 caption={t("latestCaptureDesc")}
@@ -435,84 +539,114 @@ export default async function AdminDashboardPage({
       </div>
 
       {/* Row 4: Latest registrations list */}
-      <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.015)]">
         <div className="flex flex-col gap-3 border-b border-stone-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="font-serif text-2xl text-forest-950">{t("latestTitle")}</h3>
-            <p className="mt-1 text-xs text-stone-500">{t("latestDesc")}</p>
+            <h3 className="font-sans text-base font-bold text-stone-900">{t("latestTitle")}</h3>
+            <p className="mt-0.5 text-xs text-stone-400 font-semibold">{t("latestDesc")}</p>
           </div>
           <Link
             href="/admin/registrations"
-            className="inline-flex items-center gap-1 text-sm font-semibold text-earth-700 transition hover:text-earth-800"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#4A751D] hover:underline"
           >
             <span>{t("openRegistrations")}</span>
-            <ArrowRight className="h-4 w-4 animate-[pulse_2s_infinite]" />
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
         {latestRegistrations.length === 0 ? (
-          <div className="px-6 py-16 text-center text-stone-400">{t("noRegistrations")}</div>
+          <div className="px-6 py-16 text-center text-stone-400 font-medium">{t("noRegistrations")}</div>
         ) : (
-          <div className="divide-y divide-stone-100">
-            {latestRegistrations.map((registration) => (
-              <div
-                key={registration.id}
-                className="grid gap-4 px-6 py-5 sm:grid-cols-[minmax(0,1.2fr)_minmax(180px,0.8fr)_auto] sm:items-center hover:bg-stone-50/20 transition-colors"
-              >
-                {/* Left section: Avatar + Name + Phone + Note */}
-                <div className="flex items-start gap-4 min-w-0">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-stone-100 text-stone-500">
-                    <UsersRound className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-base font-bold text-forest-950">{registration.name}</p>
-                    <p className="mt-0.5 text-xs text-stone-500 font-medium">{registration.phone}</p>
-                    <p className="mt-1 text-xs text-stone-400 capitalize">
-                      {registration.note?.trim() ? (registration.note.includes("Demo") ? "Demo" : registration.note.slice(0, 30)) : "Demo"}
-                    </p>
-                  </div>
-                </div>
+          <div className="w-full">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[700px]">
+                <thead>
+                  <tr className="border-b border-stone-200/60 text-stone-500 text-[10px] font-bold uppercase tracking-wider bg-stone-50/50">
+                    <th className="w-20 px-6 py-3 font-extrabold">STT</th>
+                    <th className="px-6 py-3 font-extrabold">
+                      <div className="flex items-center gap-1">
+                        <span>Người gửi</span>
+                        <span className="text-stone-400 text-[9px]">⇅</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-3 font-extrabold">
+                      <div className="flex items-center gap-1">
+                        <span>Số điện thoại</span>
+                        <span className="text-stone-400 text-[9px]">▾</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-3 font-extrabold">Trạng thái</th>
+                    <th className="px-6 py-3 font-extrabold">Ghi chú</th>
+                    <th className="px-6 py-3 font-extrabold">Thời gian</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {latestRegistrations.map((registration, index) => {
+                    return (
+                      <tr key={registration.id} className="hover:bg-stone-50/30 transition-colors group">
+                        <td className="px-6 py-3.5 text-sm font-bold text-stone-400">
+                          {index + 1}
+                        </td>
+                        <td className="px-6 py-3.5">
+                          <span className="text-sm font-bold text-forest-950 group-hover:text-[#4A751D] transition-colors">
+                            {registration.name}
+                          </span>
+                        </td>
+                        <td className="px-6 py-3.5 text-sm font-bold text-stone-500 tracking-tight">
+                          {registration.phone}
+                        </td>
+                        <td className="px-6 py-3.5">
+                          <div className="flex flex-wrap gap-2">
+                            {registration.address?.trim() ? (
+                              <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-850 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100/50">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                <span>{t("statusHasAddress")}</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1 text-[10px] font-bold text-stone-500 bg-stone-50 px-2.5 py-0.5 rounded-full border border-stone-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-stone-400 shrink-0" />
+                                <span>{t("statusNoAddress")}</span>
+                              </div>
+                            )}
 
-                {/* Center section: Status badges */}
-                <div className="flex flex-wrap gap-2.5">
-                  {registration.address?.trim() ? (
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50/50 px-2.5 py-1 rounded-full border border-emerald-100/50">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 fill-emerald-600 stroke-white shrink-0" />
-                      <span>{t("statusHasAddress")}</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 bg-stone-50/50 px-2.5 py-1 rounded-full border border-stone-100">
-                      <AlertCircle className="h-3.5 w-3.5 text-stone-400 shrink-0" />
-                      <span>{t("statusNoAddress")}</span>
-                    </div>
-                  )}
-
-                  {registration.note?.trim() ? (
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50/50 px-2.5 py-1 rounded-full border border-emerald-100/50">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 fill-emerald-600 stroke-white shrink-0" />
-                      <span>{t("statusHasNote")}</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 bg-stone-50/50 px-2.5 py-1 rounded-full border border-stone-100">
-                      <AlertCircle className="h-3.5 w-3.5 text-stone-400 shrink-0" />
-                      <span>{t("statusNoNote")}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Right section: Calendar icon + Full date-time */}
-                <div className="flex items-center gap-2 text-xs font-semibold text-stone-500 sm:justify-end">
-                  <Calendar className="h-4 w-4 text-stone-400 shrink-0" />
-                  <span>{formatFullDateTime(registration.created_at)}</span>
-                </div>
-              </div>
-            ))}
+                            {registration.note?.trim() ? (
+                              <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-850 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100/50">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                <span>{t("statusHasNote")}</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1 text-[10px] font-bold text-amber-850 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-100/50">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                                <span>{t("statusNoNote")}</span>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-3.5 text-sm text-stone-600">
+                          {registration.note?.trim() ? (
+                            <span className="italic font-medium">"{registration.note}"</span>
+                          ) : (
+                            <span className="text-xs text-stone-400 italic font-medium">Chưa ghi chú</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-3.5 text-xs font-bold text-stone-400">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5 text-stone-300" />
+                            <span>{formatFullDateTime(registration.created_at)}</span>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
             {/* View all bottom interactive panel */}
-            <div className="flex justify-center border-t border-stone-100 py-4 bg-stone-50/20">
+            <div className="flex justify-center border-t border-stone-100 py-4 bg-stone-50/10">
               <Link
                 href="/admin/registrations"
-                className="inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-5 py-2 text-xs font-bold text-stone-700 shadow-sm hover:bg-stone-50 hover:border-stone-300 transition"
+                className="inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-5 py-2 text-xs font-bold text-stone-700 shadow-sm hover:bg-stone-50 hover:border-stone-300 transition-all duration-200"
               >
                 <span>{tCommon("viewAll")}</span>
                 <ChevronDown className="h-4 w-4 text-stone-400" />
@@ -558,6 +692,7 @@ function Sparkline({ data, colorClass = "text-brand-green" }: { data: number[]; 
 
   // Unique id for linear gradient so they don't clash
   const gradId = `sparkline-grad-${Math.random().toString(36).substring(2, 9)}`;
+  const lastPoint = points[points.length - 1];
 
   return (
     <svg className={cn("w-20 h-8 opacity-90", colorClass)} viewBox={`0 0 ${width} ${height}`}>
@@ -579,6 +714,12 @@ function Sparkline({ data, colorClass = "text-brand-green" }: { data: number[]; 
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+      <circle
+        cx={lastPoint.x}
+        cy={lastPoint.y}
+        r="1.5"
+        fill="currentColor"
+      />
     </svg>
   );
 }
@@ -588,7 +729,7 @@ function SummaryCard({
   label,
   value,
   caption,
-  iconColorClass = "text-earth-700",
+  iconColorClass = "text-[#4A751D]",
   sparklineData = [0, 0, 0, 0, 0, 0, 0]
 }: {
   icon: React.ReactElement<{className?: string}>;
@@ -598,18 +739,26 @@ function SummaryCard({
   iconColorClass?: string;
   sparklineData?: number[];
 }) {
+  const bgClass = "bg-[#4A751D]/6 border-[#4A751D]/10";
+
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-stone-200 bg-white p-6 shadow-sm flex flex-col justify-between min-h-[175px]">
+    <div className="group relative overflow-hidden rounded-2xl border border-stone-200 bg-white p-5 flex flex-col justify-between min-h-[155px] shadow-[0_2px_8px_rgba(0,0,0,0.015)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 hover:border-stone-300 transition-all duration-300">
       <div>
-        <div className={cn("text-2xl mb-4", iconColorClass)}>
-          {icon}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className={cn("inline-flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-300 shadow-inner group-hover:scale-105", bgClass, iconColorClass)}>
+              {React.cloneElement(icon, { className: "h-4.5 w-4.5 stroke-[2]" })}
+            </div>
+            <h4 className="text-xs font-bold text-stone-700 tracking-tight">{label}</h4>
+          </div>
         </div>
-        <h4 className="text-sm font-semibold text-stone-850">{label}</h4>
-        <p className="mt-1 font-serif text-3xl font-bold text-forest-950">{value}</p>
+        <p className="mt-3.5 font-sans text-3.5xl font-black tracking-tight text-forest-950 tabular-nums">
+          {value}
+        </p>
       </div>
 
       <div className="flex items-end justify-between mt-4">
-        <p className="text-[11px] leading-4 text-stone-500 max-w-[62%]">{caption}</p>
+        <p className="text-[11px] leading-4 text-stone-500 font-medium max-w-[62%]">{caption}</p>
         <div className="shrink-0 -mb-1 select-none">
           <Sparkline data={sparklineData} colorClass={iconColorClass} />
         </div>
@@ -623,7 +772,7 @@ function CmsCard({
   label,
   value,
   caption,
-  iconColor = "text-emerald-700"
+  iconColor = "text-[#4A751D]"
 }: {
   icon: React.ReactElement<{className?: string}>;
   label: string;
@@ -631,20 +780,26 @@ function CmsCard({
   caption: string;
   iconColor?: string;
 }) {
-  return (
-    <div className="relative overflow-hidden rounded-3xl border border-stone-200 bg-white p-6 shadow-sm min-h-[145px] flex flex-col justify-between">
-      <div>
-        <div className="flex items-center gap-3">
-          <span className={cn("text-emerald-700 text-xl", iconColor)}>{icon}</span>
-          <span className="text-base font-semibold text-forest-950">{label}</span>
-        </div>
-        <p className="mt-4 font-serif text-4xl font-semibold text-forest-950">{value}</p>
-      </div>
-      <p className="mt-2 text-xs leading-5 text-stone-500 z-10">{caption}</p>
+  const bgClass = "bg-[#4A751D]/6 border-[#4A751D]/10";
 
-      {/* Faint Background Icon at bottom right */}
-      <div className={cn("absolute right-4 bottom-2 pointer-events-none select-none w-16 h-16 flex items-center justify-center opacity-10", iconColor)}>
-        {React.cloneElement(icon, {className: "w-16 h-16 stroke-[1]"})}
+  return (
+    <div className="group relative overflow-hidden rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.015)] min-h-[135px] flex flex-col justify-between transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 hover:border-stone-300">
+      <div>
+        <div className="flex items-center gap-2">
+          <div className={cn("inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-all duration-300 shadow-inner", bgClass, iconColor)}>
+            {React.cloneElement(icon, { className: "h-4 w-4 stroke-[2]" })}
+          </div>
+          <span className="text-xs font-bold text-stone-800 tracking-tight">{label}</span>
+        </div>
+        <p className="mt-3.5 font-sans text-3.5xl font-black tracking-tight text-forest-950 tabular-nums">
+          {value}
+        </p>
+      </div>
+      <p className="mt-2 text-[11px] leading-4 text-stone-500 font-medium z-10">{caption}</p>
+
+      {/* Large Outline Background Icon at bottom right */}
+      <div className={cn("absolute right-4 bottom-2 pointer-events-none select-none w-16 h-16 flex items-center justify-center opacity-20 transition-all duration-500 ease-out group-hover:scale-105", iconColor)}>
+        {React.cloneElement(icon, { className: "w-16 h-16 stroke-[0.75]" })}
       </div>
     </div>
   );
@@ -664,16 +819,16 @@ function CompletionMeter({
   const percentage = total === 0 ? 0 : Math.round((value / total) * 100);
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-bold text-forest-950">{label}</span>
-        <span className="text-xs font-semibold text-stone-500">
+        <span className="text-xs font-bold text-stone-850 tracking-tight">{label}</span>
+        <span className="text-[11px] font-bold text-[#4A751D] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100/50 shadow-sm shrink-0">
           {value}/{total} · {percentage}%
         </span>
       </div>
-      <div className="h-3 rounded-full bg-stone-100 overflow-hidden">
+      <div className="h-2 rounded-full bg-stone-100 border border-stone-200/20 overflow-hidden relative">
         <div
-          className={`h-3 rounded-full transition-all duration-500 ease-out ${accent}`}
+          className={cn("h-full rounded-full transition-all duration-700 ease-out", accent)}
           style={{width: `${percentage}%`}}
         />
       </div>
@@ -693,15 +848,15 @@ function QualityInsightCard({
   caption: string;
 }) {
   return (
-    <div className="rounded-2xl border border-stone-150 bg-stone-50/60 px-5 py-4 relative overflow-hidden flex flex-col justify-between min-h-[115px]">
+    <div className="rounded-xl border border-stone-200 bg-[#fafafa]/50 p-4.5 relative overflow-hidden flex flex-col justify-between min-h-[110px] transition-all duration-200 hover:border-stone-300">
       <div>
-        <span className="text-xs font-semibold text-stone-400 uppercase tracking-wider">{label}</span>
+        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{label}</span>
         <div className="flex items-center gap-2 mt-2">
-          {icon && <span className="text-forest-950">{icon}</span>}
-          <p className="text-lg font-bold text-forest-950">{value}</p>
+          {icon && <span className="text-[#4A751D]">{icon}</span>}
+          <p className="text-base font-black text-forest-950">{value}</p>
         </div>
       </div>
-      <p className="mt-2 text-[11px] leading-4 text-stone-500">{caption}</p>
+      <p className="mt-2 text-[10px] leading-4 text-stone-500 font-semibold">{caption}</p>
     </div>
   );
 }

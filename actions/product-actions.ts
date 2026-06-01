@@ -3,6 +3,7 @@
 import {revalidatePath} from "next/cache";
 import {uploadImageToCloudinary} from "@/lib/cloudinary";
 import {getAdminSession} from "@/lib/admin-auth";
+import {createSlug} from "@/lib/slug";
 
 function listFromText(value: FormDataEntryValue | null) {
   return String(value ?? "")
@@ -18,6 +19,64 @@ function imageListFromText(value: FormDataEntryValue | null) {
     .filter(Boolean);
 }
 
+async function createUniqueProductSlug(
+  supabase: Awaited<ReturnType<typeof getAdminSession>>["supabase"],
+  source: string,
+  id?: string
+) {
+  const baseSlug = createSlug(source);
+  let candidate = baseSlug;
+  let index = 2;
+
+  while (true) {
+    let query = supabase.from("products").select("id").eq("slug", candidate).limit(1);
+    if (id) {
+      query = query.neq("id", id);
+    }
+
+    const {data, error} = await query.maybeSingle();
+    if (error) {
+      throw error;
+    }
+
+    if (!data) {
+      return candidate;
+    }
+
+    candidate = `${baseSlug}-${index}`;
+    index += 1;
+  }
+}
+
+async function createUniqueCategorySlug(
+  supabase: Awaited<ReturnType<typeof getAdminSession>>["supabase"],
+  source: string
+) {
+  const baseSlug = createSlug(source);
+  let candidate = baseSlug;
+  let index = 2;
+
+  while (true) {
+    const {data, error} = await supabase
+      .from("product_categories")
+      .select("slug")
+      .eq("slug", candidate)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data) {
+      return candidate;
+    }
+
+    candidate = `${baseSlug}-${index}`;
+    index += 1;
+  }
+}
+
 export async function upsertProduct(formData: FormData) {
   const {supabase, user, error: authError} = await getAdminSession();
 
@@ -26,11 +85,17 @@ export async function upsertProduct(formData: FormData) {
   }
 
   const id = String(formData.get("id") ?? "");
+  const nameVi = String(formData.get("name_vi") ?? "");
+  const nameEn = String(formData.get("name_en") ?? "");
+  const slug = id
+    ? String(formData.get("slug") ?? "")
+    : await createUniqueProductSlug(supabase, nameVi || nameEn);
+
   const payload = {
-    slug: String(formData.get("slug") ?? ""),
+    slug: slug || await createUniqueProductSlug(supabase, nameVi || nameEn, id),
     category: String(formData.get("category") ?? "beans"),
-    name_vi: String(formData.get("name_vi") ?? ""),
-    name_en: String(formData.get("name_en") ?? ""),
+    name_vi: nameVi,
+    name_en: nameEn,
     short_vi: String(formData.get("short_vi") ?? ""),
     short_en: String(formData.get("short_en") ?? ""),
     description_vi: String(formData.get("description_vi") ?? ""),
@@ -52,16 +117,151 @@ export async function upsertProduct(formData: FormData) {
     images: imageListFromText(formData.get("images")),
     featured: formData.get("featured") === "true",
     is_visible: formData.get("is_visible") === "true",
-    sort_order: Number(formData.get("sort_order") ?? 0),
     updated_at: new Date().toISOString()
   };
 
-  const result = id
-    ? await supabase.from("products").update(payload).eq("id", id)
-    : await supabase.from("products").insert([payload]);
+  if (id) {
+    const result = await supabase.from("products").update(payload).eq("id", id);
 
-  if (result.error) {
-    return {success: false, error: result.error.message};
+    if (result.error) {
+      return {success: false, error: result.error.message};
+    }
+  } else {
+    const {data: lastProduct, error: orderError} = await supabase
+      .from("products")
+      .select("sort_order")
+      .order("sort_order", {ascending: false})
+      .limit(1)
+      .maybeSingle();
+
+    if (orderError) {
+      return {success: false, error: orderError.message};
+    }
+
+    const result = await supabase.from("products").insert([{
+      ...payload,
+      sort_order: Number(lastProduct?.sort_order ?? 0) + 10
+    }]);
+
+    if (result.error) {
+      return {success: false, error: result.error.message};
+    }
+  }
+
+  revalidatePath("/admin/products");
+  revalidatePath("/shop");
+  return {success: true};
+}
+
+export async function updateProductSortOrder(ids: string[]) {
+  const {supabase, user, error: authError} = await getAdminSession();
+
+  if (authError || !user) {
+    return {success: false, error: "Unauthorized"};
+  }
+
+  const updates = ids.map((id, index) =>
+    supabase
+      .from("products")
+      .update({sort_order: (index + 1) * 10, updated_at: new Date().toISOString()})
+      .eq("id", id)
+  );
+  const results = await Promise.all(updates);
+  const error = results.find((result) => result.error)?.error;
+
+  if (error) {
+    return {success: false, error: error.message};
+  }
+
+  revalidatePath("/admin/products");
+  revalidatePath("/shop");
+  return {success: true};
+}
+
+export async function upsertProductCategory(formData: FormData) {
+  const {supabase, user, error: authError} = await getAdminSession();
+
+  if (authError || !user) {
+    return {success: false, error: "Unauthorized"};
+  }
+
+  const slug = String(formData.get("slug") ?? "");
+  const nameVi = String(formData.get("name_vi") ?? "").trim();
+  const nameEn = String(formData.get("name_en") ?? "").trim();
+
+  if (!nameVi) {
+    return {success: false, error: "Tên danh mục là bắt buộc"};
+  }
+
+  if (slug) {
+    const {error} = await supabase
+      .from("product_categories")
+      .update({
+        name_vi: nameVi,
+        name_en: nameEn || nameVi,
+        is_visible: formData.get("is_visible") === "true",
+        updated_at: new Date().toISOString()
+      })
+      .eq("slug", slug);
+
+    if (error) {
+      return {success: false, error: error.message};
+    }
+  } else {
+    const {data: lastCategory, error: orderError} = await supabase
+      .from("product_categories")
+      .select("sort_order")
+      .order("sort_order", {ascending: false})
+      .limit(1)
+      .maybeSingle();
+
+    if (orderError) {
+      return {success: false, error: orderError.message};
+    }
+
+    const categorySlug = await createUniqueCategorySlug(supabase, nameVi || nameEn);
+    const {error} = await supabase.from("product_categories").insert([{
+      slug: categorySlug,
+      name_vi: nameVi,
+      name_en: nameEn || nameVi,
+      sort_order: Number(lastCategory?.sort_order ?? 0) + 10,
+      is_visible: true
+    }]);
+
+    if (error) {
+      return {success: false, error: error.message};
+    }
+  }
+
+  revalidatePath("/admin/products");
+  revalidatePath("/shop");
+  return {success: true};
+}
+
+export async function deleteProductCategory(slug: string) {
+  const {supabase, user, error: authError} = await getAdminSession();
+
+  if (authError || !user) {
+    return {success: false, error: "Unauthorized"};
+  }
+
+  const {count, error: countError} = await supabase
+    .from("products")
+    .select("id", {count: "exact", head: true})
+    .eq("category", slug);
+
+  if (countError) {
+    return {success: false, error: countError.message};
+  }
+
+  if ((count ?? 0) > 0) {
+    return {success: false, error: "Danh mục này đang có sản phẩm, vui lòng chuyển sản phẩm sang danh mục khác trước"};
+  }
+
+  const {error} = await supabase.from("product_categories").delete().eq("slug", slug);
+
+  if (error) {
+    return {success: false, error: error.message};
   }
 
   revalidatePath("/admin/products");

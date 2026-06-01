@@ -1,21 +1,36 @@
 "use client";
 
-import {useActionState} from "react";
+import {useActionState, useEffect} from "react";
+import {message} from "antd";
 import {Coffee, Lock} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
+import {useSearchParams} from "next/navigation";
 import {loginAdmin} from "@/actions/auth-actions";
 import type {Locale} from "@/i18n/routing";
 
 export function AdminLoginForm() {
   const locale = useLocale() as Locale;
   const t = useTranslations("Admin");
+  const searchParams = useSearchParams();
 
   const boundLogin = loginAdmin.bind(null, locale);
   const [state, action, isPending] = useActionState(boundLogin, undefined);
 
+  useEffect(() => {
+    if (searchParams.get("loggedOut") === "1") {
+      message.success(t("logoutSuccess"));
+    }
+  }, [searchParams, t]);
+
   return (
-    <div className="min-h-screen bg-forest-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div
+      className="relative min-h-screen flex items-center justify-center px-4 bg-cover bg-center bg-no-repeat overflow-hidden"
+      style={{ backgroundImage: "url('/tay-bac-bg.png')" }}
+    >
+      {/* Soft overlay to ensure readability and warm forest-themed depth */}
+      <div className="absolute inset-0 bg-forest-950/80 backdrop-blur-[2px] z-0" />
+
+      <div className="relative z-10 w-full max-w-md">
         <div className="mb-8 text-center">
           <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full border border-ember/20 bg-ember/10">
             <Coffee className="h-8 w-8 text-ember" />
@@ -31,11 +46,11 @@ export function AdminLoginForm() {
             </label>
             <input
               name="email"
-              type="email"
+              type="text"
               required
-              autoComplete="email"
+              autoComplete="username"
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-white placeholder-white/25 transition focus:border-ember focus:bg-white/8 focus:outline-none focus:ring-2 focus:ring-ember/30"
-              placeholder="admin@example.com"
+              placeholder="admin"
             />
           </div>
 

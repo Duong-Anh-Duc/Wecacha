@@ -207,7 +207,7 @@ export function SiteHeader() {
                   </Link>
                 ) : null}
                 <LocaleSwitcher locale={locale} pathname={pathname} solid={solid} onLoading={setLocaleLoading} />
-                {/* <CartDrawer solid={solid} /> */}
+                <CartDrawer solid={solid} />
               </>
             )}
             <MobileMenu solid={solid} onLoading={setLocaleLoading} />

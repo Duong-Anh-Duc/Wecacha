@@ -191,14 +191,14 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
             animate={{opacity: 1, y: 0}}
             transition={{duration: 0.7, delay: 0.52, ease: drawerEase}}
           >
-            {/* <SheetClose asChild>
+            <SheetClose asChild>
               <Button asChild variant="forest" className="h-14 rounded-lg text-base shadow-warm hover:shadow-cinematic">
                 <Link href="/shop">
                   <Store className="h-5 w-5" aria-hidden="true" />
                   {t("shop")}
                 </Link>
               </Button>
-            </SheetClose> */}
+            </SheetClose>
             <SheetClose asChild>
               <Button
                 asChild
