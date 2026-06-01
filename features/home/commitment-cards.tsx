@@ -2,40 +2,33 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 import {cn} from "@/lib/utils";
 
-const cards = [
-  {
-    titleKey: "commit1Title" as const,
-    copyKey:  "commit1Copy"  as const,
-    image:    "/commit-altitude.png",
-  },
-  {
-    titleKey: "commit2Title" as const,
-    copyKey:  "commit2Copy"  as const,
-    image:    "/commit-farmers.png",
-  },
-  {
-    titleKey: "commit3Title" as const,
-    copyKey:  "commit3Copy"  as const,
-    image:    "/commit-roast.png",
-  },
-];
+type CommitmentCard = {
+  key: string;
+  title: string;
+  copy: string;
+  image: string;
+};
 
-export function CommitmentCards({tone = "classic"}: {tone?: "classic" | "green"}) {
-  const t = useTranslations("Home");
+export function CommitmentCards({
+  cards,
+  tone = "classic"
+}: {
+  cards: CommitmentCard[];
+  tone?: "classic" | "green";
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const isGreen = tone === "green";
 
   return (
     <div className="flex gap-4 h-[400px] sm:h-[500px] lg:h-[600px]">
-      {cards.map(({ titleKey, copyKey, image }, index) => {
+      {cards.map(({key, title, copy, image}, index) => {
         const isActive = index === activeIndex;
 
         return (
           <div
-            key={titleKey}
+            key={key}
             onClick={() => setActiveIndex(index)}
             className={cn(
               "relative cursor-pointer overflow-hidden rounded-[2rem] border border-white/10",
@@ -49,7 +42,7 @@ export function CommitmentCards({tone = "classic"}: {tone?: "classic" | "green"}
           >
             <Image
               src={image}
-              alt={t(titleKey)}
+              alt={title}
               fill
               className="object-cover transition-transform duration-700 ease-out"
               style={{ transform: isActive ? "scale(1)" : "scale(1.08)" }}
@@ -82,7 +75,7 @@ export function CommitmentCards({tone = "classic"}: {tone?: "classic" | "green"}
                   textOverflow: "ellipsis",
                 }}
               >
-                {t(titleKey)}
+                {title}
               </h3>
               <div
                 style={{
@@ -93,7 +86,7 @@ export function CommitmentCards({tone = "classic"}: {tone?: "classic" | "green"}
                 className="overflow-hidden"
               >
                 <p className="mt-4 text-base leading-relaxed text-white/80 pr-4">
-                  {t(copyKey)}
+                  {copy}
                 </p>
               </div>
             </div>

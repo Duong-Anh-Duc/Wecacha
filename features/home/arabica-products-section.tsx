@@ -1,40 +1,38 @@
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { SectionHeading } from "@/components/sections/section-heading";
 import { Reveal } from "@/components/motion/reveal";
-import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Locale } from "@/i18n/routing";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  localizedField,
+  localizedValue,
+  type SiteSection,
+  type SiteSectionItem
+} from "@/lib/content/cms";
+
+const localeHref = (locale: Locale, href: string) => {
+  if (href.startsWith("http")) return href;
+  if (href === "/") return `/${locale}`;
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) return href;
+  return `/${locale}${href.startsWith("/") ? href : `/${href}`}`;
+};
 
 export async function ArabicaProductsSection({
   locale,
-  tone = "classic"
+  tone = "classic",
+  section,
+  items = []
 }: {
   locale: Locale;
   tone?: "classic" | "green";
+  section?: SiteSection | null;
+  items?: SiteSectionItem[];
 }) {
   const t = await getTranslations({ locale, namespace: "Home" });
   const isGreen = tone === "green";
-
-  const products = [
-    {
-      nameKey: "prod1Name" as const,
-      badgeKey: "prod1Badge" as const,
-      subKey: "prod1Sub" as const,
-      profileKey: "prod1Profile" as const,
-      storyKey: "prod1Story" as const,
-      bgImage: "/product-premium.png",
-    },
-    {
-      nameKey: "prod2Name" as const,
-      badgeKey: "prod2Badge" as const,
-      subKey: "prod2Sub" as const,
-      profileKey: "prod2Profile" as const,
-      storyKey: "prod2Story" as const,
-      bgImage: "/product-specialty.png",
-    },
-  ];
 
   return (
     <section
@@ -46,7 +44,7 @@ export async function ArabicaProductsSection({
       {/* Background Image with Dark Overlay */}
       <div className="absolute inset-0 z-0">
         <Image 
-          src="/premium-coffee-bg.png" 
+          src={section?.media?.background ?? "/premium-coffee-bg.png"} 
           alt="" 
           fill 
           className="object-cover opacity-30 mix-blend-luminosity" 
@@ -67,23 +65,23 @@ export async function ArabicaProductsSection({
         <Reveal>
           <SectionHeading
             light
-            kicker={t("productsKicker")}
-            title={t("productsTitle2")}
-            copy={t("productsCopy")}
+            kicker={localizedField(section, "eyebrow", locale) || t("productsKicker")}
+            title={localizedField(section, "title", locale) || t("productsTitle2")}
+            copy={localizedField(section, "copy", locale) || t("productsCopy")}
             className="mb-16"
           />
         </Reveal>
 
         <div className="grid gap-6 sm:grid-cols-2 sm:gap-7 md:gap-8">
-          {products.map(({ nameKey, badgeKey, subKey, profileKey, storyKey, bgImage }, i) => (
-            <Reveal key={nameKey} delay={i * 0.12}>
+          {items.map((item, i) => (
+            <Reveal key={item.item_key} delay={i * 0.12}>
               <div className="relative overflow-hidden rounded-[2.5rem] border border-parchment-100/20 p-10 shadow-[0_30px_60px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-2 hover:border-ember/60 hover:shadow-[0_20px_40px_rgba(181,112,58,0.2)] group bg-black">
                 
                 {/* Product Background Image inside Card */}
                 <div className="absolute inset-0 z-0">
                   <Image 
-                    src={bgImage} 
-                    alt={t(nameKey)} 
+                    src={item.media?.image ?? "/product-specialty.png"} 
+                    alt={localizedField(item, "title", locale)} 
                     fill 
                     className="object-cover transition-transform duration-700 group-hover:scale-110" 
                     sizes="(max-width: 768px) 100vw, 50vw" 
@@ -95,45 +93,45 @@ export async function ArabicaProductsSection({
                 {/* Content Overlay */}
                 <div className="relative z-10">
                   <span className="absolute right-0 top-0 rounded-full bg-ember px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-                    {t(badgeKey)}
+                    {localizedField(item, "label", locale)}
                   </span>
 
                   <div className="mb-8 pr-20">
                   <p className="text-xs font-bold uppercase tracking-widest text-ember">
-                    {t(subKey)}
+                    {localizedField(item, "subtitle", locale)}
                   </p>
                   <h3 className="mt-3 font-serif text-3xl text-parchment-50">
-                    {t(nameKey)}
+                    {localizedField(item, "title", locale)}
                   </h3>
                 </div>
 
                 <div className="space-y-6">
                   <div>
                     <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-white/50">
-                      {t("prodProfileLabel")}
+                      {localizedValue(section?.settings?.profileLabel, locale, t("prodProfileLabel"))}
                     </p>
                     <p className="flex items-start gap-2 text-base leading-relaxed text-white/80">
                       <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
-                      {t(profileKey)}
+                      {localizedValue(item.data?.profile, locale, "")}
                     </p>
                   </div>
 
                   <div>
                     <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-white/50">
-                      {t("prodStoryLabel")}
+                      {localizedValue(section?.settings?.storyLabel, locale, t("prodStoryLabel"))}
                     </p>
                     <p className="text-base leading-relaxed text-white/70">
-                      {t(storyKey)}
+                      {localizedField(item, "body", locale)}
                     </p>
                   </div>
                 </div>
 
                   <div className="mt-10">
                     <Link
-                      href="/contact"
+                      href={localeHref(locale, section?.settings?.cta?.href ?? "/contact")}
                       className="inline-flex h-12 items-center gap-2 rounded-xl bg-ember px-8 text-sm font-semibold tracking-wide text-white transition hover:bg-ember/90 hover:scale-105"
                     >
-                      {t("prodCta")}
+                      {localizedValue(section?.settings?.cta, locale, t("prodCta"))}
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
                   </div>

@@ -4,7 +4,14 @@ import {CinematicPageHero} from "@/components/sections/cinematic-page-hero";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {ShopGrid} from "@/features/shop/shop-grid";
 import type {Locale} from "@/i18n/routing";
-import {imageLibrary, products, type ProductCategory} from "@/lib/content";
+import type {ProductCategory} from "@/lib/content/types";
+import {
+  getPageContent,
+  getVisibleProductsByCategory,
+  localizedField,
+  localizedValue,
+  sectionByKey
+} from "@/lib/content/cms";
 
 type Props = {
   params: Promise<{locale: Locale; slug: string}>;
@@ -38,11 +45,12 @@ export default async function CategoryPage({params}: Props) {
   const t = await getTranslations({locale, namespace: "Shop"});
   const common = await getTranslations({locale, namespace: "Common"});
   const tNav = await getTranslations({locale, namespace: "Nav"});
-  
-  // Filter products by the current category slug
-  const filteredProducts = products.filter(
-    (product) => product.category === slug
-  );
+  const category = slug as ProductCategory;
+  const [content, filteredProducts] = await Promise.all([
+    getPageContent("shop"),
+    getVisibleProductsByCategory(category)
+  ]);
+  const hero = sectionByKey(content, "hero");
 
   const titleMap: Record<string, string> = {
     beans: t("beans"),
@@ -56,12 +64,12 @@ export default async function CategoryPage({params}: Props) {
   return (
     <main className="bg-parchment-50">
       <CinematicPageHero
-        kicker={t("shopKicker")}
+        kicker={localizedField(hero, "eyebrow", locale) || t("shopKicker")}
         title={categoryTitle}
-        copy={t("intro")}
-        image={slug === "gifts" ? imageLibrary.packaging : (slug === "phin" ? imageLibrary.phin : imageLibrary.beansBowl)}
+        copy={localizedField(hero, "copy", locale) || t("intro")}
+        image={hero?.media?.image}
         imageAlt={categoryTitle}
-        chips={[t("chip1"), t("chip2"), t("chip3")]}
+        chips={localizedValue(hero?.settings?.chips, locale, [t("chip1"), t("chip2"), t("chip3")])}
         fieldJournal={common("fieldJournal")}
         scrollLabel={common("scrollDown")}
         breadcrumbs={

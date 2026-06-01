@@ -137,7 +137,7 @@ export default async function LocaleLayout({children, params}: Props) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={`${bodyFont.variable} ${serif.variable} font-sans antialiased`}>
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <SmoothScrollProvider>
             <JsonLd data={organizationJsonLd(locale as Locale)} />
             <JsonLd data={webSiteJsonLd(locale as Locale)} />

@@ -27,7 +27,7 @@ import {
 import {useCartStore, getCartTotals} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
-import {formatCurrency} from "@/lib/content";
+import {formatCurrency} from "@/lib/content/helpers";
 
 const categoryMap: Record<string, Record<string, string>> = {
   beans: { vi: "Cà phê hạt rang", en: "Roasted Beans" },

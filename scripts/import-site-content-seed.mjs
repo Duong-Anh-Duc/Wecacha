@@ -249,6 +249,105 @@ function currentExploreCategoryPages(imageLibrary) {
   ];
 }
 
+function currentStoryFeatureCopy() {
+  return {
+    vi: {
+      kicker: "Câu chuyện",
+      title: "Về Wecacha: Hành trình từ nương mây đến tách cà phê",
+      body:
+        "Khám phá nguồn gốc, triết lý rang và những con người đứng sau từng hạt cà phê Sơn La đặc sản. Câu chuyện về sự kiên định và đam mê.",
+      video: "Xem hành trình của hạt cà phê",
+      discover: "Khám phá",
+      news: "Tin tức",
+      read: "Đọc thêm",
+      cards: [
+        {
+          title: "Vùng trồng nguyên liệu",
+          body: "Từ độ cao, sương núi và đất đỏ làm nên vị ngọt sâu.",
+          href: "/explore/farm"
+        },
+        {
+          title: "Phương pháp sơ chế",
+          body: "Khắt khe trong từng mẻ phơi, đảo và ghi chép mùa vụ.",
+          href: "/explore/processing"
+        },
+        {
+          title: "Văn hóa bản địa",
+          body: "Cà phê không tách khỏi bản làng, bếp lửa và thổ cẩm.",
+          href: "/explore/culture"
+        }
+      ],
+      newsCards: [
+        {
+          title: "Văn hóa cà phê",
+          body: "Khám phá chiều sâu của hạt cà phê qua lăng kính lịch sử và nhịp sống hiện đại.",
+          icon: "coffee",
+          href: "/news"
+        },
+        {
+          title: "Sự kiện & Hoạt động",
+          body: "Đồng hành cùng Wecacha trong các sự kiện ra mắt, workshop và hành trình về bản.",
+          icon: "calendar",
+          href: "/news"
+        },
+        {
+          title: "Công thức pha chế",
+          body: "Bí quyết để tự tay pha một tách cà phê thơm ngon, chuẩn vị chuyên gia.",
+          icon: "coffee",
+          href: "/news"
+        }
+      ]
+    },
+    en: {
+      kicker: "Story",
+      title: "About Wecacha: From cloud farms to the coffee cup",
+      body:
+        "Explore the origin, roast philosophy and people behind every bag of specialty coffee from Son La.",
+      video: "Watch the coffee bean journey",
+      discover: "Explore",
+      news: "News",
+      read: "Read more",
+      cards: [
+        {
+          title: "Growing regions",
+          body: "Altitude, mountain mist and red soil create deep sweetness.",
+          href: "/explore/farm"
+        },
+        {
+          title: "Processing methods",
+          body: "Precise drying, turning and harvest notes shape every batch.",
+          href: "/explore/processing"
+        },
+        {
+          title: "Local culture",
+          body: "Coffee stays close to village life, firelight and brocade.",
+          href: "/explore/culture"
+        }
+      ],
+      newsCards: [
+        {
+          title: "Coffee culture",
+          body: "Discover coffee through history, place and modern daily rituals.",
+          icon: "coffee",
+          href: "/news"
+        },
+        {
+          title: "Events & Activities",
+          body: "Join Wecacha launches, workshops and journeys back to the village.",
+          icon: "calendar",
+          href: "/news"
+        },
+        {
+          title: "Brew recipes",
+          body: "Practical recipes for a fragrant, balanced cup at home.",
+          icon: "coffee",
+          href: "/news"
+        }
+      ]
+    }
+  };
+}
+
 async function upsertOrThrow(supabase, table, rows, options) {
   if (!rows.length) return;
 
@@ -277,8 +376,9 @@ async function main() {
   const en = loadMessages("en");
   const {imageLibrary, heroVideo} = loadTsModule("lib/content/images.ts");
   const {exploreCards, testimonials, mapLocations} = loadTsModule("lib/content/discover.ts");
-  const {journeys} = loadTsModule("lib/content/stories.ts");
+  const {journeys, storyChapters} = loadTsModule("lib/content/stories.ts");
   const {products} = loadTsModule("lib/content/products.ts");
+  const storyFeatureCopy = currentStoryFeatureCopy();
   const now = new Date().toISOString();
 
   const pages = [
@@ -328,6 +428,78 @@ async function main() {
       metadata: {route: "/[locale]/shop/[slug]"},
       is_visible: true,
       sort_order: 4,
+      updated_at: now
+    },
+    {
+      key: "news",
+      path: "/news",
+      title_vi: vi.News.title,
+      title_en: en.News.title,
+      description_vi: vi.News.copy,
+      description_en: en.News.copy,
+      metadata: {route: "/[locale]/news"},
+      is_visible: true,
+      sort_order: 5,
+      updated_at: now
+    },
+    {
+      key: "about",
+      path: "/about",
+      title_vi: vi.About.heroTitle,
+      title_en: en.About.heroTitle,
+      description_vi: vi.About.heroCopy,
+      description_en: en.About.heroCopy,
+      metadata: {route: "/[locale]/about"},
+      is_visible: true,
+      sort_order: 6,
+      updated_at: now
+    },
+    {
+      key: "about-farmers",
+      path: "/about/farmers",
+      title_vi: vi.About.farmersTitle,
+      title_en: en.About.farmersTitle,
+      description_vi: vi.About.farmersPara1,
+      description_en: en.About.farmersPara1,
+      metadata: {route: "/[locale]/about/farmers"},
+      is_visible: true,
+      sort_order: 7,
+      updated_at: now
+    },
+    {
+      key: "about-philosophy",
+      path: "/about/philosophy",
+      title_vi: vi.Philosophy.heroTitle,
+      title_en: en.Philosophy.heroTitle,
+      description_vi: vi.Philosophy.respectPara1,
+      description_en: en.Philosophy.respectPara1,
+      metadata: {route: "/[locale]/about/philosophy"},
+      is_visible: true,
+      sort_order: 8,
+      updated_at: now
+    },
+    {
+      key: "story",
+      path: "/about/story",
+      title_vi: vi.Story.title,
+      title_en: en.Story.title,
+      description_vi: vi.Story.intro,
+      description_en: en.Story.intro,
+      metadata: {route: "/[locale]/about/story"},
+      is_visible: true,
+      sort_order: 9,
+      updated_at: now
+    },
+    {
+      key: "contact",
+      path: "/contact",
+      title_vi: vi.Contact.title,
+      title_en: en.Contact.title,
+      description_vi: vi.Contact.intro,
+      description_en: en.Contact.intro,
+      metadata: {route: "/[locale]/contact"},
+      is_visible: true,
+      sort_order: 10,
       updated_at: now
     },
     ...currentExploreCategoryPages(imageLibrary).map((page, index) => ({
@@ -540,6 +712,199 @@ async function main() {
       title: pair(vi.Product.reviewsTitle, en.Product.reviewsTitle),
       settings: {rating: 4.9, reviewCount: 128},
       sortOrder: 2
+    }),
+    section({
+      pageKey: "news",
+      sectionKey: "hero",
+      type: "page_hero",
+      eyebrow: pair(vi.News.kicker, en.News.kicker),
+      title: pair(vi.News.title, en.News.title),
+      copy: pair(vi.News.copy, en.News.copy),
+      media: {image: imageLibrary.cup},
+      settings: {
+        scrollLabel: {vi: vi.News.scrollLabel, en: en.News.scrollLabel}
+      },
+      sortOrder: 1
+    }),
+    section({
+      pageKey: "about",
+      sectionKey: "hero",
+      type: "page_hero",
+      eyebrow: pair(vi.About.kicker, en.About.kicker),
+      title: pair(vi.About.heroTitle, en.About.heroTitle),
+      copy: pair(vi.About.heroCopy, en.About.heroCopy),
+      media: {image: imageLibrary.mountains},
+      sortOrder: 1
+    }),
+    section({
+      pageKey: "about",
+      sectionKey: "brand_story",
+      type: "image_text",
+      title: pair(vi.About.harmonyTitle, en.About.harmonyTitle),
+      media: {image: imageLibrary.farmer},
+      sortOrder: 2
+    }),
+    section({
+      pageKey: "about",
+      sectionKey: "vision_mission",
+      type: "two_column",
+      sortOrder: 3
+    }),
+    section({
+      pageKey: "about",
+      sectionKey: "core_values",
+      type: "icon_cards",
+      eyebrow: pair(vi.About.coreValuesKicker, en.About.coreValuesKicker),
+      title: pair(vi.About.coreValuesTitle, en.About.coreValuesTitle),
+      sortOrder: 4
+    }),
+    section({
+      pageKey: "about",
+      sectionKey: "cta",
+      type: "cta",
+      title: pair(vi.About.ctaTitle, en.About.ctaTitle),
+      copy: pair(vi.About.ctaCopy, en.About.ctaCopy),
+      cta: pair(vi.About.ctaJourney, en.About.ctaJourney),
+      ctaHref: "/explore",
+      media: {background: imageLibrary.brocade},
+      sortOrder: 5
+    }),
+    section({
+      pageKey: "about-farmers",
+      sectionKey: "hero",
+      type: "page_hero",
+      eyebrow: pair(vi.About.farmersKicker, en.About.farmersKicker),
+      title: pair(vi.About.farmersTitle, en.About.farmersTitle),
+      media: {image: imageLibrary.harvest},
+      sortOrder: 1
+    }),
+    section({
+      pageKey: "about-farmers",
+      sectionKey: "body",
+      type: "image_text_quote",
+      title: pair(vi.About.farmersHandsTitle, en.About.farmersHandsTitle),
+      copy: pair(`${vi.About.farmersPara1}\n\n${vi.About.farmersPara2}`, `${en.About.farmersPara1}\n\n${en.About.farmersPara2}`),
+      quote: pair(vi.About.farmersQuote, en.About.farmersQuote),
+      media: {image: imageLibrary.village},
+      sortOrder: 2
+    }),
+    section({
+      pageKey: "about-philosophy",
+      sectionKey: "hero",
+      type: "page_hero",
+      eyebrow: pair(vi.Philosophy.heatKicker, en.Philosophy.heatKicker),
+      title: pair(vi.Philosophy.heroTitle, en.Philosophy.heroTitle),
+      media: {image: imageLibrary.coffeeRoast},
+      sortOrder: 1
+    }),
+    section({
+      pageKey: "about-philosophy",
+      sectionKey: "body",
+      type: "text_with_principles",
+      title: pair(vi.Philosophy.respectTitle, en.Philosophy.respectTitle),
+      copy: pair(`${vi.Philosophy.respectPara1}\n\n${vi.Philosophy.respectPara2}`, `${en.Philosophy.respectPara1}\n\n${en.Philosophy.respectPara2}`),
+      sortOrder: 2
+    }),
+    section({
+      pageKey: "story",
+      sectionKey: "hero",
+      type: "documentary_hero",
+      eyebrow: pair(vi.Story.documentary, en.Story.documentary),
+      title: pair(vi.Story.title, en.Story.title),
+      copy: pair(vi.Story.intro, en.Story.intro),
+      media: {image: imageLibrary.hero},
+      sortOrder: 1
+    }),
+    section({
+      pageKey: "story",
+      sectionKey: "chapters",
+      type: "chapter_slider",
+      eyebrow: pair(vi.Story.fieldNotes, en.Story.fieldNotes),
+      quote: pair(vi.Story.quote, en.Story.quote),
+      sortOrder: 2
+    }),
+    section({
+      pageKey: "story",
+      sectionKey: "journey_feature",
+      type: "story_feature",
+      eyebrow: pair(storyFeatureCopy.vi.kicker, storyFeatureCopy.en.kicker),
+      title: pair(storyFeatureCopy.vi.title, storyFeatureCopy.en.title),
+      copy: pair(storyFeatureCopy.vi.body, storyFeatureCopy.en.body),
+      cta: pair(storyFeatureCopy.vi.video, storyFeatureCopy.en.video),
+      ctaHref: "/explore",
+      media: {image: imageLibrary.hero},
+      settings: {
+        discoverLabel: {vi: storyFeatureCopy.vi.discover, en: storyFeatureCopy.en.discover},
+        newsLabel: {vi: storyFeatureCopy.vi.news, en: storyFeatureCopy.en.news},
+        readLabel: {vi: storyFeatureCopy.vi.read, en: storyFeatureCopy.en.read}
+      },
+      sortOrder: 3
+    }),
+    section({
+      pageKey: "story",
+      sectionKey: "culture_band",
+      type: "image_band",
+      eyebrow: storyChapters[2].eyebrow,
+      title: storyChapters[2].title,
+      copy: pair(storyChapters[2].body.vi[0], storyChapters[2].body.en[0]),
+      media: {images: [imageLibrary.brocade, imageLibrary.campfire, imageLibrary.village]},
+      sortOrder: 4
+    }),
+    section({
+      pageKey: "story",
+      sectionKey: "roast_section",
+      type: "image_text_cta",
+      eyebrow: storyChapters[3].eyebrow,
+      title: storyChapters[3].title,
+      copy: pair(storyChapters[3].body.vi[0], storyChapters[3].body.en[0]),
+      cta: pair(vi.Common.ctaShop, en.Common.ctaShop),
+      ctaHref: "/shop",
+      media: {
+        image: storyChapters[3].image,
+        secondaryImage: imageLibrary.beansBowl,
+        alt: storyChapters[3].alt
+      },
+      settings: {
+        extraCopy: {vi: storyChapters[3].body.vi[1], en: storyChapters[3].body.en[1]}
+      },
+      sortOrder: 5
+    }),
+    section({
+      pageKey: "story",
+      sectionKey: "conclusion",
+      type: "fullscreen_cta",
+      eyebrow: pair(vi.About.storyConclKicker, en.About.storyConclKicker),
+      title: pair(vi.About.storyConclTitle, en.About.storyConclTitle),
+      copy: pair(vi.About.storyConclCopy, en.About.storyConclCopy),
+      media: {image: imageLibrary.coffeePour},
+      sortOrder: 6
+    }),
+    section({
+      pageKey: "contact",
+      sectionKey: "hero",
+      type: "contact_hero",
+      eyebrow: pair(vi.Contact.contactKicker, en.Contact.contactKicker),
+      title: pair(vi.Contact.title, en.Contact.title),
+      copy: pair(vi.Contact.intro, en.Contact.intro),
+      media: {image: imageLibrary.village},
+      sortOrder: 1
+    }),
+    section({
+      pageKey: "contact",
+      sectionKey: "media_strip",
+      type: "media_strip",
+      media: {
+        images: [imageLibrary.village, imageLibrary.farm, imageLibrary.brocade, imageLibrary.campfire, imageLibrary.roasted, imageLibrary.cup]
+      },
+      sortOrder: 2
+    }),
+    section({
+      pageKey: "contact",
+      sectionKey: "map",
+      type: "map_embed",
+      title: pair(vi.Contact.mapIframeTitle, en.Contact.mapIframeTitle),
+      settings: {src: "https://www.google.com/maps?q=Son%20La%20Vietnam&output=embed"},
+      sortOrder: 3
     }),
     ...currentExploreCategoryPages(imageLibrary).map((page) =>
       section({
@@ -769,6 +1134,126 @@ async function main() {
         body: pair(String(bodyVi), String(bodyEn)),
         media: {icon},
         sortOrder: index + 1
+      })
+    ),
+    ...[
+      ["paragraph-1", vi.About.harmonyPara1, en.About.harmonyPara1],
+      ["paragraph-2", vi.About.harmonyPara2, en.About.harmonyPara2],
+      ["paragraph-3", vi.About.harmonyPara3, en.About.harmonyPara3]
+    ].map(([key, bodyVi, bodyEn], index) =>
+      item({
+        pageKey: "about",
+        sectionKey: "brand_story",
+        itemKey: String(key),
+        type: "paragraph",
+        body: pair(String(bodyVi), String(bodyEn)),
+        sortOrder: index + 1
+      })
+    ),
+    item({
+      pageKey: "about",
+      sectionKey: "vision_mission",
+      itemKey: "vision",
+      type: "statement",
+      title: pair(vi.About.visionTitle, en.About.visionTitle),
+      body: pair(vi.About.visionCopy, en.About.visionCopy),
+      media: {accent: "earth"},
+      sortOrder: 1
+    }),
+    item({
+      pageKey: "about",
+      sectionKey: "vision_mission",
+      itemKey: "mission",
+      type: "statement",
+      title: pair(vi.About.missionTitle, en.About.missionTitle),
+      body: pair(vi.About.missionTagline, en.About.missionTagline),
+      media: {accent: "ember"},
+      data: {
+        bullets: {
+          vi: [vi.About.missionBullet1, vi.About.missionBullet2, vi.About.missionBullet3],
+          en: [en.About.missionBullet1, en.About.missionBullet2, en.About.missionBullet3]
+        }
+      },
+      sortOrder: 2
+    }),
+    ...[
+      ["customer", "heart-handshake", vi.About.value1Label, en.About.value1Label, vi.About.value1Copy, en.About.value1Copy],
+      ["innovation", "shield-check", vi.About.value2Label, en.About.value2Label, vi.About.value2Copy, en.About.value2Copy],
+      ["integrity", "check-circle-2", vi.About.value3Label, en.About.value3Label, vi.About.value3Copy, en.About.value3Copy],
+      ["people", "leaf", vi.About.value4Label, en.About.value4Label, vi.About.value4Copy, en.About.value4Copy]
+    ].map(([key, icon, titleVi, titleEn, bodyVi, bodyEn], index) =>
+      item({
+        pageKey: "about",
+        sectionKey: "core_values",
+        itemKey: String(key),
+        type: "value_card",
+        title: pair(String(titleVi), String(titleEn)),
+        body: pair(String(bodyVi), String(bodyEn)),
+        media: {icon},
+        sortOrder: index + 1
+      })
+    ),
+    ...[
+      ["heat_control", "flame", vi.Philosophy.heatControlLabel, en.Philosophy.heatControlLabel, vi.Philosophy.heatControlDesc, en.Philosophy.heatControlDesc],
+      ["time", "clock", vi.Philosophy.timeLabel, en.Philosophy.timeLabel, vi.Philosophy.timeDesc, en.Philosophy.timeDesc],
+      ["cooling", "droplets", vi.Philosophy.coolingLabel, en.Philosophy.coolingLabel, vi.Philosophy.coolingDesc, en.Philosophy.coolingDesc]
+    ].map(([key, icon, titleVi, titleEn, bodyVi, bodyEn], index) =>
+      item({
+        pageKey: "about-philosophy",
+        sectionKey: "body",
+        itemKey: String(key),
+        type: "principle",
+        title: pair(String(titleVi), String(titleEn)),
+        body: pair(String(bodyVi), String(bodyEn)),
+        media: {icon},
+        sortOrder: index + 1
+      })
+    ),
+    ...storyChapters.map((chapter, index) =>
+      item({
+        pageKey: "story",
+        sectionKey: "chapters",
+        itemKey: chapter.id,
+        type: "chapter",
+        label: chapter.eyebrow,
+        title: chapter.title,
+        body: pair(chapter.body.vi.join("\n\n"), chapter.body.en.join("\n\n")),
+        media: {image: chapter.image},
+        data: {
+          paragraphs: chapter.body,
+          alt: chapter.alt
+        },
+        sortOrder: index + 1
+      })
+    ),
+    ...storyFeatureCopy.vi.cards.map((card, index) =>
+      item({
+        pageKey: "story",
+        sectionKey: "journey_feature",
+        itemKey: `discover-${index + 1}`,
+        type: "discover_card",
+        label: pair(storyFeatureCopy.vi.discover, storyFeatureCopy.en.discover),
+        title: pair(card.title, storyFeatureCopy.en.cards[index].title),
+        body: pair(card.body, storyFeatureCopy.en.cards[index].body),
+        href: card.href,
+        media: {
+          image: [products[0]?.images[0] ?? "/sp1.jpeg", imageLibrary.cup, imageLibrary.village][index]
+        },
+        sortOrder: index + 1
+      })
+    ),
+    ...storyFeatureCopy.vi.newsCards.map((card, index) =>
+      item({
+        pageKey: "story",
+        sectionKey: "journey_feature",
+        itemKey: `news-${index + 1}`,
+        type: "news_card",
+        label: pair(storyFeatureCopy.vi.news, storyFeatureCopy.en.news),
+        title: pair(card.title, storyFeatureCopy.en.newsCards[index].title),
+        body: pair(card.body, storyFeatureCopy.en.newsCards[index].body),
+        href: card.href,
+        media: {icon: card.icon},
+        sortOrder: 10 + index
       })
     ),
     ...currentExploreCategoryPages(imageLibrary).flatMap((page) =>

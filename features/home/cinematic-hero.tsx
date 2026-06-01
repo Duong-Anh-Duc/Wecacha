@@ -1,29 +1,45 @@
 "use client";
 
+import Link from "next/link";
 import {motion, useScroll, useTransform} from "framer-motion";
 import {ArrowDown, Play, ShoppingBag} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {Link} from "@/i18n/navigation";
+import type {Locale} from "@/i18n/routing";
 import {heroVideo, imageLibrary} from "@/lib/content";
 import {cn} from "@/lib/utils";
 
 type Props = {
+  locale: Locale;
   kicker: string;
   title: string;
   copy: string;
   primary: string;
   secondary: string;
   scrollLabel: string;
+  primaryHref?: string;
+  secondaryHref?: string;
+  media?: Record<string, any>;
   tone?: "classic" | "green";
 };
 
+const localeHref = (locale: Locale, href: string) => {
+  if (href.startsWith("http")) return href;
+  if (href === "/") return `/${locale}`;
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) return href;
+  return `/${locale}${href.startsWith("/") ? href : `/${href}`}`;
+};
+
 export function CinematicHero({
+  locale,
   kicker,
   title,
   copy,
   primary,
   secondary,
   scrollLabel,
+  primaryHref = "/contact",
+  secondaryHref = "/explore",
+  media,
   tone = "classic"
 }: Props) {
   const {scrollY} = useScroll();
@@ -48,10 +64,10 @@ export function CinematicHero({
           muted
           loop
           playsInline
-          poster={imageLibrary.heroPoster}
+          poster={media?.poster ?? imageLibrary.heroPoster}
         >
-          <source src={heroVideo} type="video/mp4" />
-          <source src={heroVideo} type="video/quicktime" />
+          <source src={media?.video ?? heroVideo} type="video/mp4" />
+          <source src={media?.video ?? heroVideo} type="video/quicktime" />
         </video>
       </motion.div>
       <div className="absolute inset-0 bg-cinema-overlay" />
@@ -80,13 +96,13 @@ export function CinematicHero({
           </p>
           <div className="mt-12 flex flex-col gap-4 sm:flex-row">
             <Button asChild size="lg" className="rounded-full px-8 h-14 text-base tracking-wide shadow-warm transition-transform hover:-translate-y-1">
-              <Link href="/contact">
+              <Link href={localeHref(locale, primaryHref)}>
                 <ShoppingBag className="h-5 w-5 mr-2" aria-hidden="true" />
                 {primary}
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="rounded-full px-8 h-14 text-base tracking-wide border-white/30 hover:bg-white/10 hover:border-white transition-all hover:-translate-y-1">
-              <Link href="/explore">
+              <Link href={localeHref(locale, secondaryHref)}>
                 <Play className="h-5 w-5 mr-2" aria-hidden="true" />
                 {secondary}
               </Link>

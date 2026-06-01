@@ -7,8 +7,8 @@ import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
 // import {FlashSaleCountdown} from "@/features/product/flash-sale-countdown";
 import type {Locale} from "@/i18n/routing";
-import type {Product} from "@/lib/content";
-import {formatCurrency, localized} from "@/lib/content";
+import type {Product} from "@/lib/content/types";
+import {formatCurrency, localized} from "@/lib/content/helpers";
 
 export function ProductBuyPanel({product}: {product: Product}) {
   const locale = useLocale() as Locale;

@@ -7,7 +7,7 @@ type CinematicPageHeroProps = {
   kicker: string;
   title: string;
   copy: string;
-  image: string;
+  image?: string;
   imageAlt: string;
   chips?: string[];
   fieldJournal?: string;
@@ -21,7 +21,7 @@ export function CinematicPageHero({
   kicker,
   title,
   copy,
-  image,
+  image = "/image1.jpeg",
   imageAlt,
   chips = [],
   fieldJournal = "Field journal",

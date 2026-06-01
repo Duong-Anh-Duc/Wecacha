@@ -3,23 +3,44 @@ import {getTranslations} from "next-intl/server";
 import {Reveal} from "@/components/motion/reveal";
 import {SectionHeading} from "@/components/sections/section-heading";
 import type {Locale} from "@/i18n/routing";
+import {localizedField, type SiteSection, type SiteSectionItem} from "@/lib/content/cms";
 
-export async function CoreValuesSection({locale}: {locale: Locale}) {
+export async function CoreValuesSection({
+  locale,
+  section,
+  items = []
+}: {
+  locale: Locale;
+  section?: SiteSection | null;
+  items?: SiteSectionItem[];
+}) {
   const t = await getTranslations({locale, namespace: "About"});
+  const iconMap = {
+    "heart-handshake": HeartHandshake,
+    "shield-check": ShieldCheck,
+    "check-circle-2": CheckCircle2,
+    leaf: Leaf
+  };
 
-  const values = [
-    {icon: HeartHandshake, label: t("value1Label"), copy: t("value1Copy")},
-    {icon: ShieldCheck, label: t("value2Label"), copy: t("value2Copy")},
-    {icon: CheckCircle2, label: t("value3Label"), copy: t("value3Copy")},
-    {icon: Leaf, label: t("value4Label"), copy: t("value4Copy")}
-  ];
+  const values = items.length > 0
+    ? items.map((item) => ({
+      icon: iconMap[item.media?.icon as keyof typeof iconMap] ?? Leaf,
+      label: localizedField(item, "title", locale),
+      copy: localizedField(item, "body", locale)
+    }))
+    : [
+      {icon: HeartHandshake, label: t("value1Label"), copy: t("value1Copy")},
+      {icon: ShieldCheck, label: t("value2Label"), copy: t("value2Copy")},
+      {icon: CheckCircle2, label: t("value3Label"), copy: t("value3Copy")},
+      {icon: Leaf, label: t("value4Label"), copy: t("value4Copy")}
+    ];
 
   return (
     <section className="px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
-          kicker={t("coreValuesKicker")}
-          title={t("coreValuesTitle")}
+          kicker={localizedField(section, "eyebrow", locale) || t("coreValuesKicker")}
+          title={localizedField(section, "title", locale) || t("coreValuesTitle")}
           align="center"
         />
 

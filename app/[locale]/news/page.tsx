@@ -1,12 +1,13 @@
 import type {Metadata} from "next";
+import Link from "next/link";
 import {setRequestLocale, getTranslations} from "next-intl/server";
 import {CinematicPageHero} from "@/components/sections/cinematic-page-hero";
 import {Reveal} from "@/components/motion/reveal";
 import {imageLibrary} from "@/lib/content";
 import type {Locale} from "@/i18n/routing";
-import {Link} from "@/i18n/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import {getPageContent, localizedField, localizedValue, sectionByKey} from "@/lib/content/cms";
 
 export const revalidate = 60; // Cache for 60s
 
@@ -16,11 +17,13 @@ type Props = {
 
 export async function generateMetadata({params}: Props): Promise<Metadata> {
   const {locale} = await params;
+  const content = await getPageContent("news");
+  const hero = sectionByKey(content, "hero");
   const isVi = locale === "vi";
-  const title = isVi ? "Tin Tức Cà Phê Sơn La · Wecacha" : "Son La Coffee News · Wecacha";
-  const description = isVi
+  const title = localizedField(hero, "title", locale) || (isVi ? "Tin Tức Cà Phê Sơn La · Wecacha" : "Son La Coffee News · Wecacha");
+  const description = localizedField(hero, "copy", locale) || (isVi
     ? "Cập nhật những câu chuyện mới nhất về cà phê, sự kiện và công thức pha chế đặc biệt từ vùng núi Sơn La Tây Bắc."
-    : "Latest stories about coffee, events and special brewing recipes from the mountains of Son La, northwest Vietnam.";
+    : "Latest stories about coffee, events and special brewing recipes from the mountains of Son La, northwest Vietnam.");
 
   return {
     title,
@@ -66,6 +69,8 @@ export default async function NewsIndexPage({params}: Props) {
   const t = await getTranslations({locale, namespace: "News"});
   const tCommon = await getTranslations({locale, namespace: "Common"});
   const isVi = locale === "vi";
+  const content = await getPageContent("news");
+  const hero = sectionByKey(content, "hero");
 
   // Lấy dữ liệu bài viết từ Supabase
   const { data: articles } = await supabase
@@ -81,12 +86,12 @@ export default async function NewsIndexPage({params}: Props) {
   return (
     <main className="bg-parchment-50">
       <CinematicPageHero
-        kicker={t("kicker")}
-        title={t("title")}
-        copy={t("copy")}
-        image={imageLibrary.cup}
+        kicker={localizedField(hero, "eyebrow", locale) || t("kicker")}
+        title={localizedField(hero, "title", locale) || t("title")}
+        copy={localizedField(hero, "copy", locale) || t("copy")}
+        image={hero?.media?.image ?? imageLibrary.cup}
         imageAlt="News"
-        scrollLabel={t("scrollLabel")}
+        scrollLabel={localizedValue<string>(hero?.settings?.scrollLabel, locale, t("scrollLabel"))}
       />
 
       <section className="px-4 py-24 sm:px-6 lg:px-8">
@@ -98,7 +103,7 @@ export default async function NewsIndexPage({params}: Props) {
               
               return (
                 <Reveal key={article.slug} delay={i * 0.1}>
-                  <Link href={`/news/${article.slug}`} className="group block overflow-hidden rounded-2xl bg-white shadow-warm">
+                  <Link href={`/${locale}/news/${article.slug}`} className="group block overflow-hidden rounded-2xl bg-white shadow-warm">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image 
                         src={imgUrl} 

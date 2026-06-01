@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {motion} from "framer-motion";
 import {
   ArrowRight,
@@ -17,10 +18,9 @@ import {
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
 import {useTranslations} from "next-intl";
-import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
-import type {Product} from "@/lib/content";
-import {formatCurrency, localized} from "@/lib/content";
+import type {Product} from "@/lib/content/types";
+import {formatCurrency, localized} from "@/lib/content/helpers";
 
 function productHighlights(product: Product, t: ReturnType<typeof useTranslations<"Product">>) {
   if (product.category === "gifts") {
@@ -184,7 +184,7 @@ export function ProductCard({
         </div>
         
         {/* Stretched link to make the entire card clickable */}
-        <Link href={`/shop/${product.slug}`} className="absolute inset-0 z-20" aria-label={localized(product.name, locale)} />
+        <Link href={`/${locale}/shop/${product.slug}`} className="absolute inset-0 z-20" aria-label={localized(product.name, locale)} />
       </div>
     </motion.article>
   );

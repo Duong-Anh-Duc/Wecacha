@@ -6,7 +6,7 @@ import {Button, Input, Select, Space, Table, Tag, Tooltip, type TableColumnsType
 import {EditOutlined, EyeInvisibleOutlined, EyeOutlined, SearchOutlined} from "@ant-design/icons";
 import {useTranslations} from "next-intl";
 import {Link} from "@/i18n/navigation";
-import {formatCurrency} from "@/lib/content";
+import {formatCurrency} from "@/lib/content/helpers";
 
 export type ProductRow = {
   id: string;

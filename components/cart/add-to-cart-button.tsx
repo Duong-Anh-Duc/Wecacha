@@ -5,8 +5,8 @@ import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import {useCartStore} from "@/features/cart/cart-store";
 import type {Locale} from "@/i18n/routing";
-import type {Product} from "@/lib/content";
-import {localized} from "@/lib/content";
+import type {Product} from "@/lib/content/types";
+import {localized} from "@/lib/content/helpers";
 import gsap from "gsap";
 
 type Props = {

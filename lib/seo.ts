@@ -1,6 +1,6 @@
 import type {Locale} from "@/i18n/routing";
-import type {Product} from "@/lib/content";
-import {formatCurrency, localized} from "@/lib/content";
+import type {Product} from "@/lib/content/types";
+import {formatCurrency, localized} from "@/lib/content/helpers";
 import {siteConfig, siteUrl} from "@/lib/site";
 
 export function webSiteJsonLd(locale: Locale) {

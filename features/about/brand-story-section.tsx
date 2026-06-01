@@ -3,9 +3,21 @@ import {getTranslations} from "next-intl/server";
 import {Reveal} from "@/components/motion/reveal";
 import type {Locale} from "@/i18n/routing";
 import {imageLibrary} from "@/lib/content";
+import {localizedField, type SiteSection, type SiteSectionItem} from "@/lib/content/cms";
 
-export async function BrandStorySection({locale}: {locale: Locale}) {
+export async function BrandStorySection({
+  locale,
+  section,
+  items = []
+}: {
+  locale: Locale;
+  section?: SiteSection | null;
+  items?: SiteSectionItem[];
+}) {
   const t = await getTranslations({locale, namespace: "About"});
+  const paragraphs = items.length > 0
+    ? items.map((item) => localizedField(item, "body", locale)).filter(Boolean)
+    : [t("harmonyPara1"), t("harmonyPara2"), t("harmonyPara3")];
 
   return (
     <section className="relative px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
@@ -13,7 +25,7 @@ export async function BrandStorySection({locale}: {locale: Locale}) {
         <Reveal>
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-cinematic">
             <Image
-              src={imageLibrary.farmer}
+              src={section?.media?.image ?? imageLibrary.farmer}
               alt="Coffee Farmer"
               fill
               className="object-cover"
@@ -26,12 +38,12 @@ export async function BrandStorySection({locale}: {locale: Locale}) {
         <Reveal delay={0.2}>
           <div className="flex flex-col justify-center">
             <h2 className="font-serif text-4xl leading-tight text-forest-950 sm:text-5xl">
-              {t("harmonyTitle")}
+              {localizedField(section, "title", locale) || t("harmonyTitle")}
             </h2>
             <div className="mt-8 space-y-6 text-lg leading-8 text-forest-950/70">
-              <p>{t("harmonyPara1")}</p>
-              <p>{t("harmonyPara2")}</p>
-              <p>{t("harmonyPara3")}</p>
+              {paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
             </div>
           </div>
         </Reveal>

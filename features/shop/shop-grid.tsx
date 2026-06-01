@@ -26,8 +26,8 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import type {Locale} from "@/i18n/routing";
-import type {Product, ProductCategory} from "@/lib/content";
-import {localized} from "@/lib/content";
+import type {Product, ProductCategory} from "@/lib/content/types";
+import {localized} from "@/lib/content/helpers";
 import {cn} from "@/lib/utils";
 
 type SortMode = "featured" | "priceAsc" | "priceDesc";

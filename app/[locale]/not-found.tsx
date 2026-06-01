@@ -1,9 +1,10 @@
+import Link from "next/link";
 import {Mountain} from "lucide-react";
-import {getTranslations} from "next-intl/server";
+import {getLocale, getTranslations} from "next-intl/server";
 import {Button} from "@/components/ui/button";
-import {Link} from "@/i18n/navigation";
 
 export default async function LocaleNotFound() {
+  const locale = await getLocale();
   const t = await getTranslations("NotFound");
 
   return (
@@ -15,7 +16,7 @@ export default async function LocaleNotFound() {
           {t("title")}. {t("copy")}
         </p>
         <Button asChild className="mt-7">
-          <Link href="/">{t("home")}</Link>
+          <Link href={`/${locale}`}>{t("home")}</Link>
         </Button>
       </div>
     </main>

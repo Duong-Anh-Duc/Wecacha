@@ -1,23 +1,34 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { Reveal } from "@/components/motion/reveal";
 import Image from "next/image";
 import type { Locale } from "@/i18n/routing";
 import { Leaf, Compass, Heart, Mountain } from "lucide-react";
+import type {SiteSection, SiteSectionItem} from "@/lib/content/cms";
 
-const icons = [Leaf, Compass, Heart, Mountain];
-const numerals = ["01", "02", "03", "04"];
+const iconMap = {
+  leaf: Leaf,
+  compass: Compass,
+  heart: Heart,
+  mountain: Mountain
+};
 
-const values = [
-  { titleKey: "coreVal1Title" as const, copyKey: "coreVal1Copy" as const, bgImage: "/core-val-1.png" },
-  { titleKey: "coreVal2Title" as const, copyKey: "coreVal2Copy" as const, bgImage: "/core-val-2.png" },
-  { titleKey: "coreVal3Title" as const, copyKey: "coreVal3Copy" as const, bgImage: "/core-val-3.png" },
-  { titleKey: "coreVal4Title" as const, copyKey: "coreVal4Copy" as const, bgImage: "/core-val-4.png" },
-];
+function field(item: SiteSection | SiteSectionItem | null | undefined, key: string, locale: Locale) {
+  if (!item) return "";
+  return String((item as any)[`${key}_${locale}`] ?? (item as any)[`${key}_vi`] ?? (item as any)[`${key}_en`] ?? "");
+}
 
-export function CoreValuesSection({ locale: _ }: { locale: Locale }) {
-  const t = useTranslations("Home");
+export function CoreValuesSection({
+  locale,
+  section,
+  items = []
+}: {
+  locale: Locale;
+  section?: SiteSection | null;
+  items?: SiteSectionItem[];
+}) {
+  const title = field(section, "title", locale);
+  const [headline, accent] = title.split(" – ");
 
   return (
     <div className="px-3 py-10 sm:px-6 lg:px-8">
@@ -30,15 +41,15 @@ export function CoreValuesSection({ locale: _ }: { locale: Locale }) {
           <Reveal>
             <header className="mb-14 text-center">
               <p className="mb-4 font-serif text-[#a0764a] text-[0.65rem] tracking-[0.35em] uppercase">
-                Triết lý cốt lõi
+                {field(section, "eyebrow", locale)}
               </p>
               <h2 className="font-serif text-[1.9rem] sm:text-[2.4rem] md:text-[3.8rem] leading-[1.08] text-[#3a2010]">
-                {t("coreValuesTitle").split(" – ")[0]}
+                {headline}
               </h2>
               <div className="mt-4 flex items-center justify-center gap-4">
                 <div className="h-px w-14 bg-[#c1a063]/45" />
                 <span className="font-serif italic text-[1.15rem] md:text-[1.55rem] text-[#7a5035]">
-                  {t("coreValuesTitle").split(" – ")[1]}
+                  {accent}
                 </span>
                 <div className="h-px w-14 bg-[#c1a063]/45" />
               </div>
@@ -47,15 +58,15 @@ export function CoreValuesSection({ locale: _ }: { locale: Locale }) {
 
           {/* Cards — alternate cards offset down for staggered rhythm */}
           <div className="grid gap-5 sm:grid-cols-2 sm:items-start lg:grid-cols-4">
-            {values.map(({ titleKey, copyKey, bgImage }, i) => {
-              const Icon = icons[i];
+            {items.map((item, i) => {
+              const Icon = iconMap[item.media?.icon as keyof typeof iconMap] ?? Leaf;
               const isOffset = i % 2 !== 0;
               return (
-                <Reveal key={titleKey} delay={i * 0.12}>
+                <Reveal key={item.item_key} delay={i * 0.12}>
                   <div className={`group relative z-30 ${isOffset ? "lg:mt-10" : ""}`}>
                     {/* Editorial numeral */}
                     <div className="absolute -top-5 left-5 z-20 select-none font-serif text-[2rem] font-bold leading-none text-[#c1a063]/45 transition-colors duration-500 group-hover:text-[#c1a063]/70 pointer-events-none">
-                      {numerals[i]}
+                      {item.data?.numeral}
                     </div>
 
                     {/* Arch card */}
@@ -65,7 +76,7 @@ export function CoreValuesSection({ locale: _ }: { locale: Locale }) {
                       <div className="relative w-full">
                         <div className="relative w-full aspect-[3/4] overflow-hidden rounded-t-[8.5rem]">
                           <Image
-                            src={bgImage}
+                            src={item.media?.image ?? `/core-val-${Math.min(i + 1, 4)}.png`}
                             alt=""
                             fill
                             className="object-cover saturate-[0.88] brightness-[0.95] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.07]"
@@ -89,11 +100,11 @@ export function CoreValuesSection({ locale: _ }: { locale: Locale }) {
                       {/* Text */}
                       <div className="flex flex-col items-center px-5 pb-8 pt-9 text-center">
                         <h3 className="mb-3 font-serif text-[1.08rem] font-medium leading-snug text-[#e4cfa2] md:text-[1.15rem]">
-                          {t(titleKey)}
+                          {field(item, "title", locale)}
                         </h3>
                         <div className="mb-4 h-px w-8 bg-[#c1a063]/35 transition-all duration-500 group-hover:w-16 group-hover:bg-[#c1a063]/65" />
                         <p className="text-[12.5px] font-light leading-[1.72] text-[#7e9488]">
-                          {t(copyKey)}
+                          {field(item, "body", locale)}
                         </p>
                       </div>
                     </div>

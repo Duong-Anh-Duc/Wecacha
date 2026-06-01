@@ -10,7 +10,7 @@ import {Input} from "@/components/ui/input";
 import {useCartStore, getCartTotals} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
-import {formatCurrency} from "@/lib/content";
+import {formatCurrency} from "@/lib/content/helpers";
 
 export function CartPageClient() {
   const locale = useLocale() as Locale;

@@ -15,7 +15,7 @@ import {createOrder} from "@/actions/order-actions";
 import {getCartTotals, useCartStore, type CartItem} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
-import {formatCurrency} from "@/lib/content";
+import {formatCurrency} from "@/lib/content/helpers";
 import Image from "next/image";
 
 type Province = {code: number; name: string};

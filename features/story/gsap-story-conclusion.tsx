@@ -2,23 +2,21 @@
 
 import {useEffect, useRef} from "react";
 import Image from "next/image";
-import {useTranslations} from "next-intl";
-import {Button} from "@/components/ui/button";
-import {Link} from "@/i18n/navigation";
 import {imageLibrary} from "@/lib/content";
 
 export function GsapStoryConclusion({
   title,
   copy,
   kicker,
+  image = imageLibrary.coffeePour,
   locale
 }: {
   title: string;
   copy: string;
   kicker: string;
+  image?: string;
   locale: string;
 }) {
-  const tStory = useTranslations("Story");
   const containerRef = useRef<HTMLElement | null>(null);
   const imageRef = useRef<HTMLDivElement | null>(null);
   const textRef = useRef<HTMLDivElement | null>(null);
@@ -77,7 +75,7 @@ export function GsapStoryConclusion({
       <div className="absolute inset-0 z-0">
         <div ref={imageRef} className="absolute -inset-y-[20%] inset-x-0 h-[140%] w-full">
           <Image
-            src={imageLibrary.coffeePour}
+            src={image}
             alt=""
             fill
             className="object-cover"

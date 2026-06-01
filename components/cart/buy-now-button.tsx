@@ -6,8 +6,8 @@ import {Button} from "@/components/ui/button";
 import {useCartStore} from "@/features/cart/cart-store";
 import {useRouter} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
-import type {Product} from "@/lib/content";
-import {localized} from "@/lib/content";
+import type {Product} from "@/lib/content/types";
+import {localized} from "@/lib/content/helpers";
 
 export function BuyNowButton({
   product,

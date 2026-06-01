@@ -1,7 +1,7 @@
 import type {MetadataRoute} from "next";
 import {routing} from "@/i18n/routing";
-import {exploreCards, products} from "@/lib/content";
 import {siteUrl} from "@/lib/site";
+import {getExplorePageKeys, getVisibleProductSlugs} from "@/lib/content/cms";
 
 type ChangeFrequency = MetadataRoute.Sitemap[number]["changeFrequency"];
 
@@ -19,8 +19,12 @@ const staticRoutes: {path: string; priority: number; freq: ChangeFrequency}[] = 
 
 const newsCategories = ["coffee-culture", "events", "recipes"];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  const [productSlugs, explorePagesFromDb] = await Promise.all([
+    getVisibleProductSlugs(),
+    getExplorePageKeys()
+  ]);
 
   const staticPages = routing.locales.flatMap((locale) =>
     staticRoutes.map(({path, priority, freq}) => ({
@@ -32,8 +36,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   );
 
   const productPages = routing.locales.flatMap((locale) =>
-    products.map((product) => ({
-      url: `${siteUrl}/${locale}/shop/${product.slug}`,
+    productSlugs.map((slug) => ({
+      url: `${siteUrl}/${locale}/shop/${slug}`,
       lastModified: now,
       changeFrequency: "weekly" as ChangeFrequency,
       priority: 0.8
@@ -41,8 +45,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   );
 
   const explorePages = routing.locales.flatMap((locale) =>
-    exploreCards.map((card) => ({
-      url: `${siteUrl}/${locale}/explore/${card.id}`,
+    explorePagesFromDb.map((page) => ({
+      url: `${siteUrl}/${locale}/explore/${page.slug}`,
       lastModified: now,
       changeFrequency: "monthly" as ChangeFrequency,
       priority: 0.6

@@ -5,7 +5,7 @@ import {App, Button, Drawer, Input, Select, Space, Table, Tag, Tooltip, Typograp
 import {EditOutlined, PhoneOutlined, SearchOutlined, SaveOutlined} from "@ant-design/icons";
 import {useTranslations} from "next-intl";
 import {updateOrderWorkflow} from "@/actions/order-actions";
-import {formatCurrency} from "@/lib/content";
+import {formatCurrency} from "@/lib/content/helpers";
 
 export type OrderRow = {
   id: string;

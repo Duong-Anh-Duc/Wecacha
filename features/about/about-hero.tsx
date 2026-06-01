@@ -4,16 +4,24 @@ import {Reveal} from "@/components/motion/reveal";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import type {Locale} from "@/i18n/routing";
 import {imageLibrary} from "@/lib/content";
+import {localizedField, type SiteSection} from "@/lib/content/cms";
 
-export async function AboutHero({locale}: {locale: Locale}) {
+export async function AboutHero({
+  locale,
+  section
+}: {
+  locale: Locale;
+  section?: SiteSection | null;
+}) {
   const t = await getTranslations({locale, namespace: "About"});
   const tNav = await getTranslations({locale, namespace: "Nav"});
+  const title = localizedField(section, "title", locale) || t("heroTitle");
 
   return (
     <section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src={imageLibrary.mountains}
+          src={section?.media?.image ?? imageLibrary.mountains}
           alt="Sơn La Mountains"
           fill
           priority
@@ -35,13 +43,13 @@ export async function AboutHero({locale}: {locale: Locale}) {
       <div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8 mt-20">
         <Reveal>
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-ember mb-6">
-            {t("kicker")}
+            {localizedField(section, "eyebrow", locale) || t("kicker")}
           </p>
           <h1 className="font-serif text-5xl leading-[1.1] text-parchment-50 sm:text-7xl">
-            {t("heroTitle")}
+            {title}
           </h1>
           <p className="mx-auto mt-8 max-w-2xl text-lg leading-8 text-white/80">
-            {t("heroCopy")}
+            {localizedField(section, "copy", locale) || t("heroCopy")}
           </p>
         </Reveal>
       </div>

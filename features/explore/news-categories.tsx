@@ -1,19 +1,28 @@
 import Image from "next/image";
+import Link from "next/link";
 import {ArrowRight, Calendar, Coffee} from "lucide-react";
 import {getTranslations} from "next-intl/server";
 import {Reveal} from "@/components/motion/reveal";
-import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
+import {localizedField, type SiteSectionItem} from "@/lib/content/cms";
 
-export async function NewsCategories({locale}: {locale: Locale}) {
+const localeHref = (locale: Locale, href?: string | null) => {
+  const path = href ?? "/explore";
+  return path.startsWith("http") ? path : `/${locale}${path.startsWith("/") ? path : `/${path}`}`;
+};
+
+export async function NewsCategories({
+  locale,
+  items = []
+}: {
+  locale: Locale;
+  items?: SiteSectionItem[];
+}) {
   const t = await getTranslations({locale, namespace: "Explore"});
-  const tNav = await getTranslations({locale, namespace: "Nav"});
-
-  const bottomArticles = [
-    {href: "/news/coffee-culture", title: t("coffeeCultureTitle"), desc: t("coffeeCultureDesc"), icon: Coffee},
-    {href: "/news/events", title: t("eventsTitle"), desc: t("eventsDesc"), icon: Calendar},
-    {href: "/news/recipes", title: t("recipesTitle"), desc: t("recipesDesc"), icon: Coffee}
-  ];
+  const iconMap = {
+    coffee: Coffee,
+    calendar: Calendar
+  };
 
   return (
     <div className="relative z-20 mt-10">
@@ -38,10 +47,10 @@ export async function NewsCategories({locale}: {locale: Locale}) {
           </div>
 
           <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-3 md:gap-0">
-            {bottomArticles.map((article, idx) => {
-              const Icon = article.icon;
+            {items.map((article, idx) => {
+              const Icon = iconMap[article.media?.icon as keyof typeof iconMap] ?? Coffee;
               return (
-                <div key={idx} className={`flex flex-col py-2 relative group px-2 sm:px-6 lg:px-12 ${idx === 2 ? "lg:pr-[8rem]" : ""}`}>
+                <div key={article.item_key} className={`flex flex-col py-2 relative group px-2 sm:px-6 lg:px-12 ${idx === 2 ? "lg:pr-[8rem]" : ""}`}>
                   {/* Faint Divider Line */}
                   {idx > 0 && (
                     <>
@@ -53,11 +62,11 @@ export async function NewsCategories({locale}: {locale: Locale}) {
                   <div className="h-10 w-10 rounded-full bg-[#203823] flex items-center justify-center text-white mb-5 shadow-md transition-transform duration-300 group-hover:scale-110">
                     <Icon className="w-4 h-4" strokeWidth={2} />
                   </div>
-                  <p className="text-[10px] font-bold text-[#b5703a] uppercase tracking-[0.15em] mb-2">{tNav("news")}</p>
-                  <h3 className="font-serif text-[1.4rem] text-[#1c2a1c] mb-3 transition-colors group-hover:text-[#b5703a]">{article.title}</h3>
-                  <p className="text-[13px] text-[#1c2a1c]/70 mb-8 min-h-[50px] leading-relaxed line-clamp-3">{article.desc}</p>
+                  <p className="text-[10px] font-bold text-[#b5703a] uppercase tracking-[0.15em] mb-2">{localizedField(article, "label", locale)}</p>
+                  <h3 className="font-serif text-[1.4rem] text-[#1c2a1c] mb-3 transition-colors group-hover:text-[#b5703a]">{localizedField(article, "title", locale)}</h3>
+                  <p className="text-[13px] text-[#1c2a1c]/70 mb-8 min-h-[50px] leading-relaxed line-clamp-3">{localizedField(article, "body", locale)}</p>
 
-                  <Link href={article.href} className="text-[13px] font-bold flex items-center gap-2 group/link text-[#1c2a1c] hover:text-[#b5703a] transition-colors w-fit mt-auto">
+                  <Link href={localeHref(locale, article.href)} className="text-[13px] font-bold flex items-center gap-2 group/link text-[#1c2a1c] hover:text-[#b5703a] transition-colors w-fit mt-auto">
                     {t("readMore")}
                     <ArrowRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
                   </Link>

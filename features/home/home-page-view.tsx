@@ -6,6 +6,7 @@ import {CoreValuesSection} from "@/features/home/core-values-section";
 import {ArabicaProductsSection} from "@/features/home/arabica-products-section";
 import {CommitmentSection} from "@/features/home/commitment-section";
 import type {Locale} from "@/i18n/routing";
+import {getPageContent, itemsForSection, localizedField, localizedValue, sectionByKey} from "@/lib/content/cms";
 
 export async function HomePageView({
   locale,
@@ -15,23 +16,54 @@ export async function HomePageView({
   tone?: "classic" | "green";
 }) {
   const t = await getTranslations({locale, namespace: "Home"});
+  const content = await getPageContent("home");
+  const hero = sectionByKey(content, "hero");
 
   return (
     <main>
       <CinematicHero
-        kicker={t("kicker")}
-        title={t("heroTitle")}
-        copy={t("heroCopy")}
-        primary={t("ctaPrimary")}
-        secondary={t("ctaSecondary")}
-        scrollLabel={t("scroll")}
+        locale={locale}
+        kicker={localizedField(hero, "eyebrow", locale) || t("kicker")}
+        title={localizedField(hero, "title", locale) || t("heroTitle")}
+        copy={localizedField(hero, "copy", locale) || t("heroCopy")}
+        primary={localizedField(hero, "cta_label", locale) || t("ctaPrimary")}
+        secondary={
+          localizedValue(hero?.settings?.secondaryCta, locale, t("ctaSecondary"))
+        }
+        primaryHref={hero?.cta_href ?? "/contact"}
+        secondaryHref={hero?.settings?.secondaryCta?.href ?? "/explore"}
+        scrollLabel={localizedValue(hero?.settings?.scrollLabel, locale, t("scroll"))}
+        media={hero?.media}
         tone={tone}
       />
-      <OriginStorySection locale={locale} tone={tone} />
-      <CultureSection locale={locale} tone={tone} />
-      <CoreValuesSection locale={locale} />
-      <ArabicaProductsSection locale={locale} tone={tone} />
-      <CommitmentSection locale={locale} tone={tone} />
+      <OriginStorySection
+        locale={locale}
+        tone={tone}
+        section={sectionByKey(content, "origin_story")}
+        items={itemsForSection(content, "origin_story")}
+      />
+      <CultureSection
+        locale={locale}
+        tone={tone}
+        section={sectionByKey(content, "culture")}
+      />
+      <CoreValuesSection
+        locale={locale}
+        section={sectionByKey(content, "core_values")}
+        items={itemsForSection(content, "core_values")}
+      />
+      <ArabicaProductsSection
+        locale={locale}
+        tone={tone}
+        section={sectionByKey(content, "featured_product_cards")}
+        items={itemsForSection(content, "featured_product_cards")}
+      />
+      <CommitmentSection
+        locale={locale}
+        tone={tone}
+        section={sectionByKey(content, "commitment")}
+        items={itemsForSection(content, "commitment")}
+      />
     </main>
   );
 }

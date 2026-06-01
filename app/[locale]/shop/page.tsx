@@ -6,7 +6,13 @@ import {Reveal} from "@/components/motion/reveal";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {ShopGrid} from "@/features/shop/shop-grid";
 import type {Locale} from "@/i18n/routing";
-import {imageLibrary, products} from "@/lib/content";
+import {
+  getPageContent,
+  getVisibleProducts,
+  localizedField,
+  localizedValue,
+  sectionByKey
+} from "@/lib/content/cms";
 
 type Props = {
   params: Promise<{locale: Locale}>;
@@ -40,16 +46,22 @@ export default async function ShopPage({params}: Props) {
   const t = await getTranslations({locale, namespace: "Shop"});
   const common = await getTranslations({locale, namespace: "Common"});
   const tNav = await getTranslations({locale, namespace: "Nav"});
+  const [content, products] = await Promise.all([
+    getPageContent("shop"),
+    getVisibleProducts()
+  ]);
+  const hero = sectionByKey(content, "hero");
+  const mediaStrip = sectionByKey(content, "media_strip");
 
   return (
     <main className="bg-parchment-50">
       <CinematicPageHero
-        kicker={t("shopKicker")}
-        title={t("title")}
-        copy={t("intro")}
-        image={imageLibrary.farm}
+        kicker={localizedField(hero, "eyebrow", locale) || t("shopKicker")}
+        title={localizedField(hero, "title", locale) || t("title")}
+        copy={localizedField(hero, "copy", locale) || t("intro")}
+        image={hero?.media?.image}
         imageAlt={t("farmImageAlt")}
-        chips={[t("chip1"), t("chip2"), t("chip3")]}
+        chips={localizedValue(hero?.settings?.chips, locale, [t("chip1"), t("chip2"), t("chip3")])}
         fieldJournal={common("fieldJournal")}
         scrollLabel={common("scrollDown")}
         breadcrumbs={
@@ -63,7 +75,7 @@ export default async function ShopPage({params}: Props) {
 
       <section className="bg-forest-950 px-4 py-10 text-white sm:px-6 lg:px-8">
         <div className="film-strip mx-auto grid max-w-7xl grid-cols-3 gap-2 sm:gap-3 md:grid-cols-5">
-          {[imageLibrary.beans, imageLibrary.roasted, imageLibrary.phin, imageLibrary.packaging, imageLibrary.cup].map(
+          {((mediaStrip?.media?.images as string[] | undefined) ?? []).map(
             (image, index) => (
               <Reveal delay={index * 0.04} key={image}>
                 <CinematicImage

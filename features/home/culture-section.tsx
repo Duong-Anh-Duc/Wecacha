@@ -4,13 +4,16 @@ import {SectionHeading} from "@/components/sections/section-heading";
 import {Reveal} from "@/components/motion/reveal";
 import type {Locale} from "@/i18n/routing";
 import {cn} from "@/lib/utils";
+import {localizedField, type SiteSection} from "@/lib/content/cms";
 
 export async function CultureSection({
   locale,
-  tone = "classic"
+  tone = "classic",
+  section
 }: {
   locale: Locale;
   tone?: "classic" | "green";
+  section?: SiteSection | null;
 }) {
   const t = await getTranslations({locale, namespace: "Home"});
   const isGreen = tone === "green";
@@ -24,7 +27,7 @@ export async function CultureSection({
     >
       <div className="absolute inset-0 opacity-40">
         <CinematicImage
-          src="/image3.jpeg"
+          src={section?.media?.background ?? "/image3.jpeg"}
           alt=""
           className="h-full rounded-none shadow-none"
           sizes="100vw"
@@ -34,14 +37,14 @@ export async function CultureSection({
         <Reveal>
           <SectionHeading
             light
-            kicker={t("cultureKicker")}
-            title={t("cultureTitle")}
-            copy={t("cultureCopy")}
+            kicker={localizedField(section, "eyebrow", locale) || t("cultureKicker")}
+            title={localizedField(section, "title", locale) || t("cultureTitle")}
+            copy={localizedField(section, "copy", locale) || t("cultureCopy")}
           />
         </Reveal>
         <Reveal delay={0.15}>
           <blockquote className="border-y border-white/10 py-10 font-serif text-3xl sm:text-4xl leading-snug text-parchment-50 italic">
-            "{t("cultureQuote")}"
+            "{localizedField(section, "quote", locale) || t("cultureQuote")}"
           </blockquote>
         </Reveal>
       </div>

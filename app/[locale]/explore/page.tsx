@@ -7,6 +7,7 @@ import {ExploreHeroCard} from "@/features/explore/explore-hero-card";
 import {ArticlesList} from "@/features/explore/articles-list";
 import {NewsCategories} from "@/features/explore/news-categories";
 import {LeafSketch, LeafSprig} from "@/features/explore/leaf-sketches";
+import {getPageContent, itemsForSection, sectionByKey} from "@/lib/content/cms";
 
 type Props = {
   params: Promise<{locale: Locale}>;
@@ -40,6 +41,7 @@ export default async function ExplorePage({params}: Props) {
   const {locale} = await params;
   setRequestLocale(locale);
   const tNav = await getTranslations({locale, namespace: "Nav"});
+  const content = await getPageContent("explore");
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f4f0e6] pb-8 pt-28 text-[#142918]">
@@ -96,11 +98,11 @@ export default async function ExplorePage({params}: Props) {
         </div>
 
         <div className="grid items-stretch gap-6 lg:grid-cols-12">
-          <ExploreHeroCard locale={locale} />
-          <ArticlesList locale={locale} />
+          <ExploreHeroCard locale={locale} section={sectionByKey(content, "hero_card")} />
+          <ArticlesList locale={locale} items={itemsForSection(content, "article_cards")} />
         </div>
 
-        <NewsCategories locale={locale} />
+        <NewsCategories locale={locale} items={itemsForSection(content, "news_categories")} />
       </div>
     </main>
   );
