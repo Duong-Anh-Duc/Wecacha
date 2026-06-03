@@ -2,6 +2,7 @@ import {
   Coffee,
   Globe2,
   HelpCircle,
+  Sparkles,
   Store
 } from "lucide-react";
 import type {Locale} from "@/i18n/routing";
@@ -35,6 +36,11 @@ export const navItems: NavItem[] = [
     href: "/explore",
     key: "explore",
     icon: Globe2
+  },
+  {
+    href: "/flavor-quiz",
+    key: "flavorQuiz",
+    icon: Sparkles
   },
   {
     href: "/faq",

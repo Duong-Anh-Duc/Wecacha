@@ -1,0 +1,82 @@
+{
+  "table": "site_section_items",
+  "key": {
+    "page_key": "home",
+    "section_key": "core_values"
+  },
+  "backed_up_at": "2026-06-02T18:20:47+07:00",
+  "old_items": [
+    {
+      "item_key": "preserve_culture",
+      "sort_order": 1,
+      "media": {
+        "icon": "leaf",
+        "image": "/core-val-1.png"
+      }
+    },
+    {
+      "item_key": "respect_history",
+      "sort_order": 2,
+      "media": {
+        "icon": "compass",
+        "image": "/core-val-2.png"
+      }
+    },
+    {
+      "item_key": "farmers_story",
+      "sort_order": 3,
+      "media": {
+        "icon": "heart",
+        "image": "/core-val-3.png"
+      }
+    },
+    {
+      "item_key": "distinct_identity",
+      "sort_order": 4,
+      "media": {
+        "icon": "mountain",
+        "image": "/core-val-4.png"
+      }
+    }
+  ],
+  "new_items": [
+    {
+      "item_key": "preserve_culture",
+      "sort_order": 1,
+      "media": {
+        "icon": "leaf",
+        "image": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780399284/wecacha/home/core-value-2-1.jpg"
+      }
+    },
+    {
+      "item_key": "respect_history",
+      "sort_order": 2,
+      "media": {
+        "icon": "compass",
+        "image": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780399285/wecacha/home/core-value-2-2.jpg"
+      }
+    },
+    {
+      "item_key": "farmers_story",
+      "sort_order": 3,
+      "media": {
+        "icon": "heart",
+        "image": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780399286/wecacha/home/core-value-2-3.jpg"
+      }
+    },
+    {
+      "item_key": "distinct_identity",
+      "sort_order": 4,
+      "media": {
+        "icon": "mountain",
+        "image": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780399287/wecacha/home/core-value-2-4.jpg"
+      }
+    }
+  ],
+  "rollback_sql": [
+    "update public.site_section_items set media = '{\"icon\":\"leaf\",\"image\":\"/core-val-1.png\"}'::jsonb where page_key = 'home' and section_key = 'core_values' and item_key = 'preserve_culture';",
+    "update public.site_section_items set media = '{\"icon\":\"compass\",\"image\":\"/core-val-2.png\"}'::jsonb where page_key = 'home' and section_key = 'core_values' and item_key = 'respect_history';",
+    "update public.site_section_items set media = '{\"icon\":\"heart\",\"image\":\"/core-val-3.png\"}'::jsonb where page_key = 'home' and section_key = 'core_values' and item_key = 'farmers_story';",
+    "update public.site_section_items set media = '{\"icon\":\"mountain\",\"image\":\"/core-val-4.png\"}'::jsonb where page_key = 'home' and section_key = 'core_values' and item_key = 'distinct_identity';"
+  ]
+}

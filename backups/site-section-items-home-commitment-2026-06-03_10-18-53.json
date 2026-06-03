@@ -1,0 +1,59 @@
+{
+  "table": "site_section_items",
+  "key": {
+    "page_key": "home",
+    "section_key": "commitment"
+  },
+  "backed_up_at": "2026-06-03T10:18:53+07:00",
+  "old_items": [
+    {
+      "item_key": "hand_harvest",
+      "sort_order": 1,
+      "media": {
+        "image": "/commit-altitude.png"
+      }
+    },
+    {
+      "item_key": "women_children",
+      "sort_order": 2,
+      "media": {
+        "image": "/commit-farmers.png"
+      }
+    },
+    {
+      "item_key": "natural_roast",
+      "sort_order": 3,
+      "media": {
+        "image": "/commit-roast.png"
+      }
+    }
+  ],
+  "new_items": [
+    {
+      "item_key": "hand_harvest",
+      "sort_order": 1,
+      "media": {
+        "image": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780457582/wecacha/home/commitment-slide-3-1.jpg"
+      }
+    },
+    {
+      "item_key": "women_children",
+      "sort_order": 2,
+      "media": {
+        "image": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780457583/wecacha/home/commitment-slide-3-2.jpg"
+      }
+    },
+    {
+      "item_key": "natural_roast",
+      "sort_order": 3,
+      "media": {
+        "image": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780457584/wecacha/home/commitment-slide-3-3.jpg"
+      }
+    }
+  ],
+  "rollback_sql": [
+    "update public.site_section_items set media = '{\"image\":\"/commit-altitude.png\"}'::jsonb where page_key = 'home' and section_key = 'commitment' and item_key = 'hand_harvest';",
+    "update public.site_section_items set media = '{\"image\":\"/commit-farmers.png\"}'::jsonb where page_key = 'home' and section_key = 'commitment' and item_key = 'women_children';",
+    "update public.site_section_items set media = '{\"image\":\"/commit-roast.png\"}'::jsonb where page_key = 'home' and section_key = 'commitment' and item_key = 'natural_roast';"
+  ]
+}

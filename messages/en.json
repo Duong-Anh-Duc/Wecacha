@@ -9,6 +9,7 @@
     "about": "About Us",
     "shop": "Shop",
     "explore": "Explore",
+    "flavorQuiz": "Coffee taste",
     "news": "News",
     "contact": "Contact",
     "cart": "Cart",
@@ -694,6 +695,243 @@
     "orderShipping": "Đang giao",
     "orderCompleted": "Hoàn tất",
     "orderCancelled": "Đã hủy"
+  },
+  "FlavorQuiz": {
+    "metaTitle": "Discover your coffee taste | Wecacha",
+    "metaDescription": "Answer a short quiz to find your coffee flavor groups, explore an interactive flavor wheel and get product suggestions.",
+    "kicker": "Flavor wheel",
+    "title": "Discover your coffee taste",
+    "intro": "Answer a few simple questions about how you drink coffee. Wecacha will calculate your matching flavor groups, highlight them on the wheel and suggest coffees to try.",
+    "start": "Start quiz",
+    "continueQuiz": "Continue quiz",
+    "viewWheel": "View wheel",
+    "wheelLabel": "Interactive coffee flavor wheel",
+    "posterTitle": "Coffee Flavor Wheel",
+    "posterSubtitle": "Vietnamese Coffee Taster's Flavor Wheel",
+    "posterFooter": "Wecacha flavor wheel, prepared for Vietnamese coffee tasting sessions. The structure references common sensory wheel conventions and does not represent a third-party certification body.",
+    "step": "Question {current}/{total}",
+    "back": "Back",
+    "next": "Next question",
+    "seeResult": "See result",
+    "selectedFlavor": "Selected flavor group",
+    "resultKicker": "Your coffee taste",
+    "restart": "Retake quiz",
+    "recommendedTitle": "Recommended products",
+    "wheel": {
+      "flower": "Flower",
+      "chamomile": "Chamomile",
+      "rose": "Rose",
+      "jasmine": "Jasmine",
+      "berryFruit": "Berry fruit",
+      "blackberry": "Blackberry",
+      "raspberry": "Raspberry",
+      "blueberry": "Blueberry",
+      "strawberry": "Strawberry",
+      "driedFruit": "Dried fruit",
+      "raisin": "Raisin",
+      "prune": "Prune",
+      "otherFruit": "Other fruit",
+      "coconut": "Coconut",
+      "cherry": "Cherry",
+      "pineapple": "Pomegranate",
+      "peach": "Peach",
+      "pear": "Pear",
+      "citrusFruit": "Citrus fruit",
+      "grapefruit": "Grapefruit",
+      "orange": "Orange",
+      "lemon": "Lemon",
+      "lime": "Lime",
+      "sour": "Sour",
+      "sourAroma": "Sour aroma",
+      "vinegar": "Vinegar",
+      "yogurt": "Yogurt",
+      "citricAcid": "Citric acid",
+      "fermented": "Fermented",
+      "wine": "Wine",
+      "whisky": "Whisky",
+      "ferment": "Ferment",
+      "green": "Green vegetal",
+      "oliveOil": "Olive oil",
+      "raw": "Raw",
+      "grass": "Grass",
+      "earth": "Earth / wood",
+      "hay": "Hay",
+      "woody": "Woody",
+      "dampEarth": "Damp earth",
+      "mineral": "Mineral",
+      "chemical": "Chemical",
+      "rubber": "Rubber",
+      "petrol": "Phenolic",
+      "medicinal": "Medicinal",
+      "musty": "Musty",
+      "stale": "Stale",
+      "mold": "Mold",
+      "dust": "Dust",
+      "roasted": "Roasted",
+      "malt": "Malt",
+      "toast": "Toast",
+      "smoke": "Smoke",
+      "ash": "Ash",
+      "cereal": "Cereal",
+      "grain": "Peanut",
+      "bread": "Bread",
+      "rice": "Roasted rice",
+      "drySpice": "Dry spice",
+      "clove": "Clove",
+      "pepper": "Black pepper",
+      "cinnamon": "Cinnamon",
+      "licorice": "Licorice",
+      "herbal": "Herbal",
+      "blackTea": "Black tea",
+      "herb": "Dried herb",
+      "nut": "Nut",
+      "peanut": "Hazelnut",
+      "hazelnut": "Almond",
+      "almond": "Roasted nut",
+      "cocoa": "Cocoa",
+      "darkChocolate": "Dark chocolate",
+      "cacao": "Cacao",
+      "milkChocolate": "Chocolate",
+      "brownSugar": "Brown sugar",
+      "molasses": "Molasses",
+      "maple": "Maple syrup",
+      "caramel": "Caramel",
+      "honey": "Honey",
+      "sweetAroma": "Sweet aroma",
+      "vanilla": "Vanilla",
+      "candy": "Candy"
+    },
+    "introCard1": {
+      "title": "Short and easy to choose",
+      "copy": "The quiz uses everyday language such as bright acidity, bold bitterness, caramel sweetness or fruity aroma."
+    },
+    "introCard2": {
+      "title": "Scored by flavor groups",
+      "copy": "Each answer adds points to groups such as floral, fruity, chocolate, nutty, spicy or roasted."
+    },
+    "introCard3": {
+      "title": "Connected to real products",
+      "copy": "The result is not just for fun. It helps you pick coffees that better match your taste."
+    },
+    "flavors": {
+      "floral": {
+        "label": "Floral",
+        "desc": "Light, clean and elegant, often found in lighter roasts or coffees with high clarity.",
+        "children": "Examples: white flowers, jasmine, floral tea, nectar."
+      },
+      "fruity": {
+        "label": "Fruity",
+        "desc": "Fresh, juicy and naturally sweet-sour, ideal for drinkers who enjoy layered coffee.",
+        "children": "Examples: apple, peach, plum, tropical fruit."
+      },
+      "citrus": {
+        "label": "Citrus",
+        "desc": "Bright acidity and a clean finish, especially pleasant as black coffee or cold brew.",
+        "children": "Examples: orange, lemon, tangerine, orange peel."
+      },
+      "berry": {
+        "label": "Berry",
+        "desc": "Red and purple fruit impressions with a clear sweet-sour feeling.",
+        "children": "Examples: strawberry, blueberry, raspberry, cherry."
+      },
+      "sweet": {
+        "label": "Sweet",
+        "desc": "Smooth and approachable, with a soft finish like honey, brown sugar or caramel.",
+        "children": "Examples: honey, caramel, brown sugar, vanilla."
+      },
+      "chocolate": {
+        "label": "Chocolate / cacao",
+        "desc": "Warm, rich and familiar, suitable for balanced cups, espresso, phin or latte.",
+        "children": "Examples: cacao, dark chocolate, mocha, cocoa butter."
+      },
+      "nutty": {
+        "label": "Nutty",
+        "desc": "Roasted nuts, grains and baked notes that feel comfortable for daily drinking.",
+        "children": "Examples: almond, cashew, walnut, cereal."
+      },
+      "spicy": {
+        "label": "Spicy",
+        "desc": "Deeper and more unusual, good for people who enjoy complex aromatic layers.",
+        "children": "Examples: cinnamon, pepper, herbs, star anise."
+      },
+      "roasted": {
+        "label": "Roasted",
+        "desc": "Bold and coffee-forward, close to traditional strong cups and phin coffee.",
+        "children": "Examples: light smoke, toast, roasted nuts, dark caramel."
+      },
+      "earthy": {
+        "label": "Earthy / woody",
+        "desc": "Full, grounded and deep, adding weight to the aftertaste.",
+        "children": "Examples: wood, damp earth, dried herbs, mineral."
+      }
+    },
+    "profiles": {
+      "bright": {
+        "title": "Fruity, citrus, floral",
+        "desc": "You fit bright, clean and delicate coffees with natural acidity. This profile often works well with light to medium Arabica, pour over, cold brew or gentle black coffee."
+      },
+      "balanced": {
+        "title": "Chocolate, soft sweetness, nutty",
+        "desc": "You fit balanced, easy-drinking coffee with a soft sweet finish and warm character. This profile works well with medium roasts, espresso, americano, latte or milk coffee."
+      },
+      "bold": {
+        "title": "Roasted, bold, dark chocolate",
+        "desc": "You fit strong coffee with low acidity, a thick body and a deep finish. This profile is close to traditional coffee taste, suitable for black phin, milk phin or bold espresso."
+      }
+    },
+    "questions": {
+      "q1": {
+        "title": "What kind of coffee taste do you enjoy?",
+        "a": "Bright, light and clean",
+        "b": "Balanced between acidity, sweetness and bitterness",
+        "c": "Bold, bitter and clearly coffee-forward",
+        "d": "Softly sweet, easy to drink and smooth"
+      },
+      "q2": {
+        "title": "Which aroma group attracts you most?",
+        "a": "Fresh fruit such as orange, lemon or apple",
+        "b": "Light, delicate floral notes",
+        "c": "Chocolate, cacao and caramel",
+        "d": "Roasted nuts, toast and grains",
+        "e": "Deep, smoky, woody or earthy notes"
+      },
+      "q3": {
+        "title": "How do you usually like to drink coffee?",
+        "a": "Pour over, V60 or gentle cold brew",
+        "b": "Balanced espresso or americano",
+        "c": "Strong black phin coffee",
+        "d": "Milk coffee, latte or cappuccino",
+        "e": "I am not sure yet, suggest for me"
+      },
+      "q4": {
+        "title": "What kind of finish do you prefer?",
+        "a": "Clean, bright and not too heavy",
+        "b": "Lightly sweet, pleasant and medium-long",
+        "c": "Bold, full and clearly coffee-like",
+        "d": "Unusual, layered and complex"
+      },
+      "q5": {
+        "title": "What matters most when choosing coffee?",
+        "a": "Easy to drink every day",
+        "b": "New flavors to explore",
+        "c": "Strong taste, alertness and traditional style",
+        "d": "Aromatic, light and slow-drinking"
+      },
+      "q6": {
+        "title": "Which roast level do you prefer?",
+        "a": "Light roast with fruit notes and acidity",
+        "b": "Medium roast, balanced and approachable",
+        "c": "Dark roast, strong and less acidic",
+        "d": "I do not know"
+      },
+      "q7": {
+        "title": "What direction should the system recommend?",
+        "a": "Light, aromatic coffee with clear flavor",
+        "b": "Balanced coffee for daily drinking",
+        "c": "Bold, strong coffee for Vietnamese taste",
+        "d": "Special coffee with a new experience"
+      }
+    }
   },
   "ExperienceForm": {
     "title": "Experience Registration",

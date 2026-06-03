@@ -8,6 +8,7 @@ type ChangeFrequency = MetadataRoute.Sitemap[number]["changeFrequency"];
 const staticRoutes: {path: string; priority: number; freq: ChangeFrequency}[] = [
   {path: "",                    priority: 1.0, freq: "weekly"},
   {path: "/shop",               priority: 0.9, freq: "weekly"},
+  {path: "/flavor-quiz",        priority: 0.85, freq: "monthly"},
   {path: "/explore",            priority: 0.8, freq: "monthly"},
   {path: "/news",               priority: 0.8, freq: "weekly"},
   {path: "/about",              priority: 0.7, freq: "monthly"},

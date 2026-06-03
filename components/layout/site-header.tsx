@@ -23,7 +23,7 @@ export function SiteHeader() {
   const [localeLoading, setLocaleLoading] = useState(false);
   const isHome = pathname === "/";
   const isGreenHome = pathname === "/green";
-  const showHomeVariantToggle = isHome || isGreenHome;
+  // const showHomeVariantToggle = isHome || isGreenHome;
 
   if (pathname.startsWith("/admin")) {
     return null;
@@ -198,6 +198,7 @@ export function SiteHeader() {
               </Link>
             ) : (
               <>
+                {/* Tạm ẩn nút chuyển "Bản xanh". Bỏ comment block này khi cần bật lại.
                 {showHomeVariantToggle ? (
                   <Link
                     href={isGreenHome ? "/" : "/green"}
@@ -206,6 +207,7 @@ export function SiteHeader() {
                     {isGreenHome ? t("classicHome") : t("greenHome")}
                   </Link>
                 ) : null}
+                */}
                 <LocaleSwitcher locale={locale} pathname={pathname} solid={solid} onLoading={setLocaleLoading} />
                 <CartDrawer solid={solid} />
               </>

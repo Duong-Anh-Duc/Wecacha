@@ -1,0 +1,19 @@
+{
+  "table": "site_sections",
+  "key": {
+    "page_key": "home",
+    "section_key": "origin_story"
+  },
+  "backed_up_at": "2026-06-02T18:19:15+07:00",
+  "old_media": {
+    "primary": "/image2.jpeg",
+    "secondary": "/image1.jpeg",
+    "background": "/image1.jpeg"
+  },
+  "new_media": {
+    "primary": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780398172/wecacha/home/origin-story-primary-1-2.png",
+    "secondary": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780398206/wecacha/home/origin-story-secondary-1-1.jpg",
+    "background": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780398206/wecacha/home/origin-story-secondary-1-1.jpg"
+  },
+  "rollback_sql": "update public.site_sections set media = '{\"primary\":\"/image2.jpeg\",\"secondary\":\"/image1.jpeg\",\"background\":\"/image1.jpeg\"}'::jsonb where page_key = 'home' and section_key = 'origin_story';"
+}

@@ -9,6 +9,7 @@
     "about": "Giới thiệu",
     "shop": "Cửa hàng",
     "explore": "Khám phá",
+    "flavorQuiz": "Gu cà phê",
     "news": "Tin tức",
     "contact": "Liên hệ",
     "cart": "Giỏ hàng",
@@ -694,6 +695,243 @@
     "orderShipping": "Đang giao",
     "orderCompleted": "Hoàn tất",
     "orderCancelled": "Đã hủy"
+  },
+  "FlavorQuiz": {
+    "metaTitle": "Khám phá gu cà phê của bạn | Wecacha",
+    "metaDescription": "Trả lời quiz ngắn để tìm nhóm hương vị cà phê phù hợp, xem vòng tròn hương vị tương tác và nhận gợi ý sản phẩm.",
+    "kicker": "Vòng tròn hương vị",
+    "title": "Khám phá gu cà phê của bạn",
+    "intro": "Trả lời vài câu hỏi dễ hiểu về thói quen uống cà phê. Wecacha sẽ tính ra nhóm hương phù hợp, highlight trên vòng tròn hương vị và gợi ý sản phẩm nên thử.",
+    "start": "Bắt đầu quiz",
+    "continueQuiz": "Tiếp tục quiz",
+    "viewWheel": "Xem vòng tròn",
+    "wheelLabel": "Vòng tròn hương vị cà phê tương tác",
+    "posterTitle": "Vòng Tròn Hương Vị Cà Phê",
+    "posterSubtitle": "Vietnamese Coffee Taster's Flavor Wheel",
+    "posterFooter": "Vòng tròn hương vị Wecacha, biên soạn cho trải nghiệm nếm thử cà phê Việt Nam. Thiết kế tham khảo cấu trúc sensory wheel phổ biến, không đại diện cho tổ chức chứng nhận bên thứ ba.",
+    "step": "Câu {current}/{total}",
+    "back": "Quay lại",
+    "next": "Câu tiếp theo",
+    "seeResult": "Xem kết quả",
+    "selectedFlavor": "Nhóm hương đang xem",
+    "resultKicker": "Gu cà phê của bạn",
+    "restart": "Làm lại quiz",
+    "recommendedTitle": "Sản phẩm phù hợp",
+    "wheel": {
+      "flower": "Hoa",
+      "chamomile": "Hoa cúc",
+      "rose": "Hoa hồng",
+      "jasmine": "Hoa nhài",
+      "berryFruit": "Quả mọng",
+      "blackberry": "Mâm xôi đen",
+      "raspberry": "Phúc bồn tử",
+      "blueberry": "Việt quất",
+      "strawberry": "Dâu tây",
+      "driedFruit": "Quả khô",
+      "raisin": "Nho khô",
+      "prune": "Mận khô",
+      "otherFruit": "Các loại quả khác",
+      "coconut": "Dừa",
+      "cherry": "Cherry",
+      "pineapple": "Thạch lựu",
+      "peach": "Quả đào",
+      "pear": "Quả lê",
+      "citrusFruit": "Quả có múi",
+      "grapefruit": "Quả bưởi",
+      "orange": "Quả cam",
+      "lemon": "Chanh vàng",
+      "lime": "Chanh xanh",
+      "sour": "Chua",
+      "sourAroma": "Mùi chua",
+      "vinegar": "Giấm",
+      "yogurt": "Sữa chua",
+      "citricAcid": "Citric acid",
+      "fermented": "Lên men",
+      "wine": "Rượu vang",
+      "whisky": "Rượu whisky",
+      "ferment": "Lên men",
+      "green": "Tươi xanh thực vật",
+      "oliveOil": "Dầu ô liu",
+      "raw": "Rau mầm",
+      "grass": "Cỏ khô",
+      "earth": "Đất / mộc",
+      "hay": "Thảo mộc",
+      "woody": "Gỗ khô",
+      "dampEarth": "Đất ẩm",
+      "mineral": "Khoáng",
+      "chemical": "Hóa chất",
+      "rubber": "Cao su",
+      "petrol": "Phenolic",
+      "medicinal": "Thuốc",
+      "musty": "Giấy / mốc",
+      "stale": "Cũ",
+      "mold": "Ẩm mốc",
+      "dust": "Bụi mốc",
+      "roasted": "Rang / nướng",
+      "malt": "Malt",
+      "toast": "Nâu / nướng",
+      "smoke": "Mùi khói",
+      "ash": "Than tro",
+      "cereal": "Ngũ cốc",
+      "grain": "Đậu phộng",
+      "bread": "Bánh mì",
+      "rice": "Gạo rang",
+      "drySpice": "Gia vị khô",
+      "clove": "Nhục đậu khấu",
+      "pepper": "Tiêu đen",
+      "cinnamon": "Quế",
+      "licorice": "Hồi",
+      "herbal": "Thảo mộc",
+      "blackTea": "Trà đen",
+      "herb": "Thảo mộc khô",
+      "nut": "Hạt",
+      "peanut": "Hạt phỉ",
+      "hazelnut": "Hạnh nhân",
+      "almond": "Hạt rang",
+      "cocoa": "Cacao",
+      "darkChocolate": "Socola đen",
+      "cacao": "Cacao",
+      "milkChocolate": "Socola",
+      "brownSugar": "Đường nâu",
+      "molasses": "Mật mía",
+      "maple": "Siro phong",
+      "caramel": "Caramel",
+      "honey": "Mật ong",
+      "sweetAroma": "Mùi ngọt",
+      "vanilla": "Vani",
+      "candy": "Kẹo ngọt"
+    },
+    "introCard1": {
+      "title": "Câu hỏi ngắn, dễ chọn",
+      "copy": "Quiz dùng ngôn ngữ đời thường như chua thanh, đắng đậm, ngọt caramel hoặc hương trái cây."
+    },
+    "introCard2": {
+      "title": "Tính điểm theo nhóm hương",
+      "copy": "Mỗi đáp án cộng điểm cho các nhóm như hương hoa, trái cây, chocolate, hạt rang hoặc rang nướng."
+    },
+    "introCard3": {
+      "title": "Gắn với sản phẩm thật",
+      "copy": "Kết quả không chỉ để xem cho vui, mà còn giúp bạn chọn dòng cà phê hợp khẩu vị hơn."
+    },
+    "flavors": {
+      "floral": {
+        "label": "Hương hoa",
+        "desc": "Nhẹ, thanh và tinh tế, thường xuất hiện ở cà phê rang sáng hoặc những mẻ có độ sạch cao.",
+        "children": "Gợi ý: hoa trắng, nhài, trà hoa, mật hoa."
+      },
+      "fruity": {
+        "label": "Hương trái cây",
+        "desc": "Tươi, mọng nước và có cảm giác chua ngọt tự nhiên, hợp với người thích cà phê nhiều tầng hương.",
+        "children": "Gợi ý: táo, đào, mận, trái cây nhiệt đới."
+      },
+      "citrus": {
+        "label": "Hương cam chanh",
+        "desc": "Chua sáng, thanh và sạch miệng, tạo cảm giác nhẹ nhàng khi uống đen hoặc pha lạnh.",
+        "children": "Gợi ý: cam, chanh, quýt, vỏ cam."
+      },
+      "berry": {
+        "label": "Hương quả mọng",
+        "desc": "Gợi nhớ các loại quả đỏ và quả tím, thường mang cảm giác chua ngọt rõ ràng.",
+        "children": "Gợi ý: dâu, việt quất, mâm xôi, cherry."
+      },
+      "sweet": {
+        "label": "Hương ngọt",
+        "desc": "Êm, dễ uống và có hậu vị ngọt dịu như mật ong, đường nâu hoặc caramel.",
+        "children": "Gợi ý: mật ong, caramel, đường nâu, vani."
+      },
+      "chocolate": {
+        "label": "Chocolate / cacao",
+        "desc": "Đậm, ấm và quen thuộc, hợp với gu cân bằng hoặc các kiểu uống espresso, phin, latte.",
+        "children": "Gợi ý: cacao, chocolate đen, mocha, bơ cacao."
+      },
+      "nutty": {
+        "label": "Hương hạt",
+        "desc": "Gợi nhớ hạt rang, ngũ cốc và bánh nướng, tạo cảm giác dễ uống hằng ngày.",
+        "children": "Gợi ý: hạnh nhân, hạt điều, óc chó, ngũ cốc."
+      },
+      "spicy": {
+        "label": "Hương gia vị",
+        "desc": "Có chiều sâu và hơi lạ miệng, phù hợp với người thích trải nghiệm mới hoặc tầng hương phức tạp.",
+        "children": "Gợi ý: quế, tiêu, thảo mộc, hồi."
+      },
+      "roasted": {
+        "label": "Hương rang nướng",
+        "desc": "Đậm, mạnh và rõ vị cà phê, gần với gu truyền thống hoặc những ly phin đậm.",
+        "children": "Gợi ý: khói nhẹ, bánh nướng, hạt rang, caramel đậm."
+      },
+      "earthy": {
+        "label": "Hương đất / mộc",
+        "desc": "Dày, trầm và mạnh, tạo cảm giác có chiều sâu ở hậu vị.",
+        "children": "Gợi ý: gỗ, đất ẩm, thảo mộc khô, khoáng."
+      }
+    },
+    "profiles": {
+      "bright": {
+        "title": "Trái cây, cam chanh, hương hoa",
+        "desc": "Bạn hợp với cà phê thanh, sáng, nhẹ nhàng và có độ chua tự nhiên. Gu này thường phù hợp với Arabica rang sáng hoặc rang vừa, pour over, cold brew hoặc uống đen nhẹ."
+      },
+      "balanced": {
+        "title": "Chocolate, ngọt dịu, hương hạt",
+        "desc": "Bạn hợp với cà phê cân bằng, dễ uống, có hậu vị ngọt nhẹ và cảm giác ấm. Gu này phù hợp với rang vừa, espresso, americano, latte hoặc cà phê sữa."
+      },
+      "bold": {
+        "title": "Rang nướng, đậm vị, chocolate đen",
+        "desc": "Bạn hợp với cà phê đậm, mạnh, ít chua và có hậu vị dày. Gu này gần với phong cách cà phê truyền thống, phù hợp với phin đen, phin sữa hoặc espresso đậm."
+      }
+    },
+    "questions": {
+      "q1": {
+        "title": "Bạn thích cà phê có cảm giác vị như thế nào?",
+        "a": "Chua thanh, nhẹ nhàng, uống sạch miệng",
+        "b": "Cân bằng giữa chua, ngọt và đắng",
+        "c": "Đắng đậm, mạnh, rõ vị cà phê",
+        "d": "Ngọt dịu, dễ uống, hậu vị êm"
+      },
+      "q2": {
+        "title": "Nhóm mùi hương nào khiến bạn dễ thích nhất?",
+        "a": "Hương trái cây tươi như cam, chanh, táo",
+        "b": "Hương hoa nhẹ, thanh, tinh tế",
+        "c": "Hương chocolate, cacao, caramel",
+        "d": "Hương hạt rang, bánh nướng, ngũ cốc",
+        "e": "Hương trầm, mạnh, hơi khói hoặc mộc"
+      },
+      "q3": {
+        "title": "Bạn thường thích uống cà phê theo kiểu nào?",
+        "a": "Pour over, V60 hoặc cold brew nhẹ nhàng",
+        "b": "Espresso hoặc Americano cân bằng",
+        "c": "Cà phê phin đen đậm",
+        "d": "Cà phê sữa, latte hoặc cappuccino",
+        "e": "Tôi chưa rõ, muốn hệ thống gợi ý"
+      },
+      "q4": {
+        "title": "Bạn thích hậu vị sau khi uống như thế nào?",
+        "a": "Sạch, thanh, không quá nặng miệng",
+        "b": "Ngọt nhẹ, dễ chịu, kéo dài vừa phải",
+        "c": "Đậm, dày, rõ vị cà phê",
+        "d": "Lạ, có tầng hương phức tạp"
+      },
+      "q5": {
+        "title": "Khi chọn cà phê, bạn ưu tiên điều gì?",
+        "a": "Dễ uống hằng ngày",
+        "b": "Có hương vị mới lạ để khám phá",
+        "c": "Đậm vị, tỉnh táo, hợp gu truyền thống",
+        "d": "Thơm, nhẹ, phù hợp uống chậm"
+      },
+      "q6": {
+        "title": "Bạn thích mức rang nào?",
+        "a": "Rang sáng, giữ hương trái cây và độ chua",
+        "b": "Rang vừa, cân bằng và dễ uống",
+        "c": "Rang đậm, mạnh và ít chua",
+        "d": "Tôi không biết"
+      },
+      "q7": {
+        "title": "Bạn muốn hệ thống gợi ý cà phê theo hướng nào?",
+        "a": "Cà phê nhẹ, thơm, dễ cảm nhận hương",
+        "b": "Cà phê cân bằng, dễ uống mỗi ngày",
+        "c": "Cà phê đậm, mạnh, hợp gu Việt Nam",
+        "d": "Cà phê đặc biệt, có trải nghiệm mới"
+      }
+    }
   },
   "ExperienceForm": {
     "title": "Đăng Ký Trải Nghiệm",

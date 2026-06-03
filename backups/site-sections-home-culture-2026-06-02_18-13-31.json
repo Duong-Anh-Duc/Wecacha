@@ -1,0 +1,15 @@
+{
+  "table": "site_sections",
+  "key": {
+    "page_key": "home",
+    "section_key": "culture"
+  },
+  "backed_up_at": "2026-06-02T18:13:31+07:00",
+  "old_media": {
+    "background": "/image3.jpeg"
+  },
+  "new_media": {
+    "background": "https://res.cloudinary.com/dxkcpaifl/image/upload/v1780398857/wecacha/home/culture-background-ddt09291.jpg"
+  },
+  "rollback_sql": "update public.site_sections set media = '{\"background\":\"/image3.jpeg\"}'::jsonb where page_key = 'home' and section_key = 'culture';"
+}
