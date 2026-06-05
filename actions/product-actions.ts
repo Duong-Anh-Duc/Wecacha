@@ -28,6 +28,19 @@ function jsonFromText<T>(value: FormDataEntryValue | null, fallback: T): T {
   }
 }
 
+function revalidateShopPaths(productSlug?: string, categorySlugs: string[] = []) {
+  for (const locale of ["vi", "en"]) {
+    revalidatePath(`/${locale}/admin/products`);
+    revalidatePath(`/${locale}/shop`);
+    if (productSlug) {
+      revalidatePath(`/${locale}/shop/${productSlug}`);
+    }
+    for (const categorySlug of categorySlugs) {
+      revalidatePath(`/${locale}/shop/category/${categorySlug}`);
+    }
+  }
+}
+
 async function productExtensionColumns(
   supabase: Awaited<ReturnType<typeof getAdminSession>>["supabase"]
 ) {
@@ -200,8 +213,7 @@ export async function upsertProduct(formData: FormData) {
     }
   }
 
-  revalidatePath("/admin/products");
-  revalidatePath("/shop");
+  revalidateShopPaths(String(payload.slug ?? ""), [String(payload.category ?? ""), ...categorySlugs].filter(Boolean));
   return {success: true};
 }
 
@@ -225,8 +237,7 @@ export async function updateProductSortOrder(ids: string[]) {
     return {success: false, error: error.message};
   }
 
-  revalidatePath("/admin/products");
-  revalidatePath("/shop");
+  revalidateShopPaths();
   return {success: true};
 }
 
@@ -285,8 +296,7 @@ export async function upsertProductCategory(formData: FormData) {
     }
   }
 
-  revalidatePath("/admin/products");
-  revalidatePath("/shop");
+  revalidateShopPaths();
   return {success: true};
 }
 
@@ -316,8 +326,7 @@ export async function deleteProductCategory(slug: string) {
     return {success: false, error: error.message};
   }
 
-  revalidatePath("/admin/products");
-  revalidatePath("/shop");
+  revalidateShopPaths();
   return {success: true};
 }
 
@@ -328,14 +337,22 @@ export async function deleteProduct(id: string) {
     return {success: false, error: "Unauthorized"};
   }
 
+  const {data: product} = await supabase
+    .from("products")
+    .select("slug, category, category_slugs")
+    .eq("id", id)
+    .maybeSingle();
+
   const {error} = await supabase.from("products").delete().eq("id", id);
 
   if (error) {
     return {success: false, error: error.message};
   }
 
-  revalidatePath("/admin/products");
-  revalidatePath("/shop");
+  revalidateShopPaths(
+    String(product?.slug ?? ""),
+    [String(product?.category ?? ""), ...((product?.category_slugs as string[] | null) ?? [])].filter(Boolean)
+  );
   return {success: true};
 }
 

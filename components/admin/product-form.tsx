@@ -2,9 +2,9 @@
 
 import {useState, useTransition} from "react";
 import Image from "next/image";
-import {App, Button, Card, Form, Input, InputNumber} from "antd";
+import {App, Button, Card, Form, Input, InputNumber, Select, Switch} from "antd";
 import {DeleteOutlined, PlusOutlined, SaveOutlined, UploadOutlined} from "@ant-design/icons";
-import {useTranslations} from "next-intl";
+import {useLocale, useTranslations} from "next-intl";
 import {uploadProductImage, upsertProduct} from "@/actions/product-actions";
 import {useRouter} from "@/i18n/navigation";
 
@@ -60,7 +60,7 @@ function textFromList(value?: string[] | string | null) {
 
 export function ProductForm({
   initialData = {},
-  categories: _categories,
+  categories,
   onSaved,
   redirectOnSave = true
 }: {
@@ -70,6 +70,7 @@ export function ProductForm({
   redirectOnSave?: boolean;
 }) {
   const t = useTranslations("Admin");
+  const locale = useLocale();
   const router = useRouter();
   const {message} = App.useApp();
   const [isPending, startTransition] = useTransition();
@@ -78,6 +79,14 @@ export function ProductForm({
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
   const [featured, setFeatured] = useState(Boolean(initialData.featured));
   const isEditing = Boolean(initialData.id);
+  const categoryOptions = categories.length > 0
+    ? categories
+    : [
+        {slug: "beans", name_vi: "beans", name_en: "beans"},
+        {slug: "ground", name_vi: "ground", name_en: "ground"},
+        {slug: "phin", name_vi: "phin", name_en: "phin"},
+        {slug: "gifts", name_vi: "gifts", name_en: "gifts"}
+      ];
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
@@ -185,6 +194,26 @@ export function ProductForm({
           <Form.Item name="name_en" label={t("fieldNameEN")} rules={[{required: true, message: t("productNameRequired")}]}>
             <Input />
           </Form.Item>
+        </div>
+        <Form.Item name="category_slugs" label={t("categoriesOptional")}>
+          <Select
+            mode="multiple"
+            allowClear
+            options={categoryOptions.map((category) => ({
+              value: category.slug,
+              label: locale === "en" ? category.name_en : category.name_vi
+            }))}
+          />
+        </Form.Item>
+        <div className="flex flex-wrap gap-6">
+          <label className="inline-flex items-center gap-3 text-sm font-medium text-stone-700">
+            <Switch checked={isVisible} onChange={setIsVisible} />
+            {t("visible")}
+          </label>
+          <label className="inline-flex items-center gap-3 text-sm font-medium text-stone-700">
+            <Switch checked={featured} onChange={setFeatured} />
+            {t("featured")}
+          </label>
         </div>
       </Card>
 
