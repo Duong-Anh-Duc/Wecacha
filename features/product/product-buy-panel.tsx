@@ -1,105 +1,146 @@
 "use client";
 
 import {useState} from "react";
-import {Minus, Plus, Star, ShieldCheck, Truck, Headphones, Droplet, Coffee, AlertCircle, ShoppingBag, CreditCard} from "lucide-react";
+import {CreditCard, Minus, Plus} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
-import {FlashSaleCountdown} from "@/features/product/flash-sale-countdown";
 import type {Locale} from "@/i18n/routing";
 import type {Product} from "@/lib/content/types";
 import {formatCurrency, localized} from "@/lib/content/helpers";
+
+function tierLabel(tier: NonNullable<Product["priceTiers"]>[number]) {
+  const range = [tier.minKg ? `${tier.minKg}kg` : "", tier.maxKg ? `${tier.maxKg}kg` : ""]
+    .filter(Boolean)
+    .join(" - ");
+  return tier.attribute || range;
+}
 
 export function ProductBuyPanel({product}: {product: Product}) {
   const locale = useLocale() as Locale;
   const t = useTranslations("Common");
   const tProduct = useTranslations("Product");
-  const [quantity, setQuantity] = useState(1);
+  const firstTier = product.priceTiers?.[0];
+  const hasWeightTiers = Boolean(product.priceTiers?.length);
+  const minKg = firstTier?.minKg ?? 1;
+  const maxKg = product.priceTiers?.reduce<number | undefined>((max, tier) => {
+    if (!tier.maxKg) return max;
+    return max === undefined ? tier.maxKg : Math.max(max, tier.maxKg);
+  }, undefined);
+  const [quantity, setQuantity] = useState(hasWeightTiers ? minKg : 1);
+  const selectedTier = product.priceTiers?.find((tier) => {
+    const matchesMin = tier.minKg ? quantity >= tier.minKg : true;
+    const matchesMax = tier.maxKg ? quantity <= tier.maxKg : true;
+    return matchesMin && matchesMax;
+  }) ?? firstTier;
+  const selectedPrice = selectedTier?.price ?? product.price;
+  const selectedOption = selectedTier
+    ? {
+        id: `${product.slug}:${selectedTier.attribute || selectedTier.minKg || "tier"}-${selectedTier.maxKg || "up"}`,
+        label: tierLabel(selectedTier),
+        price: selectedPrice
+      }
+    : undefined;
+  const totalPrice = selectedPrice * quantity;
+
+  function updateQuantity(nextQuantity: number) {
+    const normalized = Math.max(hasWeightTiers ? minKg : 1, Math.round(nextQuantity || minKg));
+    setQuantity(maxKg ? Math.min(normalized, maxKg) : normalized);
+  }
 
   return (
     <aside className="flex flex-col pt-2 relative z-0">
-      {/* Rating & Badge */}
-      <div className="flex items-center gap-3 mb-4 text-[#142918]">
-        <div className="flex items-center gap-1.5 font-bold text-sm">
-          <span>4.9</span>
-          <div className="flex text-[#f3a734]">
-            <Star className="w-4 h-4 fill-current" />
-            <Star className="w-4 h-4 fill-current" />
-            <Star className="w-4 h-4 fill-current" />
-            <Star className="w-4 h-4 fill-current" />
-            <Star className="w-4 h-4 fill-current" />
-          </div>
-          <span className="text-[#142918]/60 font-medium px-1">|</span>
-          <span className="text-[#142918]/70 font-medium">{tProduct("reviewCount", {count: 128})}</span>
-        </div>
-        {product.featured && (
-          <span className="bg-[#417a22] text-white text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-sm">
-            {tProduct("bestseller")}
-          </span>
-        )}
-      </div>
-
       <h1 className="font-serif text-[32px] lg:text-[42px] leading-[1.1] text-[#142918] mb-4">
         {localized(product.name, locale)}
       </h1>
       
-      <p className="text-[14px] lg:text-[15px] leading-[1.6] text-[#142918]/80 mb-6 w-full lg:max-w-[90%]">
-        {localized(product.description, locale)}
-      </p>
+      {localized(product.description, locale) ? (
+        <p className="mb-6 w-full text-[14px] leading-[1.6] text-[#142918]/80 lg:max-w-[90%] lg:text-[15px]">
+          {localized(product.description, locale)}
+        </p>
+      ) : null}
 
       {/* Price */}
       <div className="flex items-end gap-3 mb-8">
-        <span className="text-[32px] lg:text-[38px] font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-[#b5703a] to-[#e89d5f]">
-          {formatCurrency(product.price, locale)}
+        <span className="text-[32px] lg:text-[38px] font-bold leading-none text-[#a46131]">
+          {formatCurrency(selectedPrice, locale)}
         </span>
-        {product.originalPrice && (
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[18px] lg:text-[20px] font-medium text-[#142918]/40 line-through">
-              {formatCurrency(product.originalPrice, locale)}
-            </span>
-            <div className="relative group flex items-center overflow-hidden rounded-md border border-[#b5703a]/20 bg-gradient-to-r from-[#b5703a]/5 to-[#b5703a]/10 px-2.5 py-1 transition-all hover:border-[#b5703a]/40 hover:shadow-sm">
-              <div className="absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-[#b5703a]/80 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              <span className="bg-gradient-to-r from-[#b5703a] to-[#d68b4d] bg-clip-text text-[10px] font-bold text-transparent lg:text-[12px]">
-                {tProduct("discountBadge", {percent: 22})}
-              </span>
-            </div>
+        {hasWeightTiers ? (
+          <span className="pb-1 text-sm font-semibold text-[#142918]/58">/ kg</span>
+        ) : null}
+      </div>
+
+      {product.priceTiers?.length ? (
+        <div className="mb-8 rounded-2xl border border-[#142918]/10 bg-white p-4">
+          <p className="mb-3 text-[13px] font-bold text-[#142918]">{tProduct("buyWeightPrice")}</p>
+          <div className="space-y-2">
+            {product.priceTiers.map((tier, index) => {
+              const label = tierLabel(tier);
+              const isSelected = selectedTier === tier;
+              return (
+                <button
+                  key={`${tier.attribute}-${index}`}
+                  type="button"
+                  onClick={() => updateQuantity(tier.minKg ?? 1)}
+                  className={
+                    isSelected
+                      ? "flex w-full items-center justify-between gap-3 rounded-xl border border-[#a46131] bg-[#fff8ed] px-3 py-2 text-left text-sm shadow-[0_0_0_3px_rgba(164,97,49,0.12)]"
+                      : "flex w-full items-center justify-between gap-3 rounded-xl border border-transparent bg-[#f8f6f0] px-3 py-2 text-left text-sm transition hover:border-[#a46131]/30 hover:bg-[#fffaf2]"
+                  }
+                  aria-pressed={isSelected}
+                >
+                  <span className="font-semibold text-[#142918]/78">{label}</span>
+                  <span className="font-bold text-[#a46131]">{formatCurrency(tier.price, locale)}/kg</span>
+                </button>
+              );
+            })}
           </div>
-        )}
-      </div>
+        </div>
+      ) : null}
 
-      {product.originalPrice && <FlashSaleCountdown />}
-
-      {/* Feature Pills */}
-      <div className="grid grid-cols-3 gap-2 lg:gap-3 mb-8">
-        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl h-[72px] text-center p-1">
-          <Coffee className="w-5 h-5 text-[#142918]/70 shrink-0" />
-          <span className="text-[8px] lg:text-[9px] font-bold text-[#142918] leading-tight">{tProduct("arabicaPill")}</span>
+      {(product.weight || product.baseUnit) ? (
+        <div className="mb-8 grid gap-3 rounded-2xl border border-[#142918]/10 bg-white p-4 text-sm text-[#142918]/78 sm:grid-cols-2">
+          {product.weight ? (
+            <div>
+              <p className="mb-1 text-[12px] font-bold text-[#142918]">{tProduct("weight")}</p>
+              <p>{product.weight}</p>
+            </div>
+          ) : null}
+          {product.baseUnit ? (
+            <div>
+              <p className="mb-1 text-[12px] font-bold text-[#142918]">{tProduct("packageSpec")}</p>
+              <p>{product.baseUnit}</p>
+            </div>
+          ) : null}
         </div>
-        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl h-[72px] text-center p-1">
-          <Droplet className="w-5 h-5 text-[#142918]/70 shrink-0" />
-          <span className="text-[8px] lg:text-[9px] font-bold text-[#142918] leading-tight">{tProduct("naturalRoastFull")}</span>
-        </div>
-        <div className="flex flex-col items-center justify-center gap-1.5 bg-white border border-[#142918]/10 rounded-2xl h-[72px] text-center p-1">
-          <AlertCircle className="w-5 h-5 text-[#142918]/70 shrink-0" />
-          <span className="text-[8px] lg:text-[9px] font-bold text-[#142918] leading-tight">{tProduct("noPreservatives")}</span>
-        </div>
-      </div>
+      ) : null}
 
       <div className="mb-8">
-        <p className="mb-3 text-[13px] font-bold text-[#142918]">{t("quantity")}</p>
+        <p className="mb-3 text-[13px] font-bold text-[#142918]">
+          {hasWeightTiers ? tProduct("kgAmount") : t("quantity")}
+        </p>
         <div className="flex gap-3 lg:gap-4">
           <div className="inline-flex h-12 lg:h-14 items-center rounded-xl border border-[#142918]/20 bg-white px-2">
             <button
               className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
-              onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+              onClick={() => updateQuantity(quantity - 1)}
               aria-label={t("decreaseQty")}
             >
               <Minus className="h-4 w-4" />
             </button>
-            <span className="min-w-8 lg:min-w-10 text-center font-bold text-[15px]">{quantity}</span>
+            <input
+              value={quantity}
+              onChange={(event) => updateQuantity(Number(event.target.value))}
+              className="h-full w-14 bg-transparent text-center text-[15px] font-bold text-[#142918] outline-none"
+              inputMode="numeric"
+              min={hasWeightTiers ? minKg : 1}
+              max={maxKg}
+              type="number"
+              aria-label={hasWeightTiers ? tProduct("kgAmount") : t("quantity")}
+            />
             <button
               className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
-              onClick={() => setQuantity((value) => value + 1)}
+              onClick={() => updateQuantity(quantity + 1)}
               aria-label={t("increaseQty")}
             >
               <Plus className="h-4 w-4" />
@@ -110,47 +151,29 @@ export function ProductBuyPanel({product}: {product: Product}) {
             locale={locale}
             quantity={quantity}
             variant="default"
-            className="flex-1 h-12 lg:h-14 bg-[#a46131] hover:bg-[#8e5227] text-white rounded-xl text-[14px] lg:text-[15px] font-bold shadow-[0_4px_14px_rgba(164,97,49,0.25)] transition-all hover:-translate-y-0.5 px-2"
+            selectedOption={selectedOption}
+            className="flex-1 h-12 lg:h-14 bg-[#8e5b34] hover:bg-[#754827] text-white rounded-xl text-[14px] lg:text-[15px] font-bold shadow-[0_4px_14px_rgba(80,49,28,0.16)] transition-all hover:-translate-y-0.5 px-2"
             label={t("addToCart")}
           />
         </div>
+        {hasWeightTiers ? (
+          <div className="mt-3 flex items-center justify-between rounded-xl bg-[#f8f6f0] px-4 py-3 text-sm">
+            <span className="font-semibold text-[#142918]/70">{tProduct("estimatedTotal")}</span>
+            <span className="font-bold text-[#142918]">{formatCurrency(totalPrice, locale)}</span>
+          </div>
+        ) : null}
         <BuyNowButton
           product={product}
           quantity={quantity}
           variant="default"
-          className="w-full h-12 lg:h-14 mt-4 rounded-xl bg-gradient-to-r from-[#ff5100] to-[#cc2900] text-white text-[15px] lg:text-[16px] font-bold transition-all overflow-hidden relative group animate-fire"
+          selectedOption={selectedOption}
+          className="w-full h-12 lg:h-14 mt-4 rounded-xl bg-[#17351f] text-white text-[15px] lg:text-[16px] font-bold transition-all overflow-hidden relative group shadow-[0_8px_18px_rgba(20,41,24,0.18)] hover:bg-[#102817]"
         >
-          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
           <span className="relative flex items-center justify-center gap-2">
             <CreditCard className="w-5 h-5" />
             <span>{t("buyNow")}</span>
           </span>
         </BuyNowButton>
-      </div>
-
-      {/* Trust Badges */}
-      <div className="flex flex-col sm:flex-row gap-4 lg:gap-4 p-4 rounded-2xl bg-white/50 border border-[#142918]/5">
-        <div className="flex gap-3 flex-1 items-center sm:items-start">
-          <Truck className="w-5 h-5 text-[#142918]/80 shrink-0" />
-          <div>
-            <p className="text-[11px] font-bold text-[#142918] leading-tight">{tProduct("freeShippingTitle")}</p>
-            <p className="text-[10px] text-[#142918]/60 mt-0.5">{tProduct("freeShippingDesc")}</p>
-          </div>
-        </div>
-        <div className="flex gap-3 flex-1 items-center sm:items-start">
-          <ShieldCheck className="w-5 h-5 text-[#142918]/80 shrink-0" />
-          <div>
-            <p className="text-[11px] font-bold text-[#142918] leading-tight">{tProduct("easyReturnTitle")}</p>
-            <p className="text-[10px] text-[#142918]/60 mt-0.5">{tProduct("easyReturnDesc")}</p>
-          </div>
-        </div>
-        <div className="flex gap-3 flex-1 items-center sm:items-start">
-          <Headphones className="w-5 h-5 text-[#142918]/80 shrink-0" />
-          <div>
-            <p className="text-[11px] font-bold text-[#142918] leading-tight">{tProduct("supportTitle")}</p>
-            <p className="text-[10px] text-[#142918]/60 mt-0.5">{tProduct("supportDesc")}</p>
-          </div>
-        </div>
       </div>
     </aside>
   );

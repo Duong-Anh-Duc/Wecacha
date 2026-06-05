@@ -16,6 +16,11 @@ type Props = {
   variant?: "default" | "forest" | "outline" | "light";
   label?: string;
   className?: string;
+  selectedOption?: {
+    id: string;
+    label: string;
+    price: number;
+  };
 };
 
 export function AddToCartButton({
@@ -24,7 +29,8 @@ export function AddToCartButton({
   quantity = 1,
   variant = "default",
   label,
-  className
+  className,
+  selectedOption
 }: Props) {
   const t = useTranslations("Common");
   const addItem = useCartStore((state) => state.addItem);
@@ -34,10 +40,11 @@ export function AddToCartButton({
     addItem(
       {
         slug: product.slug,
+        variantId: selectedOption?.id,
         name: localized(product.name, locale),
-        price: product.price,
+        price: selectedOption?.price ?? product.price,
         image: product.images[0],
-        weight: product.weight,
+        weight: selectedOption?.label ?? product.weight,
         category: product.category,
         notes: localized(product.notes, locale)
       },

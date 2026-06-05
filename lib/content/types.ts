@@ -7,6 +7,7 @@ export type ProductCategory = string;
 export type Product = {
   slug: string;
   category: ProductCategory;
+  categories?: ProductCategory[];
   name: Localized;
   short: Localized;
   description: Localized;
@@ -20,8 +21,15 @@ export type Product = {
   >;
   brewGuide: Localized<string[]>;
   price: number;
+  priceTiers?: {
+    attribute: string;
+    minKg?: number;
+    maxKg?: number;
+    price: number;
+  }[];
   originalPrice?: number;
   weight: string;
+  baseUnit?: string;
   altitude: string;
   roast: Localized;
   origin: Localized;

@@ -35,7 +35,7 @@ type WheelChild = {
 };
 
 type WheelGroup = {
-  key: FlavorKey;
+  key: FlavorKey | string;
   labelKey: string;
   color: string;
   weight: number;
@@ -55,106 +55,121 @@ const wheelGroups: WheelGroup[] = [
   {
     key: "floral",
     labelKey: "flavors.floral.label",
-    color: "#cf3f94",
+    color: "#df5a97",
     weight: 10,
     children: [
-      {id: "flower", labelKey: "wheel.flower", color: "#d75d9d", leaves: ["chamomile", "rose", "jasmine"]}
+      {id: "flower", labelKey: "wheel.flower", color: "#e577aa", leaves: ["chamomile", "rose", "jasmine"]}
     ]
   },
   {
     key: "fruity",
     labelKey: "flavors.fruity.label",
-    color: "#ce4146",
+    color: "#e15b57",
     weight: 30,
     children: [
-      {id: "berryFruit", labelKey: "wheel.berryFruit", color: "#c84c64", leaves: ["blackberry", "raspberry", "blueberry", "strawberry"]},
-      {id: "driedFruit", labelKey: "wheel.driedFruit", color: "#b55262", leaves: ["raisin", "prune"]},
-      {id: "otherFruit", labelKey: "wheel.otherFruit", color: "#d36f4d", leaves: ["coconut", "cherry", "pineapple", "peach", "pear"]},
-      {id: "citrusFruit", labelKey: "wheel.citrusFruit", color: "#ddb935", leaves: ["grapefruit", "orange", "lemon", "lime"]}
+      {id: "berryFruit", labelKey: "wheel.berryFruit", color: "#d35872", leaves: ["blackberry", "raspberry", "blueberry", "strawberry"]},
+      {id: "driedFruit", labelKey: "wheel.driedFruit", color: "#b2536c", leaves: ["raisin", "prune"]},
+      {id: "otherFruit", labelKey: "wheel.otherFruit", color: "#e37e61", leaves: ["coconut", "cherry", "pomegranate", "pineapple", "peach", "pear"]},
+      {id: "citrusFruit", labelKey: "wheel.citrusFruit", color: "#ebd344", leaves: ["grapefruit", "orange", "lemon", "lime"]}
     ]
   },
   {
-    key: "citrus",
-    labelKey: "flavors.citrus.label",
-    color: "#c9c63f",
-    weight: 24,
+    key: "sour",
+    labelKey: "wheel.sour",
+    color: "#eed748",
+    weight: 12,
     children: [
-      {id: "sour", labelKey: "wheel.sour", color: "#c9c83f", leaves: ["sourAroma", "vinegar", "yogurt", "citricAcid"]},
-      {id: "fermented", labelKey: "wheel.fermented", color: "#b4ad52", leaves: ["wine", "whisky", "ferment"]}
+      {id: "sour", labelKey: "wheel.sour", color: "#eed748", leaves: ["sourAroma", "vinegar", "yogurt", "citricAcid", "malicAcid"]}
+    ]
+  },
+  {
+    key: "fermented",
+    labelKey: "wheel.fermented",
+    color: "#ad9d54",
+    weight: 12,
+    children: [
+      {id: "fermented", labelKey: "wheel.fermented", color: "#ad9d54", leaves: ["wine", "whisky", "ferment"]}
+    ]
+  },
+  {
+    key: "green",
+    labelKey: "wheel.green",
+    color: "#4fae6b",
+    weight: 12,
+    children: [
+      {id: "green", labelKey: "wheel.green", color: "#4fae6b", leaves: ["oliveOil", "raw", "green"]}
     ]
   },
   {
     key: "earthy",
     labelKey: "flavors.earthy.label",
-    color: "#3f8a56",
-    weight: 24,
+    color: "#999371",
+    weight: 12,
     children: [
-      {id: "green", labelKey: "wheel.green", color: "#3e9954", leaves: ["oliveOil", "raw", "green", "grass"]},
-      {id: "earth", labelKey: "wheel.earth", color: "#78936e", leaves: ["hay", "woody", "dampEarth", "mineral"]}
+      {id: "earth", labelKey: "wheel.earth", color: "#999371", leaves: ["grass", "hay", "woody", "dampEarth", "mineral"]}
     ]
   },
   {
-    key: "berry",
-    labelKey: "flavors.berry.label",
-    color: "#7fb9c9",
-    weight: 18,
+    key: "chemical",
+    labelKey: "wheel.chemical",
+    color: "#60acc0",
+    weight: 9,
     children: [
-      {id: "chemical", labelKey: "wheel.chemical", color: "#73b6ca", leaves: ["rubber", "petrol", "medicinal"]},
-      {id: "musty", labelKey: "wheel.musty", color: "#93adbb", leaves: ["stale", "mold", "dust"]}
+      {id: "chemical", labelKey: "wheel.chemical", color: "#60acc0", leaves: ["rubber", "wintergreen", "petrol", "medicinal"]}
+    ]
+  },
+  {
+    key: "musty",
+    labelKey: "wheel.musty",
+    color: "#7795b2",
+    weight: 9,
+    children: [
+      {id: "musty", labelKey: "wheel.musty", color: "#7795b2", leaves: ["stale", "mold", "dust"]}
     ]
   },
   {
     key: "roasted",
     labelKey: "flavors.roasted.label",
-    color: "#b65745",
+    color: "#b36453",
     weight: 25,
     children: [
-      {id: "roasted", labelKey: "wheel.roasted", color: "#a98155", leaves: ["malt", "toast", "smoke", "ash"]},
-      {id: "cereal", labelKey: "wheel.cereal", color: "#d2b24e", leaves: ["grain", "bread", "rice"]}
+      {id: "roasted", labelKey: "wheel.roasted", color: "#b58c63", leaves: ["malt", "bran", "toast", "smoke", "ash", "acrid"]},
+      {id: "cereal", labelKey: "wheel.cereal", color: "#e3ca59", leaves: ["grain", "bread", "rice"]}
     ]
   },
   {
     key: "spicy",
     labelKey: "flavors.spicy.label",
-    color: "#b34057",
+    color: "#b55465",
     weight: 22,
     children: [
-      {id: "drySpice", labelKey: "wheel.drySpice", color: "#b54d5f", leaves: ["clove", "pepper", "cinnamon", "licorice"]},
-      {id: "herbal", labelKey: "wheel.herbal", color: "#68606a", leaves: ["blackTea", "herb"]}
+      {id: "drySpice", labelKey: "wheel.drySpice", color: "#bd6277", leaves: ["clove", "pepper", "cinnamon", "nutmeg", "licorice"]},
+      {id: "herbal", labelKey: "wheel.herbal", color: "#7a707c", leaves: ["blackTea", "herb"]}
     ]
   },
   {
     key: "nutty",
     labelKey: "flavors.nutty.label",
-    color: "#978879",
-    weight: 18,
+    color: "#978474",
+    weight: 34,
     children: [
-      {id: "nut", labelKey: "wheel.nut", color: "#a98b64", leaves: ["peanut", "hazelnut", "almond"]},
-      {id: "cocoa", labelKey: "wheel.cocoa", color: "#815f50", leaves: ["cocoa", "darkChocolate"]}
-    ]
-  },
-  {
-    key: "chocolate",
-    labelKey: "flavors.chocolate.label",
-    color: "#8b6253",
-    weight: 16,
-    children: [
-      {id: "cacao", labelKey: "wheel.cacao", color: "#8b6253", leaves: ["cocoa", "darkChocolate", "milkChocolate"]}
+      {id: "cacao", labelKey: "wheel.cacao", color: "#8f6a5d", leaves: ["cocoa", "darkChocolate", "milkChocolate"]},
+      {id: "nut", labelKey: "wheel.nut", color: "#b0936e", leaves: ["peanut", "almond", "hazelnut"]}
     ]
   },
   {
     key: "sweet",
     labelKey: "flavors.sweet.label",
-    color: "#c96f3b",
+    color: "#da7e41",
     weight: 20,
     children: [
-      {id: "brownSugar", labelKey: "wheel.brownSugar", color: "#c97e45", leaves: ["molasses", "maple", "caramel", "honey"]},
-      {id: "sweetAroma", labelKey: "wheel.sweetAroma", color: "#c79262", leaves: ["vanilla", "candy", "sweetAroma"]}
+      {id: "brownSugar", labelKey: "wheel.brownSugar", color: "#db8e53", leaves: ["molasses", "maple", "caramel", "honey"]},
+      {id: "sweetAroma", labelKey: "wheel.sweetAroma", color: "#d8a071", leaves: ["vanilla", "candy", "sweetAroma"]}
     ]
   }
 ];
 
-const WHEEL_CENTER = 380;
+const WHEEL_CENTER = 550;
 
 function svgNumber(value: number) {
   return Number(value.toFixed(3));
@@ -182,6 +197,28 @@ function describeSegment(startAngle: number, endAngle: number, inner: number, ou
     `A ${inner} ${inner} 0 ${largeArcFlag} 0 ${innerStart.x} ${innerStart.y}`,
     "Z"
   ].join(" ");
+}
+
+function describeSpoke(angle: number, inner: number, outer: number, center = WHEEL_CENTER) {
+  const start = polarToCartesian(center, center, inner, angle);
+  const end = polarToCartesian(center, center, outer, angle);
+  return `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
+}
+
+function getTextPath(startAngle: number, endAngle: number, radius: number, center = WHEEL_CENTER) {
+  const midAngle = (startAngle + endAngle) / 2;
+  const normMid = ((midAngle % 360) + 360) % 360;
+  const isBottom = normMid > 90 && normMid < 270;
+
+  if (isBottom) {
+    const start = polarToCartesian(center, center, radius, endAngle);
+    const end = polarToCartesian(center, center, radius, startAngle);
+    return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 0 ${end.x} ${end.y}`;
+  } else {
+    const start = polarToCartesian(center, center, radius, startAngle);
+    const end = polarToCartesian(center, center, radius, endAngle);
+    return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 1 ${end.x} ${end.y}`;
+  }
 }
 
 function labelPosition(startAngle: number, endAngle: number, radius: number, center = WHEEL_CENTER) {
@@ -303,6 +340,7 @@ export function FlavorQuizPage({locale, products}: FlavorQuizPageProps) {
         onSelect={setSelectedFlavor}
         onStart={() => setStage("quiz")}
         stage={stage}
+        locale={locale}
       />
 
       <section className="px-4 pb-20 sm:px-6 lg:px-8">
@@ -414,7 +452,8 @@ function FlavorWheelPoster({
   selectedFlavor,
   onSelect,
   onStart,
-  stage
+  stage,
+  locale
 }: {
   t: ReturnType<typeof useTranslations<"FlavorQuiz">>;
   activeKeys: FlavorKey[];
@@ -422,13 +461,14 @@ function FlavorWheelPoster({
   onSelect: (key: FlavorKey) => void;
   onStart: () => void;
   stage: QuizStage;
+  locale: Locale;
 }) {
   return (
     <section className="relative isolate overflow-hidden bg-[#fbfaf7] px-4 pb-16 pt-28 sm:px-6 lg:px-8 lg:pt-32">
       <div className="absolute inset-x-[-12vw] top-[5.8rem] h-px rotate-[-4deg] bg-[repeating-linear-gradient(90deg,rgba(20,41,24,0.46)_0_4px,rgba(20,41,24,0.18)_4px_7px)] opacity-70" />
       <div className="absolute inset-x-[-12vw] top-[5.8rem] h-px rotate-[4deg] bg-[repeating-linear-gradient(90deg,rgba(20,41,24,0.42)_0_4px,rgba(20,41,24,0.16)_4px_7px)] opacity-70" />
 
-      <div className="relative mx-auto max-w-[1180px]">
+      <div className="relative mx-auto max-w-[880px] w-full">
         <div className="absolute left-[18%] top-[-1.75rem] z-20 h-12 w-12 sm:left-[20%]">
           <PosterClip />
         </div>
@@ -438,12 +478,12 @@ function FlavorWheelPoster({
 
         <div
           id="flavor-wheel"
-          className="relative mx-auto min-h-[900px] overflow-hidden bg-[#f4f4f1] px-6 pb-11 pt-20 shadow-[0_34px_90px_rgba(20,41,24,0.18)] ring-1 ring-forest-950/5 sm:px-14 lg:min-h-[1120px] lg:px-24"
+          className="relative mx-auto min-h-[900px] bg-[#f4f4f1] px-6 pb-11 pt-20 shadow-[0_34px_90px_rgba(20,41,24,0.18)] ring-1 ring-forest-950/5 sm:px-14 lg:min-h-[1120px] lg:px-24 w-full"
         >
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_32%_18%,rgba(255,255,255,0.82),transparent_28%),linear-gradient(90deg,rgba(20,41,24,0.035),transparent_48%,rgba(20,41,24,0.03)),linear-gradient(180deg,transparent_49.7%,rgba(20,41,24,0.055)_50%,transparent_50.3%)]" />
           <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-forest-950/5" />
           <div className="relative">
-            <h1 className="font-sans text-2xl font-black tracking-wide text-[#40556b] sm:text-3xl">
+            <h1 className="font-sans text-2xl font-bold tracking-wide text-[#40556b] sm:text-3xl">
               {t("posterTitle")}
             </h1>
             <div className="mt-2 h-px w-full bg-[#40556b]/55" />
@@ -451,13 +491,14 @@ function FlavorWheelPoster({
               {t("posterSubtitle")}
             </p>
 
-            <div className="mx-auto mt-16 max-w-[720px] lg:mt-24">
+            <div className="mx-auto mt-16 max-w-[720px] lg:max-w-[850px] lg:mt-24">
               <FlavorWheel
                 t={t}
                 activeKeys={activeKeys}
                 selectedFlavor={selectedFlavor}
                 onSelect={onSelect}
                 variant="poster"
+                locale={locale}
               />
             </div>
 
@@ -526,13 +567,155 @@ function IntroPanel({t}: {t: ReturnType<typeof useTranslations<"FlavorQuiz">>}) 
   );
 }
 
+const wheelShortLabelsVi: Record<string, string> = {
+  floral: "HOA",
+  fruity: "TRÁI CÂY",
+  sour: "CHUA",
+  fermented: "LÊN MEN",
+  green: "TƯƠI XANH THỰC VẬT",
+  earthy: "GIẤY / MỘC",
+  chemical: "HÓA CHẤT",
+  musty: "MÙI VỊ KHÁC",
+  roasted: "RANG",
+  spicy: "GIA VỊ",
+  nutty: "CACAO & HẠT",
+  sweet: "NGỌT"
+};
+
+const wheelShortLabelsEn: Record<string, string> = {
+  floral: "FLORAL",
+  fruity: "FRUITY",
+  sour: "SOUR",
+  fermented: "FERMENTED",
+  green: "GREEN/VEGGIE",
+  earthy: "PAPERY/MUSTY",
+  chemical: "CHEMICAL",
+  musty: "OTHER",
+  roasted: "ROASTED",
+  spicy: "SPICES",
+  nutty: "NUTTY/COCOA",
+  sweet: "SWEET"
+};
+
+const childShortLabelsVi: Record<string, string> = {
+  flower: "HOA",
+  berryFruit: "QUẢ MỌNG",
+  driedFruit: "QUẢ KHÔ",
+  otherFruit: "QUẢ KHÁC",
+  citrusFruit: "QUẢ CÓ MÚI",
+  sour: "LÊN MEN CHUA",
+  fermented: "LÊN MEN RƯỢU",
+  green: "TƯƠI XANH THỰC VẬT",
+  earth: "GIẤY / MỘC",
+  chemical: "HÓA CHẤT",
+  musty: "MÙI VỊ KHÁC",
+  roasted: "RANG / NƯỚNG",
+  cereal: "NGŨ CỐC",
+  drySpice: "GIA VỊ KHÔ",
+  herbal: "THẢO MỘC",
+  nut: "HẠT",
+  cocoa: "CA CAO",
+  cacao: "CA CAO",
+  brownSugar: "ĐƯỜNG NÂU",
+  sweetAroma: "VỊ NGỌT"
+};
+
+const childShortLabelsEn: Record<string, string> = {
+  flower: "FLOWER",
+  berryFruit: "BERRY",
+  driedFruit: "DRIED FRUIT",
+  otherFruit: "OTHER FRUIT",
+  citrusFruit: "CITRUS FRUIT",
+  sour: "SOUR",
+  fermented: "ALCOHOL/FERMENT",
+  green: "GREEN",
+  earth: "PAPERY/MUSTY",
+  chemical: "CHEMICAL",
+  musty: "OTHER",
+  roasted: "ROASTED",
+  cereal: "CEREAL",
+  drySpice: "DRY SPICE",
+  herbal: "HERBAL",
+  nut: "NUT",
+  cocoa: "COCOA",
+  cacao: "COCOA",
+  brownSugar: "BROWN SUGAR",
+  sweetAroma: "SWEET AROMA"
+};
+
+function getTextColorForGroup(groupKey: string, childId: string, defaultColor: string) {
+  const darkColors: Record<string, string> = {
+    floral: "#b53d71",
+    berryFruit: "#a6324a",
+    driedFruit: "#862c43",
+    otherFruit: "#b04c30",
+    citrusFruit: "#887010",
+    sour: "#887010",
+    fermented: "#706020",
+    green: "#246637",
+    earthy: "#5c5737",
+    chemical: "#2b6675",
+    musty: "#3a5166",
+    roasted: "#76512e",
+    cereal: "#8a741c",
+    drySpice: "#8a3648",
+    herbal: "#4e4650",
+    cacao: "#5c3d32",
+    nut: "#765732",
+    brownSugar: "#914d1e",
+    sweetAroma: "#965b2f"
+  };
+
+  return darkColors[childId] || darkColors[groupKey] || defaultColor;
+}
+
+function isGroupActive(groupKey: string, activeKeys: FlavorKey[]) {
+  if (groupKey === "sour" || groupKey === "fermented") {
+    return activeKeys.includes("citrus");
+  }
+  if (groupKey === "green") {
+    return activeKeys.includes("earthy");
+  }
+  if (groupKey === "chemical" || groupKey === "musty") {
+    return activeKeys.includes("berry");
+  }
+  if (groupKey === "nutty") {
+    return activeKeys.includes("nutty") || activeKeys.includes("chocolate");
+  }
+  return activeKeys.includes(groupKey as FlavorKey);
+}
+
+function isGroupSelected(groupKey: string, selectedFlavor: FlavorKey) {
+  if (groupKey === "sour" || groupKey === "fermented") {
+    return selectedFlavor === "citrus";
+  }
+  if (groupKey === "green") {
+    return selectedFlavor === "earthy";
+  }
+  if (groupKey === "chemical" || groupKey === "musty") {
+    return selectedFlavor === "berry";
+  }
+  if (groupKey === "nutty") {
+    return selectedFlavor === "nutty" || selectedFlavor === "chocolate";
+  }
+  return selectedFlavor === groupKey;
+}
+
+function mapGroupKeyToFlavorKey(groupKey: string): FlavorKey {
+  if (groupKey === "sour" || groupKey === "fermented") return "citrus";
+  if (groupKey === "green") return "earthy";
+  if (groupKey === "chemical" || groupKey === "musty") return "berry";
+  return groupKey as FlavorKey;
+}
+
 function FlavorWheel({
   id,
   t,
   activeKeys,
   selectedFlavor,
   onSelect,
-  variant = "app"
+  variant = "app",
+  locale
 }: {
   id?: string;
   t: ReturnType<typeof useTranslations<"FlavorQuiz">>;
@@ -540,6 +723,7 @@ function FlavorWheel({
   selectedFlavor: FlavorKey;
   onSelect: (key: FlavorKey) => void;
   variant?: "app" | "poster";
+  locale: Locale;
 }) {
   const totalWeight = wheelGroups.reduce((sum, group) => sum + group.weight, 0);
   let cursor = -7;
@@ -548,33 +732,54 @@ function FlavorWheel({
     <div
       id={id}
       className={cn(
-        "overflow-x-auto",
         variant === "poster"
-          ? "bg-transparent p-0 shadow-none"
-          : "rounded-[2rem] border border-forest-950/10 bg-[#f7f3ec] p-3 shadow-[0_24px_90px_rgba(20,41,24,0.14)] sm:p-5"
+          ? "bg-transparent p-0 shadow-none overflow-visible w-full"
+          : "overflow-x-auto rounded-[2rem] border border-forest-950/10 bg-[#f7f3ec] p-3 shadow-[0_24px_90px_rgba(20,41,24,0.14)] sm:p-5"
       )}
     >
       <svg
-        viewBox="0 0 760 760"
+        viewBox="0 0 1100 1100"
         role="img"
         aria-label={t("wheelLabel")}
-        className={cn("mx-auto aspect-square w-full", variant === "poster" ? "min-w-[620px] max-w-[720px]" : "min-w-[760px] lg:min-w-0")}
+        className={cn(
+          "mx-auto aspect-square w-full",
+          variant === "poster" ? "max-w-[850px] min-w-0" : "max-w-[550px] lg:max-w-none"
+        )}
       >
         <defs>
           <filter id="wheel-soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="0" dy="10" stdDeviation="12" floodColor="#142918" floodOpacity="0.08" />
           </filter>
         </defs>
-        <circle cx={WHEEL_CENTER} cy={WHEEL_CENTER} r="334" fill={variant === "poster" ? "transparent" : "#f5efe5"} filter={variant === "poster" ? undefined : "url(#wheel-soft-shadow)"} />
-        <circle cx={WHEEL_CENTER} cy={WHEEL_CENTER} r="100" fill={variant === "poster" ? "#f4f4f1" : "#f9f6ef"} stroke="rgba(20,41,24,0.12)" strokeWidth="2" />
+        <circle
+          cx={WHEEL_CENTER}
+          cy={WHEEL_CENTER}
+          r="530"
+          fill={variant === "poster" ? "transparent" : "#f5efe5"}
+          filter={variant === "poster" ? undefined : "url(#wheel-soft-shadow)"}
+        />
+        <circle
+          cx={WHEEL_CENTER}
+          cy={WHEEL_CENTER}
+          r="100"
+          fill={variant === "poster" ? "#f4f4f1" : "#f9f6ef"}
+          stroke="#d9d8d3"
+          strokeWidth="1.2"
+        />
         {wheelGroups.flatMap((group) => {
           const groupStart = cursor;
           const groupEnd = cursor + (group.weight / totalWeight) * 360;
           cursor = groupEnd;
-          const groupActive = activeKeys.includes(group.key);
-          const groupSelected = selectedFlavor === group.key;
-          const groupRotation = svgNumber((groupStart + groupEnd) / 2);
-          const groupMid = labelPosition(groupStart, groupEnd, 142);
+          const groupActive = isGroupActive(group.key, activeKeys);
+          const groupSelected = isGroupSelected(group.key, selectedFlavor);
+
+          const groupMidAngle = (groupStart + groupEnd) / 2;
+          const groupNormMid = ((groupMidAngle % 360) + 360) % 360;
+          const groupIsBottom = groupNormMid > 90 && groupNormMid < 270;
+          const groupTextRadius = groupIsBottom ? 144 : 136; // Mid of 102 and 178 is 140
+          const groupTextPathD = getTextPath(groupStart + 1.5, groupEnd - 1.5, groupTextRadius);
+          const groupLabelText = locale === "vi" ? wheelShortLabelsVi[group.key] : wheelShortLabelsEn[group.key];
+
           const childWeight = group.children.reduce((sum, child) => sum + Math.max(child.leaves.length, 1), 0);
           let childCursor = groupStart;
           const pieces = [
@@ -583,27 +788,37 @@ function FlavorWheel({
               d={describeSegment(groupStart + 0.35, groupEnd - 0.35, 102, 178)}
               fill={group.color}
               opacity={variant === "poster" ? 1 : groupActive ? 1 : 0.42}
-              stroke={groupSelected ? "#142918" : "#f9f6ef"}
-              strokeWidth={groupSelected ? 4 : 1.5}
+              stroke={groupSelected ? "#142918" : "#ffffff"}
+              strokeWidth={groupSelected ? 3 : 1.0}
               className="cursor-pointer transition duration-300 hover:opacity-100"
               role="button"
               tabIndex={0}
               aria-label={t(group.labelKey)}
-              onClick={() => onSelect(group.key)}
+              onClick={() => onSelect(mapGroupKeyToFlavorKey(group.key))}
               onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") onSelect(group.key);
+                if (event.key === "Enter" || event.key === " ") onSelect(mapGroupKeyToFlavorKey(group.key));
               }}
+            />,
+            <path
+              key={`${group.key}-textpath-def`}
+              id={`textpath-group-${group.key}`}
+              d={groupTextPathD}
+              fill="none"
+              stroke="none"
             />,
             <text
               key={`${group.key}-label`}
-              x={groupMid.x}
-              y={groupMid.y}
               textAnchor="middle"
-              dominantBaseline="middle"
-              className="pointer-events-none fill-[#fbf7ef] text-[13px] font-black uppercase"
-              transform={`rotate(${groupRotation}, ${groupMid.x}, ${groupMid.y})`}
+              dominantBaseline="central"
+              letterSpacing="0.08em"
+              className="pointer-events-none fill-[#fbf7ef] text-[10px] font-bold uppercase"
             >
-              {t(group.labelKey)}
+              <textPath
+                href={`#textpath-group-${group.key}`}
+                startOffset="50%"
+              >
+                {groupLabelText}
+              </textPath>
             </text>
           ];
 
@@ -611,35 +826,53 @@ function FlavorWheel({
             const childStart = childCursor;
             const childEnd = childCursor + (Math.max(child.leaves.length, 1) / childWeight) * (groupEnd - groupStart);
             childCursor = childEnd;
-            const childRotation = svgNumber((childStart + childEnd) / 2);
-            const childMid = labelPosition(childStart, childEnd, 218);
+
+            const childMidAngle = (childStart + childEnd) / 2;
+            const childNormMid = ((childMidAngle % 360) + 360) % 360;
+            const childIsBottom = childNormMid > 90 && childNormMid < 270;
+            const childTextRadius = childIsBottom ? 221 : 213; // Mid of 182 and 252 is 217
+            const childTextPathD = getTextPath(childStart + 1.2, childEnd - 1.2, childTextRadius);
+            const childLabelText = locale === "vi"
+              ? childShortLabelsVi[child.id] || t(child.labelKey)
+              : childShortLabelsEn[child.id] || t(child.labelKey);
+
             pieces.push(
               <path
                 key={`${group.key}-${child.id}`}
                 d={describeSegment(childStart + 0.35, childEnd - 0.35, 182, 252)}
                 fill={child.color}
                 opacity={variant === "poster" ? 0.96 : groupActive ? 0.96 : 0.38}
-                stroke="#f9f6ef"
-                strokeWidth="1.4"
+                stroke="#ffffff"
+                strokeWidth="0.8"
                 className="cursor-pointer transition duration-300 hover:opacity-100"
                 role="button"
                 tabIndex={0}
                 aria-label={t(child.labelKey)}
-                onClick={() => onSelect(group.key)}
+                onClick={() => onSelect(mapGroupKeyToFlavorKey(group.key))}
                 onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") onSelect(group.key);
+                  if (event.key === "Enter" || event.key === " ") onSelect(mapGroupKeyToFlavorKey(group.key));
                 }}
+              />,
+              <path
+                key={`${group.key}-${child.id}-textpath-def`}
+                id={`textpath-child-${group.key}-${child.id}`}
+                d={childTextPathD}
+                fill="none"
+                stroke="none"
               />,
               <text
                 key={`${group.key}-${child.id}-label`}
-                x={childMid.x}
-                y={childMid.y}
                 textAnchor="middle"
-                dominantBaseline="middle"
-                className="pointer-events-none fill-[#fbf7ef] text-[11px] font-bold uppercase"
-                transform={`rotate(${childRotation}, ${childMid.x}, ${childMid.y})`}
+                dominantBaseline="central"
+                letterSpacing="0.06em"
+                className="pointer-events-none fill-[#fbf7ef] text-[7.5px] font-bold uppercase"
               >
-                {t(child.labelKey)}
+                <textPath
+                  href={`#textpath-child-${group.key}-${child.id}`}
+                  startOffset="50%"
+                >
+                  {childLabelText}
+                </textPath>
               </text>
             );
 
@@ -647,9 +880,7 @@ function FlavorWheel({
             child.leaves.forEach((leaf, leafIndex) => {
               const leafStart = childStart + leafIndex * leafAngle + 0.28;
               const leafEnd = childStart + (leafIndex + 1) * leafAngle - 0.28;
-              const stripeCount = Math.max(2, Math.min(5, Math.round(leafAngle / 2.8)));
-              const stripeAngle = (leafEnd - leafStart) / stripeCount;
-              const label = labelPosition(leafStart, leafEnd, 345);
+              const label = polarToCartesian(WHEEL_CENTER, WHEEL_CENTER, 368, (leafStart + leafEnd) / 2);
               const rotation = svgNumber((leafStart + leafEnd) / 2);
 
               pieces.push(
@@ -658,40 +889,34 @@ function FlavorWheel({
                   d={describeSegment(leafStart, leafEnd, 258, 298)}
                   fill={child.color}
                   opacity={variant === "poster" ? 0.9 : groupActive ? 0.9 : 0.28}
-                  stroke="#f9f6ef"
-                  strokeWidth="1"
+                  stroke="#ffffff"
+                  strokeWidth="0.6"
                   className="cursor-pointer transition duration-300 hover:opacity-100"
                   role="button"
                   tabIndex={0}
                   aria-label={t(`wheel.${leaf}`)}
-                  onClick={() => onSelect(group.key)}
+                  onClick={() => onSelect(mapGroupKeyToFlavorKey(group.key))}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") onSelect(group.key);
+                    if (event.key === "Enter" || event.key === " ") onSelect(mapGroupKeyToFlavorKey(group.key));
                   }}
                 />,
-                ...Array.from({length: stripeCount}).map((_, stripeIndex) => (
-                  <path
-                    key={`${group.key}-${child.id}-${leaf}-stripe-${stripeIndex}`}
-                    d={describeSegment(
-                      leafStart + stripeIndex * stripeAngle + 0.12,
-                      leafStart + (stripeIndex + 1) * stripeAngle - 0.12,
-                      302,
-                      334
-                    )}
-                    fill={child.color}
-                    opacity={variant === "poster" ? 0.78 : groupActive ? 0.78 : 0.22}
-                    stroke="#f9f6ef"
-                    strokeWidth="0.8"
-                    className="pointer-events-none"
-                  />
-                )),
+                <path
+                  key={`${group.key}-${child.id}-${leaf}-spoke`}
+                  d={describeSpoke(rotation, 298, 360)}
+                  stroke={child.color}
+                  strokeWidth="0.7"
+                  opacity={variant === "poster" ? 0.8 : groupActive ? 0.8 : 0.24}
+                  fill="none"
+                  className="pointer-events-none"
+                />,
                 <text
                   key={`${group.key}-${child.id}-${leaf}-label`}
                   x={label.x}
                   y={label.y}
                   textAnchor={rotation > 180 ? "end" : "start"}
                   dominantBaseline="middle"
-                  className="pointer-events-none fill-forest-950/80 text-[8.5px] font-black uppercase"
+                  className="pointer-events-none text-[7.5px] font-medium uppercase tracking-wider"
+                  style={{fill: getTextColorForGroup(group.key, child.id, child.color)}}
                   transform={`rotate(${svgNumber(rotation > 180 ? rotation + 90 : rotation - 90)}, ${label.x}, ${label.y})`}
                 >
                   {t(`wheel.${leaf}`)}
@@ -702,13 +927,24 @@ function FlavorWheel({
 
           return pieces;
         })}
-        <circle cx={WHEEL_CENTER} cy={WHEEL_CENTER} r="102" fill={variant === "poster" ? "#f4f4f1" : "#f9f6ef"} stroke="rgba(20,41,24,0.12)" strokeWidth="2" />
-        <text x={WHEEL_CENTER} y="370" textAnchor="middle" className="fill-forest-950 text-[40px] font-black">
-          Wecacha
-        </text>
-        <text x={WHEEL_CENTER} y="406" textAnchor="middle" className="fill-forest-950/70 text-[14px] font-bold uppercase tracking-[0.18em]">
-          Flavor Wheel
-        </text>
+        <circle
+          cx={WHEEL_CENTER}
+          cy={WHEEL_CENTER}
+          r="102"
+          fill={variant === "poster" ? "#f4f4f1" : "#f9f6ef"}
+          stroke="#d9d8d3"
+          strokeWidth="1.2"
+        />
+        {variant !== "poster" && (
+          <>
+            <text x={WHEEL_CENTER} y={WHEEL_CENTER - 10} textAnchor="middle" className="fill-forest-950 text-[40px] font-black">
+              Wecacha
+            </text>
+            <text x={WHEEL_CENTER} y={WHEEL_CENTER + 26} textAnchor="middle" className="fill-forest-950/70 text-[14px] font-bold uppercase tracking-[0.18em]">
+              Flavor Wheel
+            </text>
+          </>
+        )}
       </svg>
     </div>
   );
@@ -824,6 +1060,7 @@ function ResultPanel({
           activeKeys={topKeys}
           selectedFlavor={selectedFlavor}
           onSelect={setSelectedFlavor}
+          locale={locale}
         />
         <FlavorPanel t={t} selectedFlavor={selectedFlavor} />
       </div>

@@ -91,10 +91,12 @@ export function CinematicPageHero({
         ) : null}
       </div>
 
-      <div className="absolute bottom-7 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-3 text-xs font-bold uppercase tracking-[0.14em] text-white/62 sm:flex">
-        <span>{scrollLabel}</span>
-        <ArrowDown className="h-4 w-4 animate-bounce" aria-hidden="true" />
-      </div>
+      {scrollLabel ? (
+        <div className="absolute bottom-7 left-1/2 z-10 hidden -translate-x-1/2 items-center gap-3 text-xs font-bold uppercase tracking-[0.14em] text-white/62 sm:flex">
+          <span>{scrollLabel}</span>
+          <ArrowDown className="h-4 w-4 animate-bounce" aria-hidden="true" />
+        </div>
+      ) : null}
     </section>
   );
 }

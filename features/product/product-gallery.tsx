@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useCallback, useEffect} from "react";
+import {useState, useCallback} from "react";
 import {useTranslations} from "next-intl";
 import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
@@ -15,6 +15,7 @@ export function ProductGallery({
   alt: string;
 }) {
   const tCommon = useTranslations("Common");
+  const safeImages = images.length ? images : ["/image.png"];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
@@ -23,12 +24,16 @@ export function ProductGallery({
   });
 
   const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
+    const nextIndex = selectedIndex === 0 ? safeImages.length - 1 : selectedIndex - 1;
+    setSelectedIndex(nextIndex);
+    if (emblaApi) emblaApi.scrollTo(nextIndex);
+  }, [emblaApi, safeImages.length, selectedIndex]);
 
   const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
+    const nextIndex = selectedIndex === safeImages.length - 1 ? 0 : selectedIndex + 1;
+    setSelectedIndex(nextIndex);
+    if (emblaApi) emblaApi.scrollTo(nextIndex);
+  }, [emblaApi, safeImages.length, selectedIndex]);
 
   const onThumbClick = useCallback(
     (index: number) => {
@@ -39,33 +44,43 @@ export function ProductGallery({
   );
 
   return (
-    <div className="flex flex-col gap-4 sticky top-28 z-10">
+    <div className="flex flex-col gap-4">
       {/* Main Image */}
-      <div className="relative aspect-[4/4.5] overflow-hidden rounded-[24px] bg-[#f8f9f6]">
+      <div className="relative aspect-[4/3.35] max-h-[calc(100vh-9rem)] overflow-hidden rounded-[24px] bg-[#f8f9f6]">
         <Image
-          src={images[selectedIndex] || images[0]}
+          src={safeImages[selectedIndex] || safeImages[0]}
           alt={`${alt} ${selectedIndex + 1}`}
           fill
           priority
           className="object-cover"
           sizes="(min-width: 1024px) 52vw, 100vw"
         />
+        {safeImages.length > 1 ? (
+          <>
+            <button
+              onClick={scrollPrev}
+              className="absolute left-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/50 bg-white/86 text-[#142918] shadow-[0_10px_30px_rgba(20,41,24,0.18)] backdrop-blur transition hover:bg-white"
+              aria-label={tCommon("prevImage")}
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={scrollNext}
+              className="absolute right-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/50 bg-white/86 text-[#142918] shadow-[0_10px_30px_rgba(20,41,24,0.18)] backdrop-blur transition hover:bg-white"
+              aria-label={tCommon("nextImage")}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </>
+        ) : null}
       </div>
 
       {/* Thumbnails */}
-      {images.length > 1 && (
-        <div className="relative flex items-center gap-2">
-          <button
-            onClick={scrollPrev}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#142918]/10 bg-white text-[#142918]/70 hover:text-[#142918] hover:bg-[#f8f9f6] transition-colors"
-            aria-label={tCommon("prevImage")}
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          
+      {safeImages.length > 1 && (
+        <div className="relative">
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex gap-3">
-              {images.map((image, index) => (
+              {safeImages.map((image, index) => (
                 <button
                   key={image}
                   onClick={() => onThumbClick(index)}
@@ -87,14 +102,6 @@ export function ProductGallery({
               ))}
             </div>
           </div>
-          
-          <button
-            onClick={scrollNext}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#142918]/10 bg-white text-[#142918]/70 hover:text-[#142918] hover:bg-[#f8f9f6] transition-colors"
-            aria-label={tCommon("nextImage")}
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
         </div>
       )}
     </div>

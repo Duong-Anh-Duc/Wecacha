@@ -63,7 +63,7 @@ export default async function ShopPage({params}: Props) {
         imageAlt={t("farmImageAlt")}
         chips={localizedValue(hero?.settings?.chips, locale, [t("chip1"), t("chip2"), t("chip3")])}
         fieldJournal={common("fieldJournal")}
-        scrollLabel={common("scrollDown")}
+        scrollLabel=""
         breadcrumbs={
           <Breadcrumbs 
             homeLabel={tNav("home")}

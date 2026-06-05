@@ -2,13 +2,14 @@
 
 import {useEffect, useMemo, useState, useTransition} from "react";
 import Image from "next/image";
-import {App, Button, Input, Select, Space, Table, Tag, Tooltip, type TableColumnsType} from "antd";
-import {EditOutlined, EyeInvisibleOutlined, EyeOutlined, SearchOutlined} from "@ant-design/icons";
-import {GripVertical} from "lucide-react";
+import {App, Button, Input, Space, Table, Tooltip, type TableColumnsType} from "antd";
+import {SearchOutlined} from "@ant-design/icons";
+import {GripVertical, Trash2} from "lucide-react";
 import {useTranslations} from "next-intl";
-import {updateProductSortOrder} from "@/actions/product-actions";
-import {Link} from "@/i18n/navigation";
+import {deleteProduct, updateProductSortOrder} from "@/actions/product-actions";
+import {useRouter} from "@/i18n/navigation";
 import {formatCurrency} from "@/lib/content/helpers";
+import {ProductFormModalButton} from "./product-form-modal-button";
 import {ProductPreviewButton} from "./product-preview-button";
 import type {ProductCategoryOption} from "./product-form";
 
@@ -16,12 +17,34 @@ export type ProductRow = {
   id: string;
   slug: string;
   category: string;
+  category_slugs?: string[] | null;
   name_vi: string;
+  name_en?: string | null;
   short_vi?: string | null;
+  short_en?: string | null;
   description_vi?: string | null;
+  description_en?: string | null;
+  farmer_story_vi?: string | null;
+  farmer_story_en?: string | null;
   price: number;
+  price_tiers?: {
+    attribute?: string;
+    minKg?: number;
+    maxKg?: number;
+    price?: number;
+  }[] | null;
   original_price: number | null;
   weight: string;
+  base_unit?: string | null;
+  altitude?: string | null;
+  roast_vi?: string | null;
+  roast_en?: string | null;
+  origin_vi?: string | null;
+  origin_en?: string | null;
+  notes_vi?: string[] | null;
+  notes_en?: string[] | null;
+  brew_guide_vi?: string[] | null;
+  brew_guide_en?: string[] | null;
   images: string[] | null;
   featured: boolean;
   is_visible: boolean;
@@ -39,12 +62,12 @@ export function ProductsTable({
   categories: ProductCategoryOption[];
 }) {
   const t = useTranslations("Admin");
-  const tShop = useTranslations("Shop");
-  const {message} = App.useApp();
+  const router = useRouter();
+  const {message, modal} = App.useApp();
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("all");
   const [orderedProducts, setOrderedProducts] = useState(products);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
 
@@ -56,21 +79,16 @@ export function ProductsTable({
     const normalized = query.trim().toLowerCase();
 
     return orderedProducts.filter((product) => {
-      const matchesCategory = category === "all" || product.category === category;
-      const haystack = [product.name_vi, product.slug, product.category].join(" ").toLowerCase();
-      return matchesCategory && (!normalized || haystack.includes(normalized));
+      const haystack = [
+        product.name_vi,
+        product.slug,
+        product.description_vi,
+        product.weight,
+        product.base_unit
+      ].join(" ").toLowerCase();
+      return !normalized || haystack.includes(normalized);
     });
-  }, [category, orderedProducts, query]);
-
-  function categoryLabel(value: string) {
-    const category = categories.find((item) => item.slug === value);
-    if (category) return category.name_vi;
-    if (value === "ground") return tShop("ground");
-    if (value === "phin") return tShop("phin");
-    if (value === "gifts") return tShop("gifts");
-    if (value === "beans") return tShop("beans");
-    return value;
-  }
+  }, [orderedProducts, query]);
 
   function handleDrop(targetId: string) {
     if (!draggingId || draggingId === targetId) {
@@ -98,6 +116,28 @@ export function ProductsTable({
       } else {
         setOrderedProducts(products);
         message.error(`${t("reorderError")}${result.error}`);
+      }
+    });
+  }
+
+  function handleDelete(row: ProductRow) {
+    modal.confirm({
+      title: t("deleteProductConfirm"),
+      okText: t("delete"),
+      okButtonProps: {danger: true},
+      cancelText: t("cancel"),
+      onOk: async () => {
+        setDeletingId(row.id);
+        const result = await deleteProduct(row.id);
+        setDeletingId(null);
+
+        if (result.success) {
+          setOrderedProducts((current) => current.filter((product) => product.id !== row.id));
+          message.success(t("deleteSuccess"));
+          router.refresh();
+        } else {
+          message.error(`${t("saveError")}${result.error}`);
+        }
       }
     });
   }
@@ -144,48 +184,48 @@ export function ProductsTable({
       )
     },
     {
-      title: t("category"),
-      dataIndex: "category",
-      filters: categories.map((category) => ({text: category.name_vi, value: category.slug})),
-      onFilter: (value, row) => row.category === value,
-      render: (value) => <Tag>{categoryLabel(value)}</Tag>
-    },
-    {
-      title: t("price"),
-      dataIndex: "price",
-      sorter: (a, b) => a.price - b.price,
-      render: (value) => formatCurrency(value, locale as "vi" | "en")
-    },
-    {
-      title: t("visibility"),
-      dataIndex: "is_visible",
-      filters: [
-        {text: t("visible"), value: true},
-        {text: t("hidden"), value: false}
-      ],
-      onFilter: (value, row) => row.is_visible === value,
+      title: t("productInfo"),
+      dataIndex: "description_vi",
       render: (value) => (
-        <Tag icon={value ? <EyeOutlined /> : <EyeInvisibleOutlined />} color={value ? "green" : "default"}>
-          {value ? t("visible") : t("hidden")}
-        </Tag>
+        <p className="max-w-80 whitespace-pre-line text-sm leading-6 text-stone-600 line-clamp-3">
+          {value || "—"}
+        </p>
       )
     },
     {
-      title: t("featured"),
-      dataIndex: "featured",
-      filters: [
-        {text: t("featured"), value: true},
-        {text: t("normal"), value: false}
-      ],
-      onFilter: (value, row) => row.featured === value,
-      render: (value) => <Tag color={value ? "gold" : "default"}>{value ? t("featured") : t("normal")}</Tag>
+      title: t("weight"),
+      dataIndex: "weight",
+      width: 120,
+      render: (value) => value || "—"
     },
     {
-      title: t("sortOrder"),
-      dataIndex: "sort_order",
-      render: (_value, _row, index) => (
-        <span className="font-medium text-stone-500">{index + 1}</span>
-      )
+      title: t("packageSpec"),
+      dataIndex: "base_unit",
+      width: 140,
+      render: (value) => value || "—"
+    },
+    {
+      title: t("priceTiers"),
+      dataIndex: "price_tiers",
+      width: 260,
+      render: (_value, row) => {
+        const tiers = row.price_tiers?.length ? row.price_tiers : [{attribute: row.weight, price: row.price}];
+        return (
+          <div className="space-y-1.5">
+            {tiers.map((tier, index) => {
+              const range = [tier.minKg ? `${tier.minKg}kg` : "", tier.maxKg ? `${tier.maxKg}kg` : ""]
+                .filter(Boolean)
+                .join(" - ");
+              return (
+                <div key={`${tier.attribute}-${index}`} className="flex items-center justify-between gap-3 rounded-lg bg-stone-50 px-2.5 py-1.5 text-xs">
+                  <span className="font-medium text-stone-600">{tier.attribute || range || "—"}</span>
+                  <span className="font-bold text-ember">{formatCurrency(Number(tier.price ?? 0), locale as "vi" | "en")}</span>
+                </div>
+              );
+            })}
+          </div>
+        );
+      }
     },
     {
       title: t("colActions"),
@@ -197,13 +237,17 @@ export function ProductsTable({
             <ProductPreviewButton product={row} categories={categories} locale={locale} compact />
           </Tooltip>
           <Tooltip title={t("edit")}>
-            <Link href={`/admin/products/${row.id}`}>
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                className="text-ember hover:!bg-transparent hover:!text-forest-950"
-              />
-            </Link>
+            <ProductFormModalButton mode="edit" product={row} categories={categories} compact />
+          </Tooltip>
+          <Tooltip title={t("delete")}>
+            <Button
+              danger
+              type="text"
+              icon={<Trash2 className="h-4 w-4" />}
+              loading={deletingId === row.id}
+              onClick={() => handleDelete(row)}
+              className="text-red-600 hover:!bg-red-50 hover:!text-red-700"
+            />
           </Tooltip>
         </Space>
       )
@@ -222,22 +266,12 @@ export function ProductsTable({
           placeholder={t("searchProducts")}
           className="max-w-xl"
         />
-        <Select
-          size="large"
-          value={category}
-          onChange={setCategory}
-          className="min-w-52"
-          options={[
-            {label: t("allCategories"), value: "all"},
-            ...categories.map((item) => ({label: item.name_vi, value: item.slug}))
-          ]}
-        />
       </div>
       <Table
         rowKey="id"
         columns={columns}
         dataSource={filtered}
-        scroll={{x: 1200}}
+        scroll={{x: 1100}}
         rowClassName={(row) => (row.id === draggingId ? "opacity-50" : "cursor-grab")}
         onRow={(row) => ({
           draggable: !isPending,

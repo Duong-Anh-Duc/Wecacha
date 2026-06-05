@@ -12,7 +12,7 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {createOrder} from "@/actions/order-actions";
-import {getCartTotals, useCartStore, type CartItem} from "@/features/cart/cart-store";
+import {cartItemId, getCartTotals, useCartStore, type CartItem} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {formatCurrency} from "@/lib/content/helpers";
@@ -99,7 +99,7 @@ export function CheckoutForm() {
     if (isBuyNow) {
       updateBuyNowQuantity(item.quantity - 1);
     } else {
-      updateQuantity(item.slug, item.quantity - 1);
+      updateQuantity(cartItemId(item), item.quantity - 1);
     }
   }
 
@@ -306,7 +306,7 @@ export function CheckoutForm() {
           ) : (
             <div className="space-y-5 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {items.map((item) => (
-                <div className="flex items-start gap-4 w-full" key={item.slug}>
+                <div className="flex items-start gap-4 w-full" key={cartItemId(item)}>
                   <div className="relative w-14 h-14 rounded-[0.6rem] overflow-hidden bg-white/10 shrink-0 border border-white/5">
                     <Image src={item.image} alt={item.name} fill sizes="56px" className="object-cover" />
                   </div>
@@ -315,6 +315,9 @@ export function CheckoutForm() {
                       <h4 className="text-[13px] font-medium text-white leading-snug">{item.name}</h4>
                       <span className="font-medium text-[13px] whitespace-nowrap shrink-0">{formatCurrency(item.price * item.quantity, locale)}</span>
                     </div>
+                    {item.weight ? (
+                      <p className="mt-1 text-[11px] text-white/50">{item.weight}</p>
+                    ) : null}
                     <div className="mt-2 flex items-center gap-3">
                       <div className="inline-flex items-center rounded-lg border border-white/15 bg-white/5">
                         <button
@@ -331,7 +334,7 @@ export function CheckoutForm() {
                           onClick={() =>
                             isBuyNow
                               ? updateBuyNowQuantity(item.quantity + 1)
-                              : updateQuantity(item.slug, item.quantity + 1)
+                              : updateQuantity(cartItemId(item), item.quantity + 1)
                           }
                           className="flex h-7 w-7 items-center justify-center text-white/70 transition-colors hover:text-white"
                           aria-label={common("increaseQty")}
@@ -342,7 +345,7 @@ export function CheckoutForm() {
                       {!isBuyNow && (
                         <button
                           type="button"
-                          onClick={() => removeItem(item.slug)}
+                          onClick={() => removeItem(cartItemId(item))}
                           className="flex h-7 w-7 items-center justify-center rounded-lg text-white/40 transition-colors hover:bg-white/5 hover:text-red-300"
                           aria-label={common("removeItem")}
                         >

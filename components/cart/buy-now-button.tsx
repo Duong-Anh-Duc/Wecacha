@@ -15,7 +15,8 @@ export function BuyNowButton({
   variant = "forest",
   className,
   label,
-  children
+  children,
+  selectedOption
 }: {
   product: Product;
   quantity?: number;
@@ -23,6 +24,11 @@ export function BuyNowButton({
   className?: string;
   label?: React.ReactNode;
   children?: React.ReactNode;
+  selectedOption?: {
+    id: string;
+    label: string;
+    price: number;
+  };
 }) {
   const locale = useLocale() as Locale;
   const t = useTranslations("Common");
@@ -37,10 +43,11 @@ export function BuyNowButton({
         setBuyNow(
           {
             slug: product.slug,
+            variantId: selectedOption?.id,
             name: localized(product.name, locale),
-            price: product.price,
+            price: selectedOption?.price ?? product.price,
             image: product.images[0],
-            weight: product.weight
+            weight: selectedOption?.label ?? product.weight
           },
           quantity
         );

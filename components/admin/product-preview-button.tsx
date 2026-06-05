@@ -2,7 +2,7 @@
 
 import {useState} from "react";
 import Image from "next/image";
-import {Button, Drawer, Tag} from "antd";
+import {Button, Drawer} from "antd";
 import {Eye} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {formatCurrency} from "@/lib/content/helpers";
@@ -15,8 +15,15 @@ export type ProductPreviewData = {
   short_vi?: string | null;
   description_vi?: string | null;
   price: number;
+  price_tiers?: {
+    attribute?: string;
+    minKg?: number;
+    maxKg?: number;
+    price?: number;
+  }[] | null;
   original_price?: number | null;
   weight?: string | null;
+  base_unit?: string | null;
   images?: string[] | null;
   featured?: boolean | null;
   is_visible?: boolean | null;
@@ -24,7 +31,7 @@ export type ProductPreviewData = {
 
 export function ProductPreviewButton({
   product,
-  categories,
+  categories: _categories,
   locale,
   compact = false
 }: {
@@ -35,8 +42,8 @@ export function ProductPreviewButton({
 }) {
   const t = useTranslations("Admin");
   const [open, setOpen] = useState(false);
-  const category = categories.find((item) => item.slug === product.category);
   const image = product.images?.[0];
+  const tiers = product.price_tiers?.length ? product.price_tiers : [{attribute: product.weight ?? "", price: product.price}];
 
   return (
     <>
@@ -69,31 +76,33 @@ export function ProductPreviewButton({
           </div>
 
           <div className="space-y-3">
-            <div className="flex flex-wrap gap-2">
-              <Tag color="green">{product.is_visible ? t("visible") : t("hidden")}</Tag>
-              {product.featured ? <Tag color="gold">{t("featured")}</Tag> : null}
-              <Tag>{category?.name_vi ?? product.category}</Tag>
-            </div>
-
             <div>
               <h3 className=" text-3xl leading-tight text-forest-950">{product.name_vi}</h3>
-              {product.short_vi ? (
-                <p className="mt-2 text-sm leading-6 text-stone-600">{product.short_vi}</p>
-              ) : null}
             </div>
 
-            <div className="flex items-end gap-3">
-              <p className="text-2xl font-bold text-ember">{formatCurrency(product.price, locale as "vi" | "en")}</p>
-              {product.original_price ? (
-                <p className="pb-1 text-sm text-stone-400 line-through">
-                  {formatCurrency(product.original_price, locale as "vi" | "en")}
-                </p>
-              ) : null}
+            <div className="space-y-2 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3">
+              <p className="text-sm font-semibold text-forest-950">{t("priceTiers")}</p>
+              {tiers.map((tier, index) => {
+                const range = [tier.minKg ? `${tier.minKg}kg` : "", tier.maxKg ? `${tier.maxKg}kg` : ""]
+                  .filter(Boolean)
+                  .join(" - ");
+                return (
+                  <div key={`${tier.attribute}-${index}`} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-stone-600">{tier.attribute || range || "—"}</span>
+                    <span className="font-bold text-ember">{formatCurrency(Number(tier.price ?? 0), locale as "vi" | "en")}</span>
+                  </div>
+                );
+              })}
             </div>
 
-            {product.weight ? (
+            {(product.weight || product.base_unit) ? (
               <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
-                <span className="font-semibold text-forest-950">{t("weight")}:</span> {product.weight}
+                {product.weight ? (
+                  <p><span className="font-semibold text-forest-950">{t("weight")}:</span> {product.weight}</p>
+                ) : null}
+                {product.base_unit ? (
+                  <p><span className="font-semibold text-forest-950">{t("packageSpec")}:</span> {product.base_unit}</p>
+                ) : null}
               </div>
             ) : null}
 

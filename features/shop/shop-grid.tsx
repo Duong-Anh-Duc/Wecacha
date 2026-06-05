@@ -54,7 +54,8 @@ export function ShopGrid({
   const filteredProducts = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     const result = products.filter((product) => {
-      const matchesCategory = category === "all" || product.category === category;
+      const productCategories = product.categories?.length ? product.categories : [product.category];
+      const matchesCategory = category === "all" || productCategories.includes(category);
       const haystack = [
         localized(product.name, locale),
         localized(product.short, locale),

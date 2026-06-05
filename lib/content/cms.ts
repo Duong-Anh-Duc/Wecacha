@@ -5,6 +5,7 @@ import type {Localized, Product, ProductCategory} from "./types";
 type ProductRow = {
   slug: string;
   category: ProductCategory;
+  category_slugs?: ProductCategory[] | null;
   name_vi: string;
   name_en: string;
   short_vi: string;
@@ -14,8 +15,10 @@ type ProductRow = {
   farmer_story_vi: string;
   farmer_story_en: string;
   price: number;
+  price_tiers?: Product["priceTiers"] | null;
   original_price: number | null;
   weight: string;
+  base_unit?: string | null;
   altitude: string;
   roast_vi: string;
   roast_en: string;
@@ -104,7 +107,7 @@ export type PageContent = {
   items: SiteSectionItem[];
 };
 
-const productColumns = [
+const baseProductColumns = [
   "slug",
   "category",
   "name_vi",
@@ -133,6 +136,20 @@ const productColumns = [
   "featured"
 ].join(",");
 
+const extendedProductColumns = [
+  "category_slugs",
+  "price_tiers",
+  "base_unit"
+].join(",");
+
+let supportsProductExtensions: boolean | null = null;
+
+function productColumns() {
+  return supportsProductExtensions === false
+    ? baseProductColumns
+    : `${baseProductColumns},${extendedProductColumns}`;
+}
+
 function pair<T>(vi: T, en: T): Localized<T> {
   return {vi, en};
 }
@@ -141,6 +158,7 @@ export function productFromRow(row: ProductRow): Product {
   return {
     slug: row.slug,
     category: row.category,
+    categories: row.category_slugs ?? (row.category ? [row.category] : []),
     name: pair(row.name_vi, row.name_en),
     short: pair(row.short_vi, row.short_en),
     description: pair(row.description_vi, row.description_en),
@@ -148,8 +166,10 @@ export function productFromRow(row: ProductRow): Product {
     journey: pair(row.journey_vi ?? [], row.journey_en ?? []),
     brewGuide: pair(row.brew_guide_vi ?? [], row.brew_guide_en ?? []),
     price: row.price,
+    priceTiers: row.price_tiers ?? [],
     originalPrice: row.original_price ?? undefined,
     weight: row.weight,
+    baseUnit: row.base_unit ?? undefined,
     altitude: row.altitude,
     roast: pair(row.roast_vi, row.roast_en),
     origin: pair(row.origin_vi, row.origin_en),
@@ -216,9 +236,29 @@ export async function getPageContent(pageKey: string): Promise<PageContent> {
 }
 
 export async function getVisibleProducts() {
+  if (supportsProductExtensions !== false) {
+    const result = await supabase
+      .from("products")
+      .select(productColumns())
+      .eq("is_visible", true)
+      .order("sort_order", {ascending: true})
+      .order("created_at", {ascending: false});
+
+    if (!result.error) {
+      supportsProductExtensions = true;
+      return ((result.data as unknown as ProductRow[]) ?? []).map(productFromRow);
+    }
+
+    if (/category_slugs|price_tiers|base_unit|schema cache|column/i.test(result.error.message)) {
+      supportsProductExtensions = false;
+    } else {
+      throw result.error;
+    }
+  }
+
   const {data, error} = await supabase
     .from("products")
-    .select(productColumns)
+    .select(baseProductColumns)
     .eq("is_visible", true)
     .order("sort_order", {ascending: true})
     .order("created_at", {ascending: false});
@@ -228,9 +268,30 @@ export async function getVisibleProducts() {
 }
 
 export async function getVisibleProductsByCategory(category: ProductCategory) {
+  if (supportsProductExtensions !== false) {
+    const result = await supabase
+      .from("products")
+      .select(productColumns())
+      .eq("is_visible", true)
+      .or(`category.eq.${category},category_slugs.cs.{${category}}`)
+      .order("sort_order", {ascending: true})
+      .order("created_at", {ascending: false});
+
+    if (!result.error) {
+      supportsProductExtensions = true;
+      return ((result.data as unknown as ProductRow[]) ?? []).map(productFromRow);
+    }
+
+    if (/category_slugs|price_tiers|base_unit|schema cache|column/i.test(result.error.message)) {
+      supportsProductExtensions = false;
+    } else {
+      throw result.error;
+    }
+  }
+
   const {data, error} = await supabase
     .from("products")
-    .select(productColumns)
+    .select(baseProductColumns)
     .eq("is_visible", true)
     .eq("category", category)
     .order("sort_order", {ascending: true})
@@ -241,9 +302,29 @@ export async function getVisibleProductsByCategory(category: ProductCategory) {
 }
 
 export async function getVisibleProductBySlug(slug: string) {
+  if (supportsProductExtensions !== false) {
+    const result = await supabase
+      .from("products")
+      .select(productColumns())
+      .eq("is_visible", true)
+      .eq("slug", slug)
+      .maybeSingle();
+
+    if (!result.error) {
+      supportsProductExtensions = true;
+      return result.data ? productFromRow(result.data as unknown as ProductRow) : null;
+    }
+
+    if (/category_slugs|price_tiers|base_unit|schema cache|column/i.test(result.error.message)) {
+      supportsProductExtensions = false;
+    } else {
+      throw result.error;
+    }
+  }
+
   const {data, error} = await supabase
     .from("products")
-    .select(productColumns)
+    .select(baseProductColumns)
     .eq("is_visible", true)
     .eq("slug", slug)
     .maybeSingle();

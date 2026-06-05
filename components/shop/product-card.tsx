@@ -6,13 +6,7 @@ import {motion} from "framer-motion";
 import {
   ArrowRight,
   Coffee,
-  Flame,
   Gift,
-  Heart,
-  Leaf,
-  MapPin,
-  PackageCheck,
-  ShieldCheck,
   Sparkles
 } from "lucide-react";
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
@@ -22,28 +16,6 @@ import type {Locale} from "@/i18n/routing";
 import type {Product} from "@/lib/content/types";
 import {formatCurrency, localized} from "@/lib/content/helpers";
 
-function productHighlights(product: Product, t: ReturnType<typeof useTranslations<"Product">>) {
-  if (product.category === "gifts") {
-    return [
-      {icon: Sparkles, label: t("handicrafted")},
-      {icon: Gift, label: t("meaningfulGift")},
-      {icon: PackageCheck, label: t("premiumBox")}
-    ];
-  }
-
-  return [
-    {
-      icon: ShieldCheck,
-      label: product.category === "phin" ? "100% Robusta" : "100% Arabica"
-    },
-    {icon: Flame, label: t("naturalRoast")},
-    {
-      icon: product.category === "phin" ? Coffee : MapPin,
-      label: product.category === "phin" ? t("boldCup") : t("sonLaFarms")
-    }
-  ];
-}
-
 export function ProductCard({
   product,
   locale
@@ -52,6 +24,8 @@ export function ProductCard({
   locale: Locale;
 }) {
   const tProduct = useTranslations("Product");
+  const image = product.images[0] ?? "/image.png";
+  const unitLabel = product.weight ? product.weight.toUpperCase() : product.baseUnit;
   return (
     <motion.article
       initial={{opacity: 0, y: 30}}
@@ -69,7 +43,7 @@ export function ProductCard({
         aria-label={localized(product.name, locale)}
       >
         <Image
-          src={product.images[0]}
+          src={image}
           alt={localized(product.name, locale)}
           fill
           quality={95}
@@ -84,14 +58,16 @@ export function ProductCard({
 
       <div className="relative z-10 flex min-h-full w-full flex-col p-6">
         <div className="flex items-start justify-between gap-3">
-          <span className="inline-flex items-center gap-2 rounded-xl bg-parchment-50 px-3 py-2 text-sm font-black uppercase text-forest-950 shadow-[0_12px_24px_rgba(0,0,0,0.2)]">
-            {product.category === "gifts" ? (
-              <Gift className="h-4 w-4" aria-hidden="true" />
-            ) : (
-              <Coffee className="h-4 w-4" aria-hidden="true" />
-            )}
-            {product.weight.toUpperCase()}
-          </span>
+          {unitLabel ? (
+            <span className="inline-flex items-center gap-2 rounded-xl bg-parchment-50 px-3 py-2 text-sm font-black uppercase text-forest-950 shadow-[0_12px_24px_rgba(0,0,0,0.2)]">
+              {product.category === "gifts" ? (
+                <Gift className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Coffee className="h-4 w-4" aria-hidden="true" />
+              )}
+              {unitLabel}
+            </span>
+          ) : null}
         </div>
 
         {product.category === "gifts" ? (
@@ -101,19 +77,6 @@ export function ProductCard({
         ) : null}
 
         <div className="mt-auto">
-          <div className="mb-5 flex min-h-[32px] flex-wrap items-start gap-2">
-            {localized(product.notes, locale)
-              .slice(0, 3)
-              .map((note) => (
-                <span
-                  key={note}
-                  className="rounded-full border border-parchment-50/20 bg-parchment-50/10 px-3 py-1.5 text-xs font-semibold text-parchment-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur"
-                >
-                  {note}
-                </span>
-              ))}
-          </div>
-
           <div className="flex min-h-[76px] items-start justify-between gap-4 sm:min-h-[80px]">
             <h3 className="line-clamp-2 font-serif text-3xl leading-tight text-parchment-50 sm:text-[2rem]">
               <span className="transition-colors group-hover:text-ember">
@@ -121,16 +84,6 @@ export function ProductCard({
               </span>
             </h3>
             <div className="flex shrink-0 flex-col items-end gap-1.5">
-              {product.originalPrice && product.originalPrice > product.price ? (
-                <div className="flex items-center gap-1.5 pt-1">
-                  <span className="text-[11px] font-semibold text-white/50 line-through">
-                    {formatCurrency(product.originalPrice, locale)}
-                  </span>
-                  <span className="rounded-md bg-red-500/20 px-1.5 py-0.5 text-[10px] font-extrabold text-red-400">
-                    -{Math.round((1 - product.price / product.originalPrice) * 100)}%
-                  </span>
-                </div>
-              ) : null}
               <div className="animate-pulse rounded-xl border border-ember/60 bg-ember/10 px-3 py-1.5 shadow-[0_0_16px_rgba(243,167,52,0.4)] backdrop-blur-md">
                 <p className="text-[17px] font-black text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.8)]">
                   {formatCurrency(product.price, locale)}
@@ -139,20 +92,11 @@ export function ProductCard({
             </div>
           </div>
 
-          <div
-            className={
-              product.category === "gifts"
-                ? "mt-6 flex min-h-[76px] flex-wrap items-center gap-3 rounded-xl border border-earth-500/50 bg-earth-900/30 p-3 sm:min-h-[84px]"
-                : "mt-6 flex min-h-[76px] flex-wrap items-center gap-3 rounded-xl border border-forest-600/40 bg-forest-950/50 p-3 sm:min-h-[84px]"
-            }
-          >
-            {productHighlights(product, tProduct).map(({icon: Icon, label}) => (
-              <div key={label} className="flex items-center gap-2 text-[11px] font-bold text-parchment-50/90">
-                <Icon className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
-                <span>{label}</span>
-              </div>
-            ))}
-          </div>
+          {localized(product.description, locale) ? (
+            <p className="mt-5 line-clamp-3 rounded-xl border border-forest-600/40 bg-forest-950/50 p-3 text-sm leading-6 text-parchment-50/90">
+              {localized(product.description, locale)}
+            </p>
+          ) : null}
         </div>
 
         <div className="mt-4">

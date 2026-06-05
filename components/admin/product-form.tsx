@@ -1,39 +1,50 @@
 "use client";
 
 import {useState, useTransition} from "react";
-import {App, Button, Card, Form, Input, InputNumber, Select, Space, Switch} from "antd";
-import {DeleteOutlined, SaveOutlined, UploadOutlined} from "@ant-design/icons";
+import Image from "next/image";
+import {App, Button, Card, Form, Input, InputNumber} from "antd";
+import {DeleteOutlined, PlusOutlined, SaveOutlined, UploadOutlined} from "@ant-design/icons";
 import {useTranslations} from "next-intl";
-import {deleteProduct, uploadProductImage, upsertProduct} from "@/actions/product-actions";
+import {uploadProductImage, upsertProduct} from "@/actions/product-actions";
 import {useRouter} from "@/i18n/navigation";
 
-type ProductFormData = {
+export type ProductFormData = {
   id?: string;
-  slug?: string;
-  category?: string;
-  name_vi?: string;
-  name_en?: string;
-  short_vi?: string;
-  short_en?: string;
-  description_vi?: string;
-  description_en?: string;
-  farmer_story_vi?: string;
-  farmer_story_en?: string;
+  slug?: string | null;
+  category?: string | null;
+  category_slugs?: string[] | null;
+  name_vi?: string | null;
+  name_en?: string | null;
+  short_vi?: string | null;
+  short_en?: string | null;
+  description_vi?: string | null;
+  description_en?: string | null;
+  farmer_story_vi?: string | null;
+  farmer_story_en?: string | null;
   price?: number;
+  price_tiers?: PriceTier[] | null;
   original_price?: number | null;
-  weight?: string;
-  altitude?: string;
-  roast_vi?: string;
-  roast_en?: string;
-  origin_vi?: string;
-  origin_en?: string;
-  notes_vi?: string[];
-  notes_en?: string[];
-  brew_guide_vi?: string[];
-  brew_guide_en?: string[];
-  images?: string[];
+  weight?: string | null;
+  base_unit?: string | null;
+  altitude?: string | null;
+  roast_vi?: string | null;
+  roast_en?: string | null;
+  origin_vi?: string | null;
+  origin_en?: string | null;
+  notes_vi?: string[] | null;
+  notes_en?: string[] | null;
+  brew_guide_vi?: string[] | null;
+  brew_guide_en?: string[] | null;
+  images?: string[] | null;
   featured?: boolean;
   is_visible?: boolean;
+};
+
+type PriceTier = {
+  attribute?: string;
+  minKg?: number;
+  maxKg?: number;
+  price?: number;
 };
 
 export type ProductCategoryOption = {
@@ -42,48 +53,53 @@ export type ProductCategoryOption = {
   name_en: string;
 };
 
-function textFromList(value?: string[] | null) {
-  return (value ?? []).join("\n");
+function textFromList(value?: string[] | string | null) {
+  if (Array.isArray(value)) return value.join("\n");
+  return value ?? "";
 }
 
 export function ProductForm({
   initialData = {},
-  categories
+  categories: _categories,
+  onSaved,
+  redirectOnSave = true
 }: {
   initialData?: ProductFormData;
   categories: ProductCategoryOption[];
+  onSaved?: () => void;
+  redirectOnSave?: boolean;
 }) {
   const t = useTranslations("Admin");
-  const tShop = useTranslations("Shop");
   const router = useRouter();
-  const {message, modal} = App.useApp();
+  const {message} = App.useApp();
   const [isPending, startTransition] = useTransition();
-  const [images, setImages] = useState(textFromList(initialData.images));
+  const [images, setImages] = useState<string[]>(initialData.images ?? []);
+  const [isUploading, setIsUploading] = useState(false);
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
   const [featured, setFeatured] = useState(Boolean(initialData.featured));
   const isEditing = Boolean(initialData.id);
-  const categoryOptions = categories.length > 0
-    ? categories
-    : [
-        {slug: "beans", name_vi: tShop("beans"), name_en: tShop("beans")},
-        {slug: "ground", name_vi: tShop("ground"), name_en: tShop("ground")},
-        {slug: "phin", name_vi: tShop("phin"), name_en: tShop("phin")},
-        {slug: "gifts", name_vi: tShop("gifts"), name_en: tShop("gifts")}
-      ];
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(event.target.files ?? []);
+    if (!files.length) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    const result = await uploadProductImage(formData);
+    setIsUploading(true);
+    try {
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const result = await uploadProductImage(formData);
 
-    if (result.url) {
-      setImages((current) => [current, result.url].filter(Boolean).join("\n"));
+        if (result.url) {
+          setImages((current) => [...current, result.url!]);
+        } else {
+          message.error(`${t("uploadError")}${result.error ?? ""}`);
+        }
+      }
       message.success(t("uploadSuccess"));
-    } else {
-      message.error(`${t("uploadError")}${result.error ?? ""}`);
+    } finally {
+      setIsUploading(false);
+      event.target.value = "";
     }
   }
 
@@ -91,12 +107,23 @@ export function ProductForm({
     const formData = new FormData();
     if (initialData.id) formData.set("id", initialData.id);
     if (initialData.slug) formData.set("slug", initialData.slug);
+    formData.set("category_slugs", JSON.stringify(initialData.category_slugs ?? (initialData.category ? [initialData.category] : [])));
     Object.entries(values).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        formData.set(key, String(value));
+        if (key === "category_slugs" || key === "price_tiers") {
+          formData.set(key, JSON.stringify(value));
+        } else {
+          formData.set(key, String(value));
+        }
       }
     });
-    formData.set("images", images);
+    const firstTierPrice = Array.isArray(values.price_tiers)
+      ? values.price_tiers.find((tier) => Number((tier as PriceTier | undefined)?.price ?? 0) > 0) as PriceTier | undefined
+      : undefined;
+    if (firstTierPrice?.price !== undefined) {
+      formData.set("price", String(firstTierPrice.price));
+    }
+    formData.set("images", images.join("\n"));
     formData.set("is_visible", isVisible ? "true" : "false");
     formData.set("featured", featured ? "true" : "false");
 
@@ -104,29 +131,11 @@ export function ProductForm({
       const result = await upsertProduct(formData);
       if (result.success) {
         message.success(t("saveSuccess"));
-        router.push("/admin/products");
+        if (onSaved) onSaved();
+        if (redirectOnSave) router.push("/admin/products");
+        router.refresh();
       } else {
         message.error(`${t("saveError")}${result.error}`);
-      }
-    });
-  }
-
-  function handleDelete() {
-    if (!initialData.id) return;
-
-    modal.confirm({
-      title: t("deleteProductConfirm"),
-      okText: t("delete"),
-      okButtonProps: {danger: true},
-      cancelText: t("cancel"),
-      onOk: async () => {
-        const result = await deleteProduct(initialData.id!);
-        if (result.success) {
-          message.success(t("deleteSuccess"));
-          router.push("/admin/products");
-        } else {
-          message.error(`${t("saveError")}${result.error}`);
-        }
       }
     });
   }
@@ -140,131 +149,150 @@ export function ProductForm({
         notes_en: textFromList(initialData.notes_en),
         brew_guide_vi: textFromList(initialData.brew_guide_vi),
         brew_guide_en: textFromList(initialData.brew_guide_en),
-        category: initialData.category ?? "beans"
+        category_slugs: initialData.category_slugs ?? (initialData.category ? [initialData.category] : []),
+        base_unit: initialData.base_unit ?? "",
+        price_tiers: initialData.price_tiers?.length ? initialData.price_tiers : [
+          {
+            attribute: initialData.weight ?? "",
+            minKg: undefined,
+            maxKg: undefined,
+            price: initialData.price
+          }
+        ]
       }}
       onFinish={handleSubmit}
       className="max-w-5xl"
     >
+      {isEditing ? (
+        <div className="mb-6 flex items-center justify-end">
+          <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isPending} size="large">
+            {t("saveProduct")}
+          </Button>
+        </div>
+      ) : null}
+
       <Card className="mb-6" title={t("productBasics")}>
+        <Form.Item name="short_vi" hidden>
+          <Input />
+        </Form.Item>
+        <Form.Item name="short_en" hidden>
+          <Input />
+        </Form.Item>
         <div className="grid gap-4 md:grid-cols-2">
-          <Form.Item name="name_vi" label={t("fieldNameVI")} rules={[{required: true}]}>
+          <Form.Item name="name_vi" label={t("fieldNameVI")} rules={[{required: true, message: t("productNameRequired")}]}>
             <Input />
           </Form.Item>
-          <Form.Item name="name_en" label={t("fieldNameEN")} rules={[{required: true}]}>
+          <Form.Item name="name_en" label={t("fieldNameEN")} rules={[{required: true, message: t("productNameRequired")}]}>
             <Input />
           </Form.Item>
-          <Form.Item name="short_vi" label={t("fieldShortVI")}>
-            <Input.TextArea autoSize={{minRows: 2, maxRows: 4}} />
-          </Form.Item>
-          <Form.Item name="short_en" label={t("fieldShortEN")}>
-            <Input.TextArea autoSize={{minRows: 2, maxRows: 4}} />
-          </Form.Item>
-        </div>
-        <div className="grid gap-4 md:grid-cols-1">
-          <Form.Item name="category" label={t("category")} rules={[{required: true}]}>
-            <Select
-              options={categoryOptions.map((category) => ({
-                label: category.name_vi,
-                value: category.slug
-              }))}
-            />
-          </Form.Item>
-        </div>
-        <div className="flex flex-wrap gap-6">
-          <Space>
-            <Switch checked={isVisible} onChange={setIsVisible} />
-            <span className="text-sm font-medium text-stone-700">{t("visible")}</span>
-          </Space>
-          <Space>
-            <Switch checked={featured} onChange={setFeatured} />
-            <span className="text-sm font-medium text-stone-700">{t("featured")}</span>
-          </Space>
         </div>
       </Card>
 
       <Card className="mb-6" title={t("productCommerce")}>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Form.Item name="price" label={t("price")} rules={[{required: true}]}>
-            <InputNumber className="w-full" min={0} />
-          </Form.Item>
-          <Form.Item name="original_price" label={t("originalPrice")}>
-            <InputNumber className="w-full" min={0} />
-          </Form.Item>
+        <Form.Item name="original_price" hidden>
+          <InputNumber />
+        </Form.Item>
+        <div className="grid gap-4 md:grid-cols-2">
           <Form.Item name="weight" label={t("weight")}>
             <Input />
           </Form.Item>
-          <Form.Item name="altitude" label={t("altitude")}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="roast_vi" label={t("roastVI")}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="roast_en" label={t("roastEN")}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="origin_vi" label={t("originVI")}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="origin_en" label={t("originEN")}>
-            <Input />
+          <Form.Item name="base_unit" label={t("packageSpec")}>
+            <Input placeholder={t("baseUnitPlaceholder")} />
           </Form.Item>
         </div>
+
+        <Form.List name="price_tiers">
+          {(fields, {add, remove}) => (
+            <div className="space-y-3">
+              {fields.map((field) => (
+                <div key={field.key} className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-3 md:grid-cols-[1fr_120px_120px_150px_auto] md:items-end">
+                  <Form.Item name={[field.name, "attribute"]} label={t("priceAttribute")} className="mb-0">
+                    <Input placeholder={t("priceAttributePlaceholder")} />
+                  </Form.Item>
+                  <Form.Item name={[field.name, "minKg"]} label={t("minKg")} className="mb-0">
+                    <InputNumber className="w-full" min={0} />
+                  </Form.Item>
+                  <Form.Item name={[field.name, "maxKg"]} label={t("maxKg")} className="mb-0">
+                    <InputNumber className="w-full" min={0} />
+                  </Form.Item>
+                  <Form.Item name={[field.name, "price"]} label={t("price")} className="mb-0" rules={[{required: true}]}>
+                    <InputNumber className="w-full" min={0} />
+                  </Form.Item>
+                  <Button danger type="text" icon={<DeleteOutlined />} onClick={() => remove(field.name)} />
+                </div>
+              ))}
+              <Button icon={<PlusOutlined />} onClick={() => add({attribute: "", price: 0})}>
+                {t("addPriceTier")}
+              </Button>
+            </div>
+          )}
+        </Form.List>
+
+        <Form.Item name="price" hidden>
+          <InputNumber />
+        </Form.Item>
+
+        {["altitude", "roast_vi", "roast_en", "origin_vi", "origin_en"].map((name) => (
+          <Form.Item key={name} name={name} hidden>
+            <Input />
+          </Form.Item>
+        ))}
       </Card>
 
       <Card className="mb-6" title={t("productContent")}>
         <div className="grid gap-4 md:grid-cols-2">
-          <Form.Item name="description_vi" label={t("descriptionVI")}>
+          <Form.Item name="description_vi" label={t("productInfoVI")}>
             <Input.TextArea rows={5} />
           </Form.Item>
-          <Form.Item name="description_en" label={t("descriptionEN")}>
+          <Form.Item name="description_en" label={t("productInfoEN")}>
             <Input.TextArea rows={5} />
-          </Form.Item>
-          <Form.Item name="farmer_story_vi" label={t("farmerStoryVI")}>
-            <Input.TextArea rows={5} />
-          </Form.Item>
-          <Form.Item name="farmer_story_en" label={t("farmerStoryEN")}>
-            <Input.TextArea rows={5} />
-          </Form.Item>
-          <Form.Item name="notes_vi" label={t("notesVI")}>
-            <Input.TextArea rows={4} placeholder={t("oneItemPerLine")} />
-          </Form.Item>
-          <Form.Item name="notes_en" label={t("notesEN")}>
-            <Input.TextArea rows={4} placeholder={t("oneItemPerLine")} />
-          </Form.Item>
-          <Form.Item name="brew_guide_vi" label={t("brewGuideVI")}>
-            <Input.TextArea rows={4} placeholder={t("oneItemPerLine")} />
-          </Form.Item>
-          <Form.Item name="brew_guide_en" label={t("brewGuideEN")}>
-            <Input.TextArea rows={4} placeholder={t("oneItemPerLine")} />
           </Form.Item>
         </div>
+        {["farmer_story_vi", "farmer_story_en", "notes_vi", "notes_en", "brew_guide_vi", "brew_guide_en"].map((name) => (
+          <Form.Item key={name} name={name} hidden>
+            <Input />
+          </Form.Item>
+        ))}
       </Card>
 
       <Card className="mb-6" title={t("productImages")}>
         <div className="space-y-4">
-          <Button icon={<UploadOutlined />} onClick={() => document.getElementById("product-image-upload")?.click()}>
+          <Button
+            icon={<UploadOutlined />}
+            loading={isUploading}
+            disabled={isUploading}
+            onClick={() => document.getElementById("product-image-upload")?.click()}
+          >
             {t("uploadTab")}
           </Button>
-          <input id="product-image-upload" type="file" accept="image/*" hidden onChange={handleFileChange} />
-          <Input.TextArea
-            rows={5}
-            value={images}
-            onChange={(event) => setImages(event.target.value)}
-            placeholder={t("imageUrlsPlaceholder")}
-          />
+          <input id="product-image-upload" type="file" accept="image/*" multiple hidden onChange={handleFileChange} />
+          {images.length ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {images.map((image, index) => (
+                <div key={`${image}-${index}`} className="relative aspect-square overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
+                  <Image src={image} alt="" fill sizes="160px" className="object-cover" />
+                  <Button
+                    danger
+                    size="small"
+                    type="primary"
+                    icon={<DeleteOutlined />}
+                    className="absolute right-2 top-2"
+                    onClick={() => setImages((current) => current.filter((_, imageIndex) => imageIndex !== index))}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       </Card>
 
-      <div className="flex items-center gap-3">
-        <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isPending} size="large">
-          {t("saveProduct")}
-        </Button>
-        {isEditing ? (
-          <Button danger icon={<DeleteOutlined />} onClick={handleDelete} size="large">
-            {t("delete")}
+      {!isEditing ? (
+        <div className="flex items-center gap-3">
+          <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isPending} size="large">
+            {t("saveProduct")}
           </Button>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
     </Form>
   );
 }

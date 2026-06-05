@@ -24,7 +24,7 @@ import {
   SheetTitle,
   SheetTrigger
 } from "@/components/ui/sheet";
-import {useCartStore, getCartTotals} from "@/features/cart/cart-store";
+import {cartItemId, useCartStore, getCartTotals} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {formatCurrency} from "@/lib/content/helpers";
@@ -48,11 +48,11 @@ export function CartDrawer({solid}: {solid?: boolean}) {
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
 
-  function handleDecrease(slug: string, quantity: number) {
+  function handleDecrease(id: string, quantity: number) {
     if (quantity <= 1) {
-      setConfirmRemove(slug);
+      setConfirmRemove(id);
     } else {
-      updateQuantity(slug, quantity - 1);
+      updateQuantity(id, quantity - 1);
     }
   }
 
@@ -105,8 +105,10 @@ export function CartDrawer({solid}: {solid?: boolean}) {
             </div>
           ) : (
             <>
-              {items.map((item) => (
-                <div key={item.slug} className="bg-white rounded-[24px] p-3 mb-4 flex gap-4 shadow-[0_4px_20px_rgba(20,41,24,0.03)] border border-[#142918]/[0.06] relative">
+              {items.map((item) => {
+                const id = cartItemId(item);
+                return (
+                <div key={id} className="bg-white rounded-[24px] p-3 mb-4 flex gap-4 shadow-[0_4px_20px_rgba(20,41,24,0.03)] border border-[#142918]/[0.06] relative">
                   <div className="relative w-[110px] h-[120px] rounded-[18px] overflow-hidden shrink-0 bg-[#f8f9f6]">
                     <Image src={item.image} alt={item.name} fill className="object-cover" sizes="110px" />
                     {(!item.category || item.category === "beans" || item.category === "ground") && (
@@ -121,7 +123,7 @@ export function CartDrawer({solid}: {solid?: boolean}) {
                       <span className="bg-[#f0e6d6] text-[#6b4c2a] text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md">
                         {item.category ? (categoryMap[item.category]?.[locale] || item.category) : tCommon("product")}
                       </span>
-                      <button onClick={() => setConfirmRemove(item.slug)} className="w-8 h-8 flex items-center justify-center rounded-full border border-blue-600/20 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors -mr-1 -mt-1">
+                      <button onClick={() => setConfirmRemove(id)} className="w-8 h-8 flex items-center justify-center rounded-full border border-blue-600/20 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors -mr-1 -mt-1">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -135,11 +137,11 @@ export function CartDrawer({solid}: {solid?: boolean}) {
                     )}
                     <div className="mt-auto flex justify-between items-center">
                       <div className="flex items-center rounded-xl border border-[#142918]/15 h-[34px]">
-                        <button onClick={() => handleDecrease(item.slug, item.quantity)} className="w-[34px] h-full flex items-center justify-center text-[#142918]/70 hover:text-[#142918]">
+                        <button onClick={() => handleDecrease(id, item.quantity)} className="w-[34px] h-full flex items-center justify-center text-[#142918]/70 hover:text-[#142918]">
                           <Minus className="w-3.5 h-3.5" />
                         </button>
                         <span className="text-sm font-semibold w-5 text-center text-[#142918]">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.slug, item.quantity + 1)} className="w-[34px] h-full flex items-center justify-center text-[#142918]/70 hover:text-[#142918]">
+                        <button onClick={() => updateQuantity(id, item.quantity + 1)} className="w-[34px] h-full flex items-center justify-center text-[#142918]/70 hover:text-[#142918]">
                           <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -147,7 +149,7 @@ export function CartDrawer({solid}: {solid?: boolean}) {
                     </div>
                   </div>
                 </div>
-              ))}
+              );})}
 
               <div className="flex flex-wrap items-center justify-between bg-white rounded-[20px] p-3 mb-8 shadow-[0_4px_20px_rgba(20,41,24,0.02)] border border-[#142918]/[0.04]">
                 <div className="flex items-center gap-2.5 flex-1 justify-center border-r border-[#142918]/10 pr-2">

@@ -7,7 +7,7 @@ import {Minus, Plus, Trash2} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
-import {useCartStore, getCartTotals} from "@/features/cart/cart-store";
+import {cartItemId, useCartStore, getCartTotals} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
 import {formatCurrency} from "@/lib/content/helpers";
@@ -44,9 +44,11 @@ export function CartPageClient() {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
       <div className="grid gap-4">
-        {items.map((item, index) => (
+        {items.map((item, index) => {
+          const id = cartItemId(item);
+          return (
           <motion.article
-            key={item.slug}
+            key={id}
             initial={{opacity: 0, y: 20}}
             animate={{opacity: 1, y: 0}}
             transition={{duration: 0.45, delay: index * 0.04}}
@@ -75,14 +77,14 @@ export function CartPageClient() {
                 <button
                   aria-label={common("removeItem")}
                   className="rounded-full p-2 text-forest-950/56 transition hover:bg-forest-950/8 hover:text-forest-950"
-                  onClick={() => removeItem(item.slug)}
+                  onClick={() => removeItem(id)}
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
                 <div className="inline-flex items-center rounded-full border border-forest-950/14 bg-white/54">
                   <button
                     className="p-3"
-                    onClick={() => updateQuantity(item.slug, item.quantity - 1)}
+                    onClick={() => updateQuantity(id, item.quantity - 1)}
                     aria-label={common("decreaseQty")}
                   >
                     <Minus className="h-4 w-4" />
@@ -92,7 +94,7 @@ export function CartPageClient() {
                   </span>
                   <button
                     className="p-3"
-                    onClick={() => updateQuantity(item.slug, item.quantity + 1)}
+                    onClick={() => updateQuantity(id, item.quantity + 1)}
                     aria-label={common("increaseQty")}
                   >
                     <Plus className="h-4 w-4" />
@@ -101,7 +103,7 @@ export function CartPageClient() {
               </div>
             </div>
           </motion.article>
-        ))}
+        );})}
       </div>
 
       <aside className="h-fit rounded-md border border-forest-950/10 bg-forest-950 p-6 text-white shadow-cinematic">

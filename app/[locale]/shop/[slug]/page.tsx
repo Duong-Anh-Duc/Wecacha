@@ -174,63 +174,21 @@ export default async function ProductDetailPage({params}: Props) {
       </section>
 
       <section className="px-4 py-8 sm:px-6 lg:px-8 bg-parchment-50">
-        <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[1fr_0.8fr] gap-8">
+        <div className="mx-auto max-w-7xl">
           <Reveal>
             <div className="bg-[#fcfbfa] rounded-[24px] p-8 lg:p-10 border border-[#142918]/[0.06]">
               <h3 className="font-bold text-lg text-[#142918] mb-8">{t("infoHeading")}</h3>
               <div className="flex flex-col gap-5">
                 {[
-                  {label: t("origin"), value: localized(product.origin, locale)},
-                  {label: t("altitude"), value: product.altitude},
-                  {label: t("roast"), value: localized(product.roast, locale)},
-                  {label: t("ingredient"), value: "100% Arabica"},
-                  {label: t("notes"), value: localized(product.notes, locale).join(", ")},
+                  {label: t("productInfo"), value: localized(product.description, locale)},
                   {label: t("weight"), value: product.weight},
-                  {label: t("expiry"), value: t("expiryValue")},
-                  {label: t("storage"), value: t("storageValue")}
-                ].map((item, idx) => (
+                  {label: t("packageSpec"), value: product.baseUnit}
+                ].filter((item) => item.value).map((item, idx) => (
                   <div key={idx} className="grid grid-cols-[120px_1fr] sm:grid-cols-[140px_1fr] gap-4 items-start border-b border-[#142918]/[0.06] pb-5 last:border-0 last:pb-0">
                     <span className="font-bold text-[13px] text-[#142918]">{item.label}</span>
                     <span className="text-[14px] text-[#142918]/80 leading-relaxed">{item.value}</span>
                   </div>
                 ))}
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.1}>
-            <div className="bg-[#f8f6f0] rounded-[24px] p-8 lg:p-10 border border-[#142918]/[0.04]">
-              <h3 className="font-bold text-lg text-[#142918] mb-8">{t("brew")}</h3>
-              <ol className="flex flex-col gap-6 relative">
-                {localized(product.brewGuide, locale).map((step, index) => (
-                  <li className="flex gap-5 items-start relative z-10" key={index}>
-                    <div className="w-8 h-8 rounded-full bg-[#e8e0d5] text-[#142918] flex items-center justify-center font-bold text-sm shrink-0">
-                      {index + 1}
-                    </div>
-                    <span className="pt-1.5 text-[14px] text-[#142918]/80 leading-relaxed">{step}</span>
-                  </li>
-                ))}
-              </ol>
-              
-              <div className="mt-10 pt-8 border-t border-[#142918]/10 grid grid-cols-2 gap-4">
-                <div className="flex gap-3 items-center">
-                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 border border-[#142918]/10">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#a46131]"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  </div>
-                  <div>
-                    <p className="font-bold text-[11px] text-[#142918]">{t("brewTime")}</p>
-                    <p className="text-[11px] text-[#142918]/60 mt-0.5">{t("brewTimeValue")}</p>
-                  </div>
-                </div>
-                <div className="flex gap-3 items-center">
-                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 border border-[#142918]/10">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#a46131]"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
-                  </div>
-                  <div>
-                    <p className="font-bold text-[11px] text-[#142918]">{t("brewTemp")}</p>
-                    <p className="text-[11px] text-[#142918]/60 mt-0.5">{t("brewTempValue")}</p>
-                  </div>
-                </div>
               </div>
             </div>
           </Reveal>

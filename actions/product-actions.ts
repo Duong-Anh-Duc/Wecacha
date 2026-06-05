@@ -19,6 +19,32 @@ function imageListFromText(value: FormDataEntryValue | null) {
     .filter(Boolean);
 }
 
+function jsonFromText<T>(value: FormDataEntryValue | null, fallback: T): T {
+  try {
+    const parsed = JSON.parse(String(value ?? ""));
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+async function productExtensionColumns(
+  supabase: Awaited<ReturnType<typeof getAdminSession>>["supabase"]
+) {
+  const {error} = await supabase
+    .from("products")
+    .select("category_slugs,price_tiers,base_unit")
+    .limit(1);
+
+  const hasExtensions = !error;
+
+  return {
+    categorySlugs: hasExtensions,
+    priceTiers: hasExtensions,
+    baseUnit: hasExtensions
+  };
+}
+
 async function createUniqueProductSlug(
   supabase: Awaited<ReturnType<typeof getAdminSession>>["supabase"],
   source: string,
@@ -86,23 +112,39 @@ export async function upsertProduct(formData: FormData) {
 
   const id = String(formData.get("id") ?? "");
   const nameVi = String(formData.get("name_vi") ?? "");
-  const nameEn = String(formData.get("name_en") ?? "");
+  const nameEn = String(formData.get("name_en") ?? "") || nameVi;
+  const categorySlugs = jsonFromText<string[]>(formData.get("category_slugs"), [])
+    .map((item) => String(item).trim())
+    .filter(Boolean);
+  const priceTiers = jsonFromText<
+    {attribute?: string; minKg?: number | null; maxKg?: number | null; price?: number | null}[]
+  >(formData.get("price_tiers"), [])
+    .map((tier) => ({
+      attribute: String(tier.attribute ?? "").trim(),
+      minKg: tier.minKg === null || tier.minKg === undefined ? undefined : Number(tier.minKg),
+      maxKg: tier.maxKg === null || tier.maxKg === undefined ? undefined : Number(tier.maxKg),
+      price: Number(tier.price ?? 0)
+    }))
+    .filter((tier) => tier.attribute || tier.minKg || tier.maxKg || tier.price);
+  const firstTierPrice = priceTiers.find((tier) => tier.price > 0)?.price;
+  const extensionColumns = await productExtensionColumns(supabase);
   const slug = id
     ? String(formData.get("slug") ?? "")
     : await createUniqueProductSlug(supabase, nameVi || nameEn);
 
-  const payload = {
+  const rawPrice = String(formData.get("price") ?? "").trim();
+  const payload: Record<string, unknown> = {
     slug: slug || await createUniqueProductSlug(supabase, nameVi || nameEn, id),
-    category: String(formData.get("category") ?? "beans"),
+    category: categorySlugs[0] ?? String(formData.get("category") ?? "beans") ?? "beans",
     name_vi: nameVi,
     name_en: nameEn,
     short_vi: String(formData.get("short_vi") ?? ""),
-    short_en: String(formData.get("short_en") ?? ""),
+    short_en: String(formData.get("short_en") ?? "") || String(formData.get("short_vi") ?? ""),
     description_vi: String(formData.get("description_vi") ?? ""),
     description_en: String(formData.get("description_en") ?? ""),
     farmer_story_vi: String(formData.get("farmer_story_vi") ?? ""),
     farmer_story_en: String(formData.get("farmer_story_en") ?? ""),
-    price: Number(formData.get("price") ?? 0),
+    price: rawPrice ? Number(rawPrice) : Number(firstTierPrice ?? 0),
     original_price: formData.get("original_price") ? Number(formData.get("original_price")) : null,
     weight: String(formData.get("weight") ?? ""),
     altitude: String(formData.get("altitude") ?? ""),
@@ -119,6 +161,16 @@ export async function upsertProduct(formData: FormData) {
     is_visible: formData.get("is_visible") === "true",
     updated_at: new Date().toISOString()
   };
+
+  if (extensionColumns.categorySlugs) {
+    payload.category_slugs = categorySlugs;
+  }
+  if (extensionColumns.priceTiers) {
+    payload.price_tiers = priceTiers;
+  }
+  if (extensionColumns.baseUnit) {
+    payload.base_unit = String(formData.get("base_unit") ?? "");
+  }
 
   if (id) {
     const result = await supabase.from("products").update(payload).eq("id", id);
