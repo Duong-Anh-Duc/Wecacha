@@ -34,6 +34,19 @@ async function createUniqueArticleSlug(
   }
 }
 
+function revalidateArticlePaths(slug?: string, placement?: string) {
+  for (const locale of ["vi", "en"]) {
+    revalidatePath(`/${locale}/admin/articles`);
+    revalidatePath(`/${locale}/news`);
+    if (slug) {
+      revalidatePath(`/${locale}/news/${slug}`);
+    }
+    if (placement === "home" || placement === "both") {
+      revalidatePath(`/${locale}`);
+    }
+  }
+}
+
 export async function upsertArticle(data: any) {
   try {
     const supabase = await createClient();
@@ -66,8 +79,7 @@ export async function upsertArticle(data: any) {
       if (error) throw error;
     }
 
-    revalidatePath("/admin/articles");
-    revalidatePath("/news");
+    revalidateArticlePaths(payload.slug, payload.placement);
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message };
@@ -77,11 +89,15 @@ export async function upsertArticle(data: any) {
 export async function deleteArticle(id: string) {
   try {
     const supabase = await createClient();
+    const {data: article} = await supabase
+      .from("news_articles")
+      .select("slug, placement")
+      .eq("id", id)
+      .maybeSingle();
     const { error } = await supabase.from("news_articles").delete().eq("id", id);
     if (error) throw error;
 
-    revalidatePath("/admin/articles");
-    revalidatePath("/news");
+    revalidateArticlePaths(String(article?.slug ?? ""), String(article?.placement ?? ""));
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message };
@@ -103,8 +119,7 @@ export async function updateArticleSortOrder(ids: string[]) {
 
     if (error) throw error;
 
-    revalidatePath("/admin/articles");
-    revalidatePath("/news");
+    revalidateArticlePaths(undefined, "both");
     return {success: true};
   } catch (err: any) {
     return {success: false, error: err.message};

@@ -2,11 +2,11 @@
 
 import {useEffect, useMemo, useState, useTransition} from "react";
 import Image from "next/image";
-import {App, Button, Input, Space, Table, Tooltip, type TableColumnsType} from "antd";
+import {App, Button, Input, Space, Switch, Table, Tooltip, type TableColumnsType} from "antd";
 import {SearchOutlined} from "@ant-design/icons";
 import {GripVertical, Trash2} from "lucide-react";
 import {useTranslations} from "next-intl";
-import {deleteProduct, updateProductSortOrder} from "@/actions/product-actions";
+import {deleteProduct, updateProductSortOrder, updateProductVisibility} from "@/actions/product-actions";
 import {useRouter} from "@/i18n/navigation";
 import {formatCurrency} from "@/lib/content/helpers";
 import {ProductFormModalButton} from "./product-form-modal-button";
@@ -68,6 +68,7 @@ export function ProductsTable({
   const [orderedProducts, setOrderedProducts] = useState(products);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [visibilityPendingId, setVisibilityPendingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
 
@@ -142,6 +143,38 @@ export function ProductsTable({
     });
   }
 
+  async function updateVisibility(row: ProductRow, isVisible: boolean) {
+    const previousProducts = orderedProducts;
+    setVisibilityPendingId(row.id);
+    setOrderedProducts((current) =>
+      current.map((product) =>
+        product.id === row.id ? {...product, is_visible: isVisible} : product
+      )
+    );
+
+    const result = await updateProductVisibility(row.id, isVisible);
+    setVisibilityPendingId(null);
+
+    if (result.success) {
+      message.success(isVisible ? t("productVisibleSuccess") : t("productHiddenSuccess"));
+      router.refresh();
+    } else {
+      setOrderedProducts(previousProducts);
+      message.error(`${t("saveError")}${result.error}`);
+    }
+  }
+
+  function handleVisibilityChange(row: ProductRow, isVisible: boolean) {
+    modal.confirm({
+      title: isVisible ? t("showProductConfirmTitle") : t("hideProductConfirmTitle"),
+      content: isVisible ? t("showProductConfirmDesc") : t("hideProductConfirmDesc"),
+      okText: isVisible ? t("visibleShort") : t("hiddenShort"),
+      okButtonProps: {danger: !isVisible},
+      cancelText: t("cancel"),
+      onOk: () => updateVisibility(row, isVisible)
+    });
+  }
+
   const columns: TableColumnsType<ProductRow> = [
     {
       title: "",
@@ -203,6 +236,28 @@ export function ProductsTable({
       dataIndex: "base_unit",
       width: 140,
       render: (value) => value || "—"
+    },
+    {
+      title: t("visibility"),
+      dataIndex: "is_visible",
+      width: 130,
+      align: "center",
+      filters: [
+        {text: t("visible"), value: true},
+        {text: t("hidden"), value: false}
+      ],
+      onFilter: (value, row) => row.is_visible === value,
+      render: (_value, row) => (
+        <Tooltip title={row.is_visible ? t("visible") : t("hidden")}>
+          <Switch
+            checked={row.is_visible}
+            loading={visibilityPendingId === row.id}
+            checkedChildren={t("visibleShort")}
+            unCheckedChildren={t("hiddenShort")}
+            onChange={(checked) => handleVisibilityChange(row, checked)}
+          />
+        </Tooltip>
+      )
     },
     {
       title: t("priceTiers"),

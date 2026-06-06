@@ -5,6 +5,13 @@ import {getAdminSession} from "@/lib/admin-auth";
 
 type RegistrationStatus = "new" | "contacted" | "closed";
 
+function revalidateAdminRegistrationPaths() {
+  for (const locale of ["vi", "en"]) {
+    revalidatePath(`/${locale}/admin`);
+    revalidatePath(`/${locale}/admin/registrations`);
+  }
+}
+
 export async function updateRegistrationWorkflow(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "new") as RegistrationStatus;
@@ -40,7 +47,6 @@ export async function updateRegistrationWorkflow(formData: FormData) {
     return {success: false, error: error.message};
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/registrations");
+  revalidateAdminRegistrationPaths();
   return {success: true};
 }

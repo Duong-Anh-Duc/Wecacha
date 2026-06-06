@@ -162,15 +162,17 @@ export function ProductForm({
         base_unit: initialData.base_unit ?? "",
         price_tiers: initialData.price_tiers?.length ? initialData.price_tiers : [
           {
-            attribute: initialData.weight ?? "",
-            minKg: undefined,
-            maxKg: undefined,
+            attribute: "5kg đến 20kg",
+            price: initialData.price
+          },
+          {
+            attribute: "21kg đến 50kg",
             price: initialData.price
           }
         ]
       }}
       onFinish={handleSubmit}
-      className="max-w-5xl"
+      className="w-full"
     >
       {isEditing ? (
         <div className="mb-6 flex items-center justify-end">
@@ -234,15 +236,9 @@ export function ProductForm({
           {(fields, {add, remove}) => (
             <div className="space-y-3">
               {fields.map((field) => (
-                <div key={field.key} className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-3 md:grid-cols-[1fr_120px_120px_150px_auto] md:items-end">
+                <div key={field.key} className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-3 md:grid-cols-[1fr_180px_auto] md:items-end">
                   <Form.Item name={[field.name, "attribute"]} label={t("priceAttribute")} className="mb-0">
                     <Input placeholder={t("priceAttributePlaceholder")} />
-                  </Form.Item>
-                  <Form.Item name={[field.name, "minKg"]} label={t("minKg")} className="mb-0">
-                    <InputNumber className="w-full" min={0} />
-                  </Form.Item>
-                  <Form.Item name={[field.name, "maxKg"]} label={t("maxKg")} className="mb-0">
-                    <InputNumber className="w-full" min={0} />
                   </Form.Item>
                   <Form.Item name={[field.name, "price"]} label={t("price")} className="mb-0" rules={[{required: true}]}>
                     <InputNumber className="w-full" min={0} />
@@ -250,7 +246,7 @@ export function ProductForm({
                   <Button danger type="text" icon={<DeleteOutlined />} onClick={() => remove(field.name)} />
                 </div>
               ))}
-              <Button icon={<PlusOutlined />} onClick={() => add({attribute: "", price: 0})}>
+              <Button icon={<PlusOutlined />} onClick={() => add({attribute: "", price: undefined})}>
                 {t("addPriceTier")}
               </Button>
             </div>
@@ -316,7 +312,7 @@ export function ProductForm({
       </Card>
 
       {!isEditing ? (
-        <div className="flex items-center gap-3">
+        <div className="sticky bottom-0 z-20 -mx-1 flex items-center justify-end border-t border-stone-200 bg-white/95 px-1 py-4 backdrop-blur">
           <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isPending} size="large">
             {t("saveProduct")}
           </Button>

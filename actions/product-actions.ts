@@ -30,7 +30,9 @@ function jsonFromText<T>(value: FormDataEntryValue | null, fallback: T): T {
 
 function revalidateShopPaths(productSlug?: string, categorySlugs: string[] = []) {
   for (const locale of ["vi", "en"]) {
+    revalidatePath(`/${locale}`);
     revalidatePath(`/${locale}/admin/products`);
+    revalidatePath(`/${locale}/flavor-quiz`);
     revalidatePath(`/${locale}/shop`);
     if (productSlug) {
       revalidatePath(`/${locale}/shop/${productSlug}`);
@@ -238,6 +240,39 @@ export async function updateProductSortOrder(ids: string[]) {
   }
 
   revalidateShopPaths();
+  return {success: true};
+}
+
+export async function updateProductVisibility(id: string, isVisible: boolean) {
+  const {supabase, user, error: authError} = await getAdminSession();
+
+  if (authError || !user) {
+    return {success: false, error: "Unauthorized"};
+  }
+
+  const {data: product, error: productError} = await supabase
+    .from("products")
+    .select("slug, category, category_slugs")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (productError) {
+    return {success: false, error: productError.message};
+  }
+
+  const {error} = await supabase
+    .from("products")
+    .update({is_visible: isVisible, updated_at: new Date().toISOString()})
+    .eq("id", id);
+
+  if (error) {
+    return {success: false, error: error.message};
+  }
+
+  revalidateShopPaths(
+    String(product?.slug ?? ""),
+    [String(product?.category ?? ""), ...((product?.category_slugs as string[] | null) ?? [])].filter(Boolean)
+  );
   return {success: true};
 }
 

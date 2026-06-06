@@ -13,6 +13,13 @@ type OrderItemInput = {
   price: number;
 };
 
+function revalidateAdminPaths(path: string) {
+  for (const locale of ["vi", "en"]) {
+    revalidatePath(`/${locale}/admin`);
+    revalidatePath(`/${locale}${path}`);
+  }
+}
+
 export async function createOrder(data: {
   customer_name: string;
   phone: string;
@@ -77,7 +84,7 @@ export async function createOrder(data: {
     return {success: false, error: itemError.message};
   }
 
-  revalidatePath("/admin/orders");
+  revalidateAdminPaths("/admin/orders");
   return {success: true, orderId: order.id as string};
 }
 
@@ -113,7 +120,6 @@ export async function updateOrderWorkflow(formData: FormData) {
     return {success: false, error: error.message};
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/orders");
+  revalidateAdminPaths("/admin/orders");
   return {success: true};
 }

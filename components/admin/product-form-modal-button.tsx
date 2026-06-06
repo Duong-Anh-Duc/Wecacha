@@ -47,10 +47,11 @@ export function ProductFormModalButton({
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-        width={1040}
+        width="min(1180px, calc(100vw - 32px))"
+        style={{top: 24}}
         destroyOnHidden
       >
-        <div className="max-h-[calc(100vh-180px)] overflow-y-auto pr-1">
+        <div className="max-h-[calc(100vh-120px)] overflow-y-auto pr-1">
           <ProductForm
             initialData={product}
             categories={categories}
