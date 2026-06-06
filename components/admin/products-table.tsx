@@ -277,8 +277,10 @@ export function ProductsTable({
           className="max-w-xl"
         />
         <Select
-          value={statusFilter}
-          onChange={setStatusFilter}
+          value={statusFilter === "all" ? undefined : statusFilter}
+          onChange={(value) => setStatusFilter(value ?? "all")}
+          allowClear
+          placeholder={t("businessStatusAll")}
           className="w-full sm:w-64"
           size="large"
           options={[
