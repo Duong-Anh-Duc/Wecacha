@@ -80,7 +80,7 @@ export function ShopGrid({
     setCurrentPage(1);
   }, [query, category, sort]);
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
   const currentProducts = filteredProducts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -189,42 +189,40 @@ export function ShopGrid({
       </div>
 
       {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="mt-12 flex items-center justify-center gap-2">
-          <button
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e0d8] bg-white text-forest-950 transition hover:bg-[#fcfbfa] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          
-          <div className="flex items-center gap-1">
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold transition-colors",
-                  currentPage === i + 1
-                    ? "bg-[#b5703a] text-white shadow-md"
-                    : "text-forest-950/60 hover:bg-black/5 hover:text-forest-950"
-                )}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
+      <div className="mt-12 flex items-center justify-center gap-2">
+        <button
+          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+          disabled={currentPage === 1}
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e0d8] bg-white text-forest-950 transition hover:bg-[#fcfbfa] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
 
-          <button
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e0d8] bg-white text-forest-950 transition hover:bg-[#fcfbfa] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
+        <div className="flex items-center gap-1">
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold transition-colors",
+                currentPage === i + 1
+                  ? "bg-[#b5703a] text-white shadow-md"
+                  : "text-forest-950/60 hover:bg-black/5 hover:text-forest-950"
+              )}
+            >
+              {i + 1}
+            </button>
+          ))}
         </div>
-      )}
+
+        <button
+          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+          disabled={currentPage === totalPages}
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e0d8] bg-white text-forest-950 transition hover:bg-[#fcfbfa] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
     </div>
   );
 }

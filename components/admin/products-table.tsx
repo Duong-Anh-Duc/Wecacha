@@ -1,12 +1,12 @@
 "use client";
 
-import {useEffect, useMemo, useState, useTransition} from "react";
+import {useEffect, useMemo, useState} from "react";
 import Image from "next/image";
-import {App, Button, Input, Space, Switch, Table, Tooltip, type TableColumnsType} from "antd";
+import {App, Button, Input, Select, Space, Switch, Table, Tooltip, type TableColumnsType} from "antd";
 import {SearchOutlined} from "@ant-design/icons";
-import {GripVertical, Trash2} from "lucide-react";
+import {Trash2} from "lucide-react";
 import {useTranslations} from "next-intl";
-import {deleteProduct, updateProductSortOrder, updateProductVisibility} from "@/actions/product-actions";
+import {deleteProduct, updateProductVisibility} from "@/actions/product-actions";
 import {useRouter} from "@/i18n/navigation";
 import {formatCurrency} from "@/lib/content/helpers";
 import {ProductFormModalButton} from "./product-form-modal-button";
@@ -52,6 +52,8 @@ export type ProductRow = {
   created_at: string;
 };
 
+type StatusFilter = "all" | "active" | "stopped";
+
 export function ProductsTable({
   products,
   locale,
@@ -65,11 +67,10 @@ export function ProductsTable({
   const router = useRouter();
   const {message, modal} = App.useApp();
   const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [orderedProducts, setOrderedProducts] = useState(products);
-  const [draggingId, setDraggingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [visibilityPendingId, setVisibilityPendingId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
 
   useEffect(() => {
@@ -80,6 +81,10 @@ export function ProductsTable({
     const normalized = query.trim().toLowerCase();
 
     return orderedProducts.filter((product) => {
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "active" && product.is_visible) ||
+        (statusFilter === "stopped" && !product.is_visible);
       const haystack = [
         product.name_vi,
         product.slug,
@@ -87,39 +92,9 @@ export function ProductsTable({
         product.weight,
         product.base_unit
       ].join(" ").toLowerCase();
-      return !normalized || haystack.includes(normalized);
+      return matchesStatus && (!normalized || haystack.includes(normalized));
     });
-  }, [orderedProducts, query]);
-
-  function handleDrop(targetId: string) {
-    if (!draggingId || draggingId === targetId) {
-      setDraggingId(null);
-      return;
-    }
-
-    const fromIndex = orderedProducts.findIndex((product) => product.id === draggingId);
-    const toIndex = orderedProducts.findIndex((product) => product.id === targetId);
-    if (fromIndex < 0 || toIndex < 0) {
-      setDraggingId(null);
-      return;
-    }
-
-    const nextProducts = [...orderedProducts];
-    const [movedProduct] = nextProducts.splice(fromIndex, 1);
-    nextProducts.splice(toIndex, 0, movedProduct);
-    setOrderedProducts(nextProducts);
-    setDraggingId(null);
-
-    startTransition(async () => {
-      const result = await updateProductSortOrder(nextProducts.map((product) => product.id));
-      if (result.success) {
-        message.success(t("reorderSuccess"));
-      } else {
-        setOrderedProducts(products);
-        message.error(`${t("reorderError")}${result.error}`);
-      }
-    });
-  }
+  }, [orderedProducts, query, statusFilter]);
 
   function handleDelete(row: ProductRow) {
     modal.confirm({
@@ -156,7 +131,7 @@ export function ProductsTable({
     setVisibilityPendingId(null);
 
     if (result.success) {
-      message.success(isVisible ? t("productVisibleSuccess") : t("productHiddenSuccess"));
+      message.success(isVisible ? t("productBusinessActiveSuccess") : t("productBusinessStoppedSuccess"));
       router.refresh();
     } else {
       setOrderedProducts(previousProducts);
@@ -166,9 +141,9 @@ export function ProductsTable({
 
   function handleVisibilityChange(row: ProductRow, isVisible: boolean) {
     modal.confirm({
-      title: isVisible ? t("showProductConfirmTitle") : t("hideProductConfirmTitle"),
-      content: isVisible ? t("showProductConfirmDesc") : t("hideProductConfirmDesc"),
-      okText: isVisible ? t("visibleShort") : t("hiddenShort"),
+      title: isVisible ? t("startBusinessConfirmTitle") : t("stopBusinessConfirmTitle"),
+      content: isVisible ? t("startBusinessConfirmDesc") : t("stopBusinessConfirmDesc"),
+      okText: isVisible ? t("businessActive") : t("businessStopped"),
       okButtonProps: {danger: !isVisible},
       cancelText: t("cancel"),
       onOk: () => updateVisibility(row, isVisible)
@@ -177,20 +152,9 @@ export function ProductsTable({
 
   const columns: TableColumnsType<ProductRow> = [
     {
-      title: "",
-      key: "drag",
-      width: 46,
-      align: "center",
-      render: () => (
-        <Tooltip title={t("dragToReorder")}>
-          <GripVertical className="mx-auto h-4 w-4 cursor-grab text-stone-400" />
-        </Tooltip>
-      )
-    },
-    {
       title: t("colIndex"),
       key: "index",
-      width: 72,
+      width: 76,
       align: "center",
       render: (_value, _row, index) => (
         <span className="font-medium text-stone-500">
@@ -217,15 +181,6 @@ export function ProductsTable({
       )
     },
     {
-      title: t("productInfo"),
-      dataIndex: "description_vi",
-      render: (value) => (
-        <p className="max-w-80 whitespace-pre-line text-sm leading-6 text-stone-600 line-clamp-3">
-          {value || "—"}
-        </p>
-      )
-    },
-    {
       title: t("weight"),
       dataIndex: "weight",
       width: 120,
@@ -236,28 +191,6 @@ export function ProductsTable({
       dataIndex: "base_unit",
       width: 140,
       render: (value) => value || "—"
-    },
-    {
-      title: t("visibility"),
-      dataIndex: "is_visible",
-      width: 130,
-      align: "center",
-      filters: [
-        {text: t("visible"), value: true},
-        {text: t("hidden"), value: false}
-      ],
-      onFilter: (value, row) => row.is_visible === value,
-      render: (_value, row) => (
-        <Tooltip title={row.is_visible ? t("visible") : t("hidden")}>
-          <Switch
-            checked={row.is_visible}
-            loading={visibilityPendingId === row.id}
-            checkedChildren={t("visibleShort")}
-            unCheckedChildren={t("hiddenShort")}
-            onChange={(checked) => handleVisibilityChange(row, checked)}
-          />
-        </Tooltip>
-      )
     },
     {
       title: t("priceTiers"),
@@ -281,6 +214,28 @@ export function ProductsTable({
           </div>
         );
       }
+    },
+    {
+      title: t("businessStatus"),
+      dataIndex: "is_visible",
+      width: 180,
+      align: "center",
+      render: (_value, row) => (
+        <div className="flex flex-col items-center gap-1.5">
+          <Tooltip title={row.is_visible ? t("businessActive") : t("businessStopped")}>
+            <Switch
+              checked={row.is_visible}
+              loading={visibilityPendingId === row.id}
+              checkedChildren={t("businessActiveShort")}
+              unCheckedChildren={t("businessStoppedShort")}
+              onChange={(checked) => handleVisibilityChange(row, checked)}
+            />
+          </Tooltip>
+          <span className={row.is_visible ? "text-xs font-semibold text-emerald-700" : "text-xs font-semibold text-stone-500"}>
+            {row.is_visible ? t("businessActive") : t("businessStopped")}
+          </span>
+        </div>
+      )
     },
     {
       title: t("colActions"),
@@ -321,20 +276,23 @@ export function ProductsTable({
           placeholder={t("searchProducts")}
           className="max-w-xl"
         />
+        <Select
+          value={statusFilter}
+          onChange={setStatusFilter}
+          className="w-full sm:w-64"
+          size="large"
+          options={[
+            {value: "all", label: t("businessStatusAll")},
+            {value: "active", label: t("businessActive")},
+            {value: "stopped", label: t("businessStopped")}
+          ]}
+        />
       </div>
       <Table
         rowKey="id"
         columns={columns}
         dataSource={filtered}
-        scroll={{x: 1100}}
-        rowClassName={(row) => (row.id === draggingId ? "opacity-50" : "cursor-grab")}
-        onRow={(row) => ({
-          draggable: !isPending,
-          onDragStart: () => setDraggingId(row.id),
-          onDragOver: (event) => event.preventDefault(),
-          onDrop: () => handleDrop(row.id),
-          onDragEnd: () => setDraggingId(null)
-        })}
+        scroll={{x: 1040}}
         onChange={(nextPagination) => {
           setPagination({
             current: nextPagination.current ?? 1,

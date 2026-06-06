@@ -219,7 +219,7 @@ export function ProductForm({
         <div className="flex flex-wrap gap-5 pt-1">
           <label className="inline-flex items-center gap-3 text-sm font-medium text-stone-700">
             <Switch checked={isVisible} onChange={setIsVisible} />
-            {t("visible")}
+            {isVisible ? t("businessActive") : t("businessStopped")}
           </label>
           <label className="inline-flex items-center gap-3 text-sm font-medium text-stone-700">
             <Switch checked={featured} onChange={setFeatured} />
