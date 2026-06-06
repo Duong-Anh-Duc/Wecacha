@@ -1,14 +1,14 @@
 "use client";
 
-import {useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import Image from "next/image";
 import {App, Button, Input, Select, Space, Switch, Table, Tooltip, type TableColumnsType} from "antd";
 import {SearchOutlined} from "@ant-design/icons";
 import {Trash2} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {deleteProduct, updateProductVisibility} from "@/actions/product-actions";
-import {useRouter} from "@/i18n/navigation";
 import {formatCurrency} from "@/lib/content/helpers";
+import {createClient} from "@/lib/supabase/client";
 import {ProductFormModalButton} from "./product-form-modal-button";
 import {ProductPreviewButton} from "./product-preview-button";
 import type {ProductCategoryOption} from "./product-form";
@@ -64,11 +64,12 @@ export function ProductsTable({
   categories: ProductCategoryOption[];
 }) {
   const t = useTranslations("Admin");
-  const router = useRouter();
   const {message, modal} = App.useApp();
+  const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [orderedProducts, setOrderedProducts] = useState(products);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [visibilityPendingId, setVisibilityPendingId] = useState<string | null>(null);
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
@@ -76,6 +77,59 @@ export function ProductsTable({
   useEffect(() => {
     setOrderedProducts(products);
   }, [products]);
+
+  const refreshProducts = useCallback(async () => {
+    setIsSyncing(true);
+    const supabase = createClient();
+    const {data, error} = await supabase
+      .from("products")
+      .select("*")
+      .order("sort_order", {ascending: true})
+      .order("created_at", {ascending: false});
+
+    setIsSyncing(false);
+    if (error) {
+      message.error(`${t("loadError")} ${error.message}`);
+      return;
+    }
+
+    setOrderedProducts((data as ProductRow[]) ?? []);
+  }, [message, t]);
+
+  useEffect(() => {
+    const scheduleRefresh = () => {
+      if (refreshTimer.current) clearTimeout(refreshTimer.current);
+      refreshTimer.current = setTimeout(() => {
+        refreshProducts();
+      }, 350);
+    };
+
+    window.addEventListener("products:changed", scheduleRefresh);
+
+    const supabase = createClient();
+    const channel = supabase
+      .channel("admin-products-table-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "products"
+        },
+        scheduleRefresh
+      )
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR") {
+          message.warning(t("realtimeUnavailable"));
+        }
+      });
+
+    return () => {
+      window.removeEventListener("products:changed", scheduleRefresh);
+      if (refreshTimer.current) clearTimeout(refreshTimer.current);
+      supabase.removeChannel(channel);
+    };
+  }, [message, refreshProducts, t]);
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -110,7 +164,7 @@ export function ProductsTable({
         if (result.success) {
           setOrderedProducts((current) => current.filter((product) => product.id !== row.id));
           message.success(t("deleteSuccess"));
-          router.refresh();
+          window.dispatchEvent(new Event("products:changed"));
         } else {
           message.error(`${t("saveError")}${result.error}`);
         }
@@ -132,7 +186,7 @@ export function ProductsTable({
 
     if (result.success) {
       message.success(isVisible ? t("productBusinessActiveSuccess") : t("productBusinessStoppedSuccess"));
-      router.refresh();
+      window.dispatchEvent(new Event("products:changed"));
     } else {
       setOrderedProducts(previousProducts);
       message.error(`${t("saveError")}${result.error}`);
@@ -294,6 +348,7 @@ export function ProductsTable({
         rowKey="id"
         columns={columns}
         dataSource={filtered}
+        loading={isSyncing ? {tip: t("productTableSyncing")} : false}
         scroll={{x: 1040}}
         onChange={(nextPagination) => {
           setPagination({

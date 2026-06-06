@@ -183,9 +183,12 @@ export function ProductForm({
       const result = await upsertProduct(formData);
       if (result.success) {
         message.success(t("saveSuccess"));
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("products:changed"));
+        }
         if (onSaved) onSaved();
         if (redirectOnSave) router.push("/admin/products");
-        router.refresh();
+        if (redirectOnSave) router.refresh();
       } else {
         message.error(`${t("saveError")}${result.error}`);
       }

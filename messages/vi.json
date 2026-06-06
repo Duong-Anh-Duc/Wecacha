@@ -544,6 +544,7 @@
     "realtimeNewOrder": "Có đơn hàng mới, danh sách đã được cập nhật.",
     "realtimeNewRegistration": "Có đăng ký mới, danh sách đã được cập nhật.",
     "realtimeUnavailable": "Realtime chưa sẵn sàng. Vui lòng bật Realtime cho bảng trong Supabase.",
+    "productTableSyncing": "Đang cập nhật bảng sản phẩm...",
     "backDashboard": "Về tổng quan",
     "backArticles": "Về danh sách bài viết",
     "backProducts": "Về danh sách sản phẩm",
