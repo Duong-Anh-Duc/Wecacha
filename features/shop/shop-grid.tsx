@@ -34,7 +34,7 @@ type SortMode = "featured" | "priceAsc" | "priceDesc";
 type CategoryMode = "all" | ProductCategory;
 
 const categories: CategoryMode[] = ["all", "beans", "ground", "phin", "gifts"];
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 6;
 
 export function ShopGrid({
   products,

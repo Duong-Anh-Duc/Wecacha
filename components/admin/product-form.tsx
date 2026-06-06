@@ -58,6 +58,15 @@ function textFromList(value?: string[] | string | null) {
   return value ?? "";
 }
 
+function formatNumber(value: string | number | undefined) {
+  if (value === undefined || value === "") return "";
+  return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function parseNumber(value: string | undefined) {
+  return value?.replace(/,/g, "") ?? "";
+}
+
 export function ProductForm({
   initialData = {},
   categories,
@@ -172,24 +181,24 @@ export function ProductForm({
         ]
       }}
       onFinish={handleSubmit}
-      className="w-full"
+      className="w-full [&_.ant-card-body]:p-4 [&_.ant-card-head]:min-h-12 [&_.ant-card-head]:px-4 [&_.ant-card-head-title]:py-3 [&_.ant-form-item]:mb-3"
     >
       {isEditing ? (
-        <div className="mb-6 flex items-center justify-end">
+        <div className="mb-4 flex items-center justify-end">
           <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isPending} size="large">
             {t("saveProduct")}
           </Button>
         </div>
       ) : null}
 
-      <Card className="mb-6" title={t("productBasics")}>
+      <Card className="mb-4" title={t("productBasics")}>
         <Form.Item name="short_vi" hidden>
           <Input />
         </Form.Item>
         <Form.Item name="short_en" hidden>
           <Input />
         </Form.Item>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-3 md:grid-cols-2">
           <Form.Item name="name_vi" label={t("fieldNameVI")} rules={[{required: true, message: t("productNameRequired")}]}>
             <Input />
           </Form.Item>
@@ -207,7 +216,7 @@ export function ProductForm({
             }))}
           />
         </Form.Item>
-        <div className="flex flex-wrap gap-6">
+        <div className="flex flex-wrap gap-5 pt-1">
           <label className="inline-flex items-center gap-3 text-sm font-medium text-stone-700">
             <Switch checked={isVisible} onChange={setIsVisible} />
             {t("visible")}
@@ -219,11 +228,11 @@ export function ProductForm({
         </div>
       </Card>
 
-      <Card className="mb-6" title={t("productCommerce")}>
+      <Card className="mb-4" title={t("productCommerce")}>
         <Form.Item name="original_price" hidden>
           <InputNumber />
         </Form.Item>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-3 md:grid-cols-2">
           <Form.Item name="weight" label={t("weight")}>
             <Input />
           </Form.Item>
@@ -234,14 +243,20 @@ export function ProductForm({
 
         <Form.List name="price_tiers">
           {(fields, {add, remove}) => (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {fields.map((field) => (
-                <div key={field.key} className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-3 md:grid-cols-[1fr_180px_auto] md:items-end">
+                <div key={field.key} className="grid gap-2.5 rounded-xl border border-stone-200 bg-stone-50 p-2.5 md:grid-cols-[1fr_180px_auto] md:items-end">
                   <Form.Item name={[field.name, "attribute"]} label={t("priceAttribute")} className="mb-0">
                     <Input placeholder={t("priceAttributePlaceholder")} />
                   </Form.Item>
                   <Form.Item name={[field.name, "price"]} label={t("price")} className="mb-0" rules={[{required: true}]}>
-                    <InputNumber className="w-full" min={0} />
+                    <InputNumber
+                      className="w-full"
+                      min={0}
+                      addonAfter="VNĐ"
+                      formatter={formatNumber}
+                      parser={parseNumber}
+                    />
                   </Form.Item>
                   <Button danger type="text" icon={<DeleteOutlined />} onClick={() => remove(field.name)} />
                 </div>
@@ -264,13 +279,13 @@ export function ProductForm({
         ))}
       </Card>
 
-      <Card className="mb-6" title={t("productContent")}>
-        <div className="grid gap-4 md:grid-cols-2">
+      <Card className="mb-4" title={t("productContent")}>
+        <div className="grid gap-3 md:grid-cols-2">
           <Form.Item name="description_vi" label={t("productInfoVI")}>
-            <Input.TextArea rows={5} />
+            <Input.TextArea rows={3} />
           </Form.Item>
           <Form.Item name="description_en" label={t("productInfoEN")}>
-            <Input.TextArea rows={5} />
+            <Input.TextArea rows={3} />
           </Form.Item>
         </div>
         {["farmer_story_vi", "farmer_story_en", "notes_vi", "notes_en", "brew_guide_vi", "brew_guide_en"].map((name) => (
@@ -280,8 +295,8 @@ export function ProductForm({
         ))}
       </Card>
 
-      <Card className="mb-6" title={t("productImages")}>
-        <div className="space-y-4">
+      <Card className="mb-4" title={t("productImages")}>
+        <div className="space-y-3">
           <Button
             icon={<UploadOutlined />}
             loading={isUploading}
@@ -312,7 +327,7 @@ export function ProductForm({
       </Card>
 
       {!isEditing ? (
-        <div className="sticky bottom-0 z-20 -mx-1 flex items-center justify-end border-t border-stone-200 bg-white/95 px-1 py-4 backdrop-blur">
+        <div className="sticky bottom-0 z-20 -mx-1 flex items-center justify-end border-t border-stone-200 bg-white/95 px-1 py-3 backdrop-blur">
           <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isPending} size="large">
             {t("saveProduct")}
           </Button>
