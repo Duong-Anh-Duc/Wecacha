@@ -2,7 +2,7 @@
 
 import {useState, useTransition} from "react";
 import Image from "next/image";
-import {App, Button, Card, Form, Input, InputNumber, Select, Switch} from "antd";
+import {App, Button, Card, Form, Input, InputNumber, Modal, Select, Switch} from "antd";
 import {DeleteOutlined, PlusOutlined, SaveOutlined, UploadOutlined} from "@ant-design/icons";
 import {useLocale, useTranslations} from "next-intl";
 import {uploadProductImage, upsertProduct} from "@/actions/product-actions";
@@ -47,6 +47,8 @@ type PriceTier = {
   price?: number;
 };
 
+const defaultPriceAttributes = ["5kg đến 20kg", "21kg đến 50kg"];
+
 export type ProductCategoryOption = {
   slug: string;
   name_vi: string;
@@ -82,11 +84,21 @@ export function ProductForm({
   const locale = useLocale();
   const router = useRouter();
   const {message} = App.useApp();
+  const [form] = Form.useForm();
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<string[]>(initialData.images ?? []);
   const [isUploading, setIsUploading] = useState(false);
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
   const [featured, setFeatured] = useState(Boolean(initialData.featured));
+  const [attributeModalOpen, setAttributeModalOpen] = useState(false);
+  const [pendingAttributeIndex, setPendingAttributeIndex] = useState<number | null>(null);
+  const [newAttributeName, setNewAttributeName] = useState("");
+  const [attributeOptions, setAttributeOptions] = useState<string[]>(() => {
+    const existingAttributes = (initialData.price_tiers ?? [])
+      .map((tier) => tier.attribute?.trim())
+      .filter((attribute): attribute is string => Boolean(attribute));
+    return Array.from(new Set([...defaultPriceAttributes, ...existingAttributes]));
+  });
   const isEditing = Boolean(initialData.id);
   const categoryOptions = categories.length > 0
     ? categories
@@ -96,6 +108,28 @@ export function ProductForm({
         {slug: "phin", name_vi: "phin", name_en: "phin"},
         {slug: "gifts", name_vi: "gifts", name_en: "gifts"}
       ];
+
+  function openAttributeModal(fieldIndex: number | null = null) {
+    setPendingAttributeIndex(fieldIndex);
+    setNewAttributeName("");
+    setAttributeModalOpen(true);
+  }
+
+  function handleCreateAttribute() {
+    const attribute = newAttributeName.trim();
+    if (!attribute) {
+      message.error(t("attributeNameRequired"));
+      return;
+    }
+
+    setAttributeOptions((current) => current.includes(attribute) ? current : [...current, attribute]);
+    if (pendingAttributeIndex !== null) {
+      form.setFieldValue(["price_tiers", pendingAttributeIndex, "attribute"], attribute);
+    }
+    setAttributeModalOpen(false);
+    setPendingAttributeIndex(null);
+    setNewAttributeName("");
+  }
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
@@ -159,30 +193,32 @@ export function ProductForm({
   }
 
   return (
-    <Form
-      layout="vertical"
-      initialValues={{
-        ...initialData,
-        notes_vi: textFromList(initialData.notes_vi),
-        notes_en: textFromList(initialData.notes_en),
-        brew_guide_vi: textFromList(initialData.brew_guide_vi),
-        brew_guide_en: textFromList(initialData.brew_guide_en),
-        category_slugs: initialData.category_slugs ?? (initialData.category ? [initialData.category] : []),
-        base_unit: initialData.base_unit ?? "",
-        price_tiers: initialData.price_tiers?.length ? initialData.price_tiers : [
-          {
-            attribute: "5kg đến 20kg",
-            price: initialData.price
-          },
-          {
-            attribute: "21kg đến 50kg",
-            price: initialData.price
-          }
-        ]
-      }}
-      onFinish={handleSubmit}
-      className="w-full [&_.ant-card-body]:p-4 [&_.ant-card-head]:min-h-12 [&_.ant-card-head]:px-4 [&_.ant-card-head-title]:py-3 [&_.ant-form-item]:mb-3"
-    >
+    <>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          ...initialData,
+          notes_vi: textFromList(initialData.notes_vi),
+          notes_en: textFromList(initialData.notes_en),
+          brew_guide_vi: textFromList(initialData.brew_guide_vi),
+          brew_guide_en: textFromList(initialData.brew_guide_en),
+          category_slugs: initialData.category_slugs ?? (initialData.category ? [initialData.category] : []),
+          base_unit: initialData.base_unit ?? "",
+          price_tiers: initialData.price_tiers?.length ? initialData.price_tiers : [
+            {
+              attribute: defaultPriceAttributes[0],
+              price: initialData.price
+            },
+            {
+              attribute: defaultPriceAttributes[1],
+              price: initialData.price
+            }
+          ]
+        }}
+        onFinish={handleSubmit}
+        className="w-full [&_.ant-card-body]:p-4 [&_.ant-card-head]:min-h-12 [&_.ant-card-head]:px-4 [&_.ant-card-head-title]:py-3 [&_.ant-form-item]:mb-3"
+      >
       {isEditing ? (
         <div className="mb-4 flex items-center justify-end">
           <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isPending} size="large">
@@ -245,10 +281,19 @@ export function ProductForm({
           {(fields, {add, remove}) => (
             <div className="space-y-2.5">
               {fields.map((field) => (
-                <div key={field.key} className="grid gap-2.5 rounded-xl border border-stone-200 bg-stone-50 p-2.5 md:grid-cols-[1fr_180px_auto] md:items-end">
+                <div key={field.key} className="grid gap-2.5 rounded-xl border border-stone-200 bg-stone-50 p-2.5 md:grid-cols-[minmax(0,1fr)_150px_180px_auto] md:items-end">
                   <Form.Item name={[field.name, "attribute"]} label={t("priceAttribute")} className="mb-0">
-                    <Input placeholder={t("priceAttributePlaceholder")} />
+                    <Select
+                      allowClear
+                      showSearch
+                      placeholder={t("selectAttribute")}
+                      optionFilterProp="label"
+                      options={attributeOptions.map((attribute) => ({value: attribute, label: attribute}))}
+                    />
                   </Form.Item>
+                  <Button icon={<PlusOutlined />} onClick={() => openAttributeModal(field.name)}>
+                    {t("quickAddAttribute")}
+                  </Button>
                   <Form.Item name={[field.name, "price"]} label={t("price")} className="mb-0" rules={[{required: true}]}>
                     <InputNumber
                       className="w-full"
@@ -333,6 +378,32 @@ export function ProductForm({
           </Button>
         </div>
       ) : null}
-    </Form>
+      </Form>
+
+      <Modal
+        title={t("createAttribute")}
+        open={attributeModalOpen}
+        okText={t("addAttribute")}
+        cancelText={t("cancel")}
+        onCancel={() => {
+          setAttributeModalOpen(false);
+          setPendingAttributeIndex(null);
+          setNewAttributeName("");
+        }}
+        onOk={handleCreateAttribute}
+        destroyOnHidden
+      >
+        <div className="pt-2">
+          <label className="mb-2 block text-sm font-medium text-stone-700">{t("attributeName")}</label>
+          <Input
+            value={newAttributeName}
+            placeholder={t("attributeNamePlaceholder")}
+            onChange={(event) => setNewAttributeName(event.target.value)}
+            onPressEnter={handleCreateAttribute}
+            autoFocus
+          />
+        </div>
+      </Modal>
+    </>
   );
 }

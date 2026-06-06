@@ -1,5 +1,6 @@
 import type {Metadata} from "next";
 import {getTranslations, setRequestLocale} from "next-intl/server";
+import {ProductsRealtimeRefresh} from "@/components/realtime/products-realtime-refresh";
 import {FlavorQuizPage} from "@/features/flavor-quiz/flavor-quiz-page";
 import type {Locale} from "@/i18n/routing";
 import {getVisibleProducts} from "@/lib/content/cms";
@@ -31,5 +32,10 @@ export default async function FlavorQuizRoute({params}: Props) {
   setRequestLocale(locale);
   const products = await getVisibleProducts();
 
-  return <FlavorQuizPage locale={locale} products={products} />;
+  return (
+    <>
+      <ProductsRealtimeRefresh />
+      <FlavorQuizPage locale={locale} products={products} />
+    </>
+  );
 }

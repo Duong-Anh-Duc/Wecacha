@@ -1,6 +1,7 @@
 import type {Metadata} from "next";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {CinematicPageHero} from "@/components/sections/cinematic-page-hero";
+import {ProductsRealtimeRefresh} from "@/components/realtime/products-realtime-refresh";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {ShopGrid} from "@/features/shop/shop-grid";
 import type {Locale} from "@/i18n/routing";
@@ -63,6 +64,7 @@ export default async function CategoryPage({params}: Props) {
 
   return (
     <main className="bg-parchment-50">
+      <ProductsRealtimeRefresh />
       <CinematicPageHero
         kicker={localizedField(hero, "eyebrow", locale) || t("shopKicker")}
         title={categoryTitle}

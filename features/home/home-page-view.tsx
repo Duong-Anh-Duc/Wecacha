@@ -6,7 +6,8 @@ import {CoreValuesSection} from "@/features/home/core-values-section";
 import {ArabicaProductsSection} from "@/features/home/arabica-products-section";
 import {CommitmentSection} from "@/features/home/commitment-section";
 import type {Locale} from "@/i18n/routing";
-import {getPageContent, itemsForSection, localizedField, localizedValue, sectionByKey} from "@/lib/content/cms";
+import {ProductsRealtimeRefresh} from "@/components/realtime/products-realtime-refresh";
+import {getPageContent, getVisibleProducts, itemsForSection, localizedField, localizedValue, sectionByKey} from "@/lib/content/cms";
 
 export async function HomePageView({
   locale,
@@ -16,11 +17,15 @@ export async function HomePageView({
   tone?: "classic" | "green";
 }) {
   const t = await getTranslations({locale, namespace: "Home"});
-  const content = await getPageContent("home");
+  const [content, products] = await Promise.all([
+    getPageContent("home"),
+    getVisibleProducts()
+  ]);
   const hero = sectionByKey(content, "hero");
 
   return (
     <main>
+      <ProductsRealtimeRefresh />
       <CinematicHero
         locale={locale}
         kicker={localizedField(hero, "eyebrow", locale) || t("kicker")}
@@ -57,6 +62,7 @@ export async function HomePageView({
         tone={tone}
         section={sectionByKey(content, "featured_product_cards")}
         items={itemsForSection(content, "featured_product_cards")}
+        products={products}
       />
       <CommitmentSection
         locale={locale}

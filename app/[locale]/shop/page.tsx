@@ -2,6 +2,7 @@ import type {Metadata} from "next";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {CinematicImage} from "@/components/sections/cinematic-image";
 import {CinematicPageHero} from "@/components/sections/cinematic-page-hero";
+import {ProductsRealtimeRefresh} from "@/components/realtime/products-realtime-refresh";
 import {Reveal} from "@/components/motion/reveal";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {ShopGrid} from "@/features/shop/shop-grid";
@@ -55,6 +56,7 @@ export default async function ShopPage({params}: Props) {
 
   return (
     <main className="bg-parchment-50">
+      <ProductsRealtimeRefresh />
       <CinematicPageHero
         kicker={localizedField(hero, "eyebrow", locale) || t("shopKicker")}
         title={localizedField(hero, "title", locale) || t("title")}

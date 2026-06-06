@@ -12,6 +12,8 @@ import {
   type SiteSection,
   type SiteSectionItem
 } from "@/lib/content/cms";
+import {localized} from "@/lib/content/helpers";
+import type {Product} from "@/lib/content/types";
 
 const localeHref = (locale: Locale, href: string) => {
   if (href.startsWith("http")) return href;
@@ -24,15 +26,45 @@ export async function ArabicaProductsSection({
   locale,
   tone = "classic",
   section,
-  items = []
+  items = [],
+  products = []
 }: {
   locale: Locale;
   tone?: "classic" | "green";
   section?: SiteSection | null;
   items?: SiteSectionItem[];
+  products?: Product[];
 }) {
   const t = await getTranslations({ locale, namespace: "Home" });
   const isGreen = tone === "green";
+  const homeProducts = (products.some((product) => product.featured)
+    ? products.filter((product) => product.featured)
+    : products
+  ).slice(0, 4);
+  const productCards = homeProducts.map((product) => {
+    const productName = localized(product.name, locale);
+    return {
+      key: product.slug,
+      title: productName,
+      subtitle: localized(product.origin, locale) || product.weight,
+      label: product.baseUnit || product.weight,
+      profile: localized(product.notes, locale).join(", ") || localized(product.short, locale),
+      body: localized(product.description, locale),
+      image: product.images[0] ?? "/product-specialty.png",
+      href: `/shop/${product.slug}`
+    };
+  });
+  const cmsCards = items.map((item) => ({
+    key: item.item_key,
+    title: localizedField(item, "title", locale),
+    subtitle: localizedField(item, "subtitle", locale),
+    label: localizedField(item, "label", locale),
+    profile: localizedValue(item.data?.profile, locale, ""),
+    body: localizedField(item, "body", locale),
+    image: item.media?.image ?? "/product-specialty.png",
+    href: section?.settings?.cta?.href ?? "/contact"
+  }));
+  const cards = productCards.length > 0 ? productCards : cmsCards;
 
   return (
     <section
@@ -73,15 +105,15 @@ export async function ArabicaProductsSection({
         </Reveal>
 
         <div className="grid gap-6 sm:grid-cols-2 sm:gap-7 md:gap-8">
-          {items.map((item, i) => (
-            <Reveal key={item.item_key} delay={i * 0.12}>
+          {cards.map((item, i) => (
+            <Reveal key={item.key} delay={i * 0.12}>
               <div className="relative overflow-hidden rounded-[2.5rem] border border-parchment-100/20 p-10 shadow-[0_30px_60px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-2 hover:border-ember/60 hover:shadow-[0_20px_40px_rgba(181,112,58,0.2)] group bg-black">
                 
                 {/* Product Background Image inside Card */}
                 <div className="absolute inset-0 z-0">
                   <Image 
-                    src={item.media?.image ?? "/product-specialty.png"} 
-                    alt={localizedField(item, "title", locale)} 
+                    src={item.image} 
+                    alt={item.title} 
                     fill 
                     className="object-cover transition-transform duration-700 group-hover:scale-110" 
                     sizes="(max-width: 768px) 100vw, 50vw" 
@@ -93,15 +125,15 @@ export async function ArabicaProductsSection({
                 {/* Content Overlay */}
                 <div className="relative z-10">
                   <span className="absolute right-0 top-0 rounded-full bg-ember px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-                    {localizedField(item, "label", locale)}
+                    {item.label}
                   </span>
 
                   <div className="mb-8 pr-20">
                   <p className="text-xs font-bold uppercase tracking-widest text-ember">
-                    {localizedField(item, "subtitle", locale)}
+                    {item.subtitle}
                   </p>
                   <h3 className="mt-3 font-serif text-3xl text-parchment-50">
-                    {localizedField(item, "title", locale)}
+                    {item.title}
                   </h3>
                 </div>
 
@@ -112,7 +144,7 @@ export async function ArabicaProductsSection({
                     </p>
                     <p className="flex items-start gap-2 text-base leading-relaxed text-white/80">
                       <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
-                      {localizedValue(item.data?.profile, locale, "")}
+                      {item.profile}
                     </p>
                   </div>
 
@@ -121,14 +153,14 @@ export async function ArabicaProductsSection({
                       {localizedValue(section?.settings?.storyLabel, locale, t("prodStoryLabel"))}
                     </p>
                     <p className="text-base leading-relaxed text-white/70">
-                      {localizedField(item, "body", locale)}
+                      {item.body}
                     </p>
                   </div>
                 </div>
 
                   <div className="mt-10">
                     <Link
-                      href={localeHref(locale, section?.settings?.cta?.href ?? "/contact")}
+                      href={localeHref(locale, item.href)}
                       className="inline-flex h-12 items-center gap-2 rounded-xl bg-ember px-8 text-sm font-semibold tracking-wide text-white transition hover:bg-ember/90 hover:scale-105"
                     >
                       {localizedValue(section?.settings?.cta, locale, t("prodCta"))}

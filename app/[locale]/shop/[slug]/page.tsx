@@ -4,6 +4,7 @@ import {notFound} from "next/navigation";
 import {Coffee, Leaf, Star, Sun} from "lucide-react";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {Reveal} from "@/components/motion/reveal";
+import {ProductsRealtimeRefresh} from "@/components/realtime/products-realtime-refresh";
 import {JsonLd} from "@/components/seo/json-ld";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {ProductBuyPanel} from "@/features/product/product-buy-panel";
@@ -108,6 +109,7 @@ export default async function ProductDetailPage({params}: Props) {
 
   return (
     <main className="bg-parchment-50">
+      <ProductsRealtimeRefresh />
       <JsonLd data={productJsonLd(product, locale)} />
       <section className="px-4 pb-16 pt-32 sm:px-6 lg:px-8 lg:pb-24">
         <div className="mx-auto max-w-7xl">
