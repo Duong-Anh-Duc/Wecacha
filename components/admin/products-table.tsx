@@ -11,7 +11,7 @@ import {formatCurrency} from "@/lib/content/helpers";
 import {createClient} from "@/lib/supabase/client";
 import {ProductFormModalButton} from "./product-form-modal-button";
 import {ProductPreviewButton} from "./product-preview-button";
-import type {ProductCategoryOption} from "./product-form";
+import type {ProductAttributeOption, ProductCategoryOption} from "./product-form";
 
 export type ProductRow = {
   id: string;
@@ -29,6 +29,11 @@ export type ProductRow = {
   price: number;
   price_tiers?: {
     attribute?: string;
+    minKg?: number;
+    maxKg?: number;
+    price?: number;
+  }[] | null;
+  bulk_price_tiers?: {
     minKg?: number;
     maxKg?: number;
     price?: number;
@@ -57,11 +62,13 @@ type StatusFilter = "all" | "active" | "stopped";
 export function ProductsTable({
   products,
   locale,
-  categories
+  categories,
+  attributes = []
 }: {
   products: ProductRow[];
   locale: string;
   categories: ProductCategoryOption[];
+  attributes?: ProductAttributeOption[];
 }) {
   const t = useTranslations("Admin");
   const {message, modal} = App.useApp();
@@ -301,7 +308,7 @@ export function ProductsTable({
             <ProductPreviewButton product={row} categories={categories} locale={locale} compact />
           </Tooltip>
           <Tooltip title={t("edit")}>
-            <ProductFormModalButton mode="edit" product={row} categories={categories} compact />
+            <ProductFormModalButton mode="edit" product={row} categories={categories} attributes={attributes} compact />
           </Tooltip>
           <Tooltip title={t("delete")}>
             <Button

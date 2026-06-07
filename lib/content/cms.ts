@@ -16,6 +16,7 @@ type ProductRow = {
   farmer_story_en: string;
   price: number;
   price_tiers?: Product["priceTiers"] | null;
+  bulk_price_tiers?: Product["bulkPriceTiers"] | null;
   original_price: number | null;
   weight: string;
   base_unit?: string | null;
@@ -139,6 +140,7 @@ const baseProductColumns = [
 const extendedProductColumns = [
   "category_slugs",
   "price_tiers",
+  "bulk_price_tiers",
   "base_unit"
 ].join(",");
 
@@ -167,6 +169,7 @@ export function productFromRow(row: ProductRow): Product {
     brewGuide: pair(row.brew_guide_vi ?? [], row.brew_guide_en ?? []),
     price: row.price,
     priceTiers: row.price_tiers ?? [],
+    bulkPriceTiers: row.bulk_price_tiers ?? [],
     originalPrice: row.original_price ?? undefined,
     weight: row.weight,
     baseUnit: row.base_unit ?? undefined,
@@ -249,7 +252,7 @@ export async function getVisibleProducts() {
       return ((result.data as unknown as ProductRow[]) ?? []).map(productFromRow);
     }
 
-    if (/category_slugs|price_tiers|base_unit|schema cache|column/i.test(result.error.message)) {
+    if (/category_slugs|price_tiers|bulk_price_tiers|base_unit|schema cache|column/i.test(result.error.message)) {
       supportsProductExtensions = false;
     } else {
       throw result.error;
@@ -282,7 +285,7 @@ export async function getVisibleProductsByCategory(category: ProductCategory) {
       return ((result.data as unknown as ProductRow[]) ?? []).map(productFromRow);
     }
 
-    if (/category_slugs|price_tiers|base_unit|schema cache|column/i.test(result.error.message)) {
+    if (/category_slugs|price_tiers|bulk_price_tiers|base_unit|schema cache|column/i.test(result.error.message)) {
       supportsProductExtensions = false;
     } else {
       throw result.error;
@@ -315,7 +318,7 @@ export async function getVisibleProductBySlug(slug: string) {
       return result.data ? productFromRow(result.data as unknown as ProductRow) : null;
     }
 
-    if (/category_slugs|price_tiers|base_unit|schema cache|column/i.test(result.error.message)) {
+    if (/category_slugs|price_tiers|bulk_price_tiers|base_unit|schema cache|column/i.test(result.error.message)) {
       supportsProductExtensions = false;
     } else {
       throw result.error;

@@ -50,13 +50,18 @@ async function productExtensionColumns(
     .from("products")
     .select("category_slugs,price_tiers,base_unit")
     .limit(1);
+  const {error: bulkError} = await supabase
+    .from("products")
+    .select("bulk_price_tiers")
+    .limit(1);
 
   const hasExtensions = !error;
 
   return {
     categorySlugs: hasExtensions,
     priceTiers: hasExtensions,
-    baseUnit: hasExtensions
+    baseUnit: hasExtensions,
+    bulkPriceTiers: !bulkError
   };
 }
 
@@ -118,6 +123,17 @@ async function createUniqueCategorySlug(
   }
 }
 
+async function productAttributeColumns(
+  supabase: Awaited<ReturnType<typeof getAdminSession>>["supabase"]
+) {
+  const {error} = await supabase
+    .from("product_attributes")
+    .select("id")
+    .limit(1);
+
+  return !error;
+}
+
 export async function upsertProduct(formData: FormData) {
   const {supabase, user, error: authError} = await getAdminSession();
 
@@ -142,6 +158,15 @@ export async function upsertProduct(formData: FormData) {
     }))
     .filter((tier) => tier.attribute || tier.minKg || tier.maxKg || tier.price);
   const firstTierPrice = priceTiers.find((tier) => tier.price > 0)?.price;
+  const bulkPriceTiers = jsonFromText<
+    {minKg?: number | null; maxKg?: number | null; price?: number | null}[]
+  >(formData.get("bulk_price_tiers"), [])
+    .map((tier) => ({
+      minKg: tier.minKg === null || tier.minKg === undefined ? undefined : Number(tier.minKg),
+      maxKg: tier.maxKg === null || tier.maxKg === undefined ? undefined : Number(tier.maxKg),
+      price: Number(tier.price ?? 0)
+    }))
+    .filter((tier) => tier.minKg || tier.maxKg || tier.price);
   const extensionColumns = await productExtensionColumns(supabase);
   const slug = id
     ? String(formData.get("slug") ?? "")
@@ -185,6 +210,9 @@ export async function upsertProduct(formData: FormData) {
   }
   if (extensionColumns.baseUnit) {
     payload.base_unit = String(formData.get("base_unit") ?? "");
+  }
+  if (extensionColumns.bulkPriceTiers) {
+    payload.bulk_price_tiers = bulkPriceTiers;
   }
 
   if (id) {
@@ -263,6 +291,58 @@ export async function updateProductVisibility(id: string, isVisible: boolean) {
   const {error} = await supabase
     .from("products")
     .update({is_visible: isVisible, updated_at: new Date().toISOString()})
+    .eq("id", id);
+
+  if (error) {
+    return {success: false, error: error.message};
+  }
+
+  revalidateShopPaths(
+    String(product?.slug ?? ""),
+    [String(product?.category ?? ""), ...((product?.category_slugs as string[] | null) ?? [])].filter(Boolean)
+  );
+  return {success: true};
+}
+
+export async function updateProductBulkPriceTiers(
+  id: string,
+  tiers: {minKg?: number | null; maxKg?: number | null; price?: number | null}[]
+) {
+  const {supabase, user, error: authError} = await getAdminSession();
+
+  if (authError || !user) {
+    return {success: false, error: "Unauthorized"};
+  }
+
+  const hasBulkPriceTiers = (await productExtensionColumns(supabase)).bulkPriceTiers;
+  if (!hasBulkPriceTiers) {
+    return {success: false, error: "Chưa có cột bulk_price_tiers. Vui lòng chạy migration product-attributes-migration.sql"};
+  }
+
+  const bulkPriceTiers = tiers
+    .map((tier) => ({
+      minKg: tier.minKg === null || tier.minKg === undefined ? undefined : Number(tier.minKg),
+      maxKg: tier.maxKg === null || tier.maxKg === undefined ? undefined : Number(tier.maxKg),
+      price: Number(tier.price ?? 0)
+    }))
+    .filter((tier) => tier.minKg || tier.maxKg || tier.price);
+
+  const {data: product, error: productError} = await supabase
+    .from("products")
+    .select("slug, category, category_slugs")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (productError) {
+    return {success: false, error: productError.message};
+  }
+
+  const {error} = await supabase
+    .from("products")
+    .update({
+      bulk_price_tiers: bulkPriceTiers,
+      updated_at: new Date().toISOString()
+    })
     .eq("id", id);
 
   if (error) {
@@ -356,6 +436,82 @@ export async function deleteProductCategory(slug: string) {
   }
 
   const {error} = await supabase.from("product_categories").delete().eq("slug", slug);
+
+  if (error) {
+    return {success: false, error: error.message};
+  }
+
+  revalidateShopPaths();
+  return {success: true};
+}
+
+export async function upsertProductAttribute(formData: FormData) {
+  const {supabase, user, error: authError} = await getAdminSession();
+
+  if (authError || !user) {
+    return {success: false, error: "Unauthorized"};
+  }
+
+  const id = String(formData.get("id") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+
+  if (!name) {
+    return {success: false, error: "Tên thuộc tính là bắt buộc"};
+  }
+
+  const hasAttributeTable = await productAttributeColumns(supabase);
+  if (!hasAttributeTable) {
+    return {success: false, error: "Chưa có bảng product_attributes. Vui lòng chạy migration product-attributes-migration.sql"};
+  }
+
+  if (id) {
+    const {error} = await supabase
+      .from("product_attributes")
+      .update({
+        name,
+        is_visible: formData.get("is_visible") === "true",
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", id);
+
+    if (error) {
+      return {success: false, error: error.message};
+    }
+  } else {
+    const {data: lastAttribute, error: orderError} = await supabase
+      .from("product_attributes")
+      .select("sort_order")
+      .order("sort_order", {ascending: false})
+      .limit(1)
+      .maybeSingle();
+
+    if (orderError) {
+      return {success: false, error: orderError.message};
+    }
+
+    const {error} = await supabase.from("product_attributes").insert([{
+      name,
+      sort_order: Number(lastAttribute?.sort_order ?? 0) + 10,
+      is_visible: true
+    }]);
+
+    if (error) {
+      return {success: false, error: error.message};
+    }
+  }
+
+  revalidateShopPaths();
+  return {success: true};
+}
+
+export async function deleteProductAttribute(id: string) {
+  const {supabase, user, error: authError} = await getAdminSession();
+
+  if (authError || !user) {
+    return {success: false, error: "Unauthorized"};
+  }
+
+  const {error} = await supabase.from("product_attributes").delete().eq("id", id);
 
   if (error) {
     return {success: false, error: error.message};

@@ -27,6 +27,11 @@ export type Product = {
     maxKg?: number;
     price: number;
   }[];
+  bulkPriceTiers?: {
+    minKg?: number;
+    maxKg?: number;
+    price: number;
+  }[];
   originalPrice?: number;
   weight: string;
   baseUnit?: string;

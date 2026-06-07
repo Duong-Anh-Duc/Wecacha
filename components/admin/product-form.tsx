@@ -3,9 +3,9 @@
 import {useState, useTransition} from "react";
 import Image from "next/image";
 import {App, Button, Card, Form, Input, InputNumber, Modal, Select, Switch} from "antd";
-import {DeleteOutlined, PlusOutlined, SaveOutlined, UploadOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PlusOutlined, SaveOutlined, UploadOutlined} from "@ant-design/icons";
 import {useLocale, useTranslations} from "next-intl";
-import {uploadProductImage, upsertProduct} from "@/actions/product-actions";
+import {updateProductBulkPriceTiers, uploadProductImage, upsertProduct, upsertProductAttribute} from "@/actions/product-actions";
 import {useRouter} from "@/i18n/navigation";
 
 export type ProductFormData = {
@@ -23,6 +23,7 @@ export type ProductFormData = {
   farmer_story_en?: string | null;
   price?: number;
   price_tiers?: PriceTier[] | null;
+  bulk_price_tiers?: BulkPriceTier[] | null;
   original_price?: number | null;
   weight?: string | null;
   base_unit?: string | null;
@@ -47,7 +48,19 @@ type PriceTier = {
   price?: number;
 };
 
-const defaultPriceAttributes = ["5kg đến 20kg", "21kg đến 50kg"];
+type BulkPriceTier = {
+  minKg?: number;
+  maxKg?: number;
+  price?: number;
+};
+
+const defaultAttributeGroups = ["CÂN NẶNG", "MÀU", "DUNG TÍCH", "KHỐI LƯỢNG"];
+const defaultAttributeValues = ["1kg", "2kg", "5kg", "10kg", "20kg", "50kg"];
+
+export type ProductAttributeOption = {
+  id?: string;
+  name: string;
+};
 
 export type ProductCategoryOption = {
   slug: string;
@@ -72,11 +85,13 @@ function parseNumber(value: string | undefined) {
 export function ProductForm({
   initialData = {},
   categories,
+  attributes = [],
   onSaved,
   redirectOnSave = true
 }: {
   initialData?: ProductFormData;
   categories: ProductCategoryOption[];
+  attributes?: ProductAttributeOption[];
   onSaved?: () => void;
   redirectOnSave?: boolean;
 }) {
@@ -85,20 +100,44 @@ export function ProductForm({
   const router = useRouter();
   const {message} = App.useApp();
   const [form] = Form.useForm();
+  const initialPriceTiers = initialData.price_tiers?.length
+    ? initialData.price_tiers
+    : defaultAttributeValues.map((attribute) => ({
+        attribute,
+        price: initialData.price
+      }));
+  const initialAttributeValues = initialPriceTiers
+    .map((tier) => tier.attribute?.trim())
+    .filter((attribute): attribute is string => Boolean(attribute));
+  const initialBulkPriceTiers = initialData.bulk_price_tiers?.length
+    ? initialData.bulk_price_tiers
+    : [
+        {minKg: 5, maxKg: 20, price: undefined},
+        {minKg: 21, maxKg: 50, price: undefined}
+      ];
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<string[]>(initialData.images ?? []);
   const [isUploading, setIsUploading] = useState(false);
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
   const [featured, setFeatured] = useState(Boolean(initialData.featured));
   const [attributeModalOpen, setAttributeModalOpen] = useState(false);
-  const [pendingAttributeIndex, setPendingAttributeIndex] = useState<number | null>(null);
+  const [priceGuideOpen, setPriceGuideOpen] = useState(false);
+  const [bulkPriceTiers, setBulkPriceTiers] = useState<BulkPriceTier[]>(initialBulkPriceTiers);
+  const [bulkPriceDraft, setBulkPriceDraft] = useState<BulkPriceTier[]>(initialBulkPriceTiers);
+  const [isSavingBulkPrices, setIsSavingBulkPrices] = useState(false);
   const [newAttributeName, setNewAttributeName] = useState("");
-  const [attributeOptions, setAttributeOptions] = useState<string[]>(() => {
-    const existingAttributes = (initialData.price_tiers ?? [])
-      .map((tier) => tier.attribute?.trim())
-      .filter((attribute): attribute is string => Boolean(attribute));
-    return Array.from(new Set([...defaultPriceAttributes, ...existingAttributes]));
+  const [editingAttribute, setEditingAttribute] = useState<ProductAttributeOption | null>(null);
+  const [attributeOptions, setAttributeOptions] = useState<ProductAttributeOption[]>(() => {
+    const keyed = new Map<string, ProductAttributeOption>();
+    [...defaultAttributeGroups.map((name) => ({name})), ...attributes].forEach((attribute) => {
+      keyed.set(attribute.name, attribute);
+    });
+    return Array.from(keyed.values());
   });
+  const [selectedAttributeGroup, setSelectedAttributeGroup] = useState(
+    attributes[0]?.name ?? defaultAttributeGroups[0]
+  );
+  const [attributeValues, setAttributeValues] = useState<string[]>(initialAttributeValues);
   const isEditing = Boolean(initialData.id);
   const categoryOptions = categories.length > 0
     ? categories
@@ -109,26 +148,105 @@ export function ProductForm({
         {slug: "gifts", name_vi: "gifts", name_en: "gifts"}
       ];
 
-  function openAttributeModal(fieldIndex: number | null = null) {
-    setPendingAttributeIndex(fieldIndex);
+  function openCreateAttributeModal() {
+    setEditingAttribute(null);
     setNewAttributeName("");
     setAttributeModalOpen(true);
   }
 
-  function handleCreateAttribute() {
-    const attribute = newAttributeName.trim();
-    if (!attribute) {
+  function openEditAttributeModal(attribute: ProductAttributeOption, event?: React.MouseEvent<HTMLElement>) {
+    event?.preventDefault();
+    event?.stopPropagation();
+    setEditingAttribute(attribute);
+    setNewAttributeName(attribute.name);
+    setAttributeModalOpen(true);
+  }
+
+  async function handleSaveAttribute() {
+    const attributeGroup = newAttributeName.trim();
+    if (!attributeGroup) {
       message.error(t("attributeNameRequired"));
       return;
     }
 
-    setAttributeOptions((current) => current.includes(attribute) ? current : [...current, attribute]);
-    if (pendingAttributeIndex !== null) {
-      form.setFieldValue(["price_tiers", pendingAttributeIndex, "attribute"], attribute);
+    const formData = new FormData();
+    if (editingAttribute?.id) formData.set("id", editingAttribute.id);
+    formData.set("name", attributeGroup);
+    formData.set("is_visible", "true");
+    const result = await upsertProductAttribute(formData);
+    if (!result.success) {
+      message.error(`${t("saveError")}${result.error}`);
+      return;
     }
+
+    if (editingAttribute) {
+      setAttributeOptions((current) =>
+        current.map((item) => item.name === editingAttribute.name ? {...item, name: attributeGroup} : item)
+      );
+      if (selectedAttributeGroup === editingAttribute.name) {
+        setSelectedAttributeGroup(attributeGroup);
+      }
+    } else {
+      setAttributeOptions((current) => current.some((item) => item.name === attributeGroup) ? current : [...current, {name: attributeGroup}]);
+      setSelectedAttributeGroup(attributeGroup);
+    }
+    message.success(t("saveSuccess"));
     setAttributeModalOpen(false);
-    setPendingAttributeIndex(null);
+    setEditingAttribute(null);
     setNewAttributeName("");
+  }
+
+  function closeAttributeModal() {
+    setAttributeModalOpen(false);
+    setEditingAttribute(null);
+    setNewAttributeName("");
+  }
+
+  function syncAttributeValues(nextValues: string[]) {
+    const normalizedValues = Array.from(new Set(nextValues.map((value) => value.trim()).filter(Boolean)));
+    const currentTiers = (form.getFieldValue("price_tiers") as PriceTier[] | undefined) ?? initialPriceTiers;
+    setAttributeValues(normalizedValues);
+    form.setFieldValue(
+      "price_tiers",
+      normalizedValues.map((attribute) => {
+        const existingTier = currentTiers.find((tier) => tier.attribute === attribute);
+        return existingTier ?? {attribute, price: undefined};
+      })
+    );
+  }
+
+  function openPriceGuideModal() {
+    setBulkPriceDraft(bulkPriceTiers);
+    setPriceGuideOpen(true);
+  }
+
+  function closePriceGuideModal() {
+    setBulkPriceDraft(bulkPriceTiers);
+    setPriceGuideOpen(false);
+  }
+
+  async function savePriceGuideModal() {
+    setBulkPriceTiers(bulkPriceDraft);
+    if (initialData.id) {
+      setIsSavingBulkPrices(true);
+      const result = await updateProductBulkPriceTiers(initialData.id, bulkPriceDraft);
+      setIsSavingBulkPrices(false);
+
+      if (!result.success) {
+        message.error(`${t("saveError")}${result.error}`);
+        return;
+      }
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("products:changed"));
+      }
+      message.success(t("saveSuccess"));
+      setPriceGuideOpen(false);
+      return;
+    }
+
+    setPriceGuideOpen(false);
+    message.success(t("priceGuideApplied"));
   }
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -175,6 +293,7 @@ export function ProductForm({
     if (firstTierPrice?.price !== undefined) {
       formData.set("price", String(firstTierPrice.price));
     }
+    formData.set("bulk_price_tiers", JSON.stringify(bulkPriceTiers));
     formData.set("images", images.join("\n"));
     formData.set("is_visible", isVisible ? "true" : "false");
     formData.set("featured", featured ? "true" : "false");
@@ -208,16 +327,7 @@ export function ProductForm({
           brew_guide_en: textFromList(initialData.brew_guide_en),
           category_slugs: initialData.category_slugs ?? (initialData.category ? [initialData.category] : []),
           base_unit: initialData.base_unit ?? "",
-          price_tiers: initialData.price_tiers?.length ? initialData.price_tiers : [
-            {
-              attribute: defaultPriceAttributes[0],
-              price: initialData.price
-            },
-            {
-              attribute: defaultPriceAttributes[1],
-              price: initialData.price
-            }
-          ]
+          price_tiers: initialPriceTiers
         }}
         onFinish={handleSubmit}
         className="w-full [&_.ant-card-body]:p-4 [&_.ant-card-head]:min-h-12 [&_.ant-card-head]:px-4 [&_.ant-card-head-title]:py-3 [&_.ant-form-item]:mb-3"
@@ -280,24 +390,97 @@ export function ProductForm({
           </Form.Item>
         </div>
 
+        <div className="mb-4 space-y-3 rounded-2xl border border-stone-200 bg-white p-4">
+          <div>
+            <p className="text-sm font-bold text-forest-950">{t("priceAttribute")}</p>
+            <p className="mt-1 text-sm text-stone-500">{t("attributeHelp")}</p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-[240px_minmax(0,1fr)_140px_auto] md:items-start">
+            <Select
+              value={selectedAttributeGroup}
+              showSearch
+              filterOption={(input, option) =>
+                String(option?.value ?? "").toLowerCase().includes(input.toLowerCase())
+              }
+              popupRender={(menu) => (
+                <>
+                  {menu}
+                  <div className="border-t border-stone-100 p-2">
+                    <Button
+                      type="link"
+                      icon={<PlusOutlined />}
+                      className="px-1 font-semibold"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={openCreateAttributeModal}
+                    >
+                      {t("createAttribute")}
+                    </Button>
+                  </div>
+                </>
+              )}
+              optionRender={(option) => {
+                const attribute = attributeOptions.find((item) => item.name === option.value);
+                return (
+                  <div className="flex items-center justify-between gap-3">
+                    <span>{String(option.label)}</span>
+                    {attribute ? (
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<EditOutlined />}
+                        aria-label={t("editAttribute")}
+                        onClick={(event) => openEditAttributeModal(attribute, event)}
+                      />
+                    ) : null}
+                  </div>
+                );
+              }}
+              options={attributeOptions.map((attribute) => ({
+                value: attribute.name,
+                label: attribute.name
+              }))}
+              onChange={(value) => setSelectedAttributeGroup(value)}
+            />
+            <Select
+              mode="tags"
+              value={attributeValues}
+              placeholder={t("attributeValuePlaceholder")}
+              tokenSeparators={[","]}
+              options={defaultAttributeValues.map((value) => ({value, label: value}))}
+              onChange={syncAttributeValues}
+            />
+            <Button onClick={() => syncAttributeValues(defaultAttributeValues)}>
+              {t("quickSelect")}
+            </Button>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => syncAttributeValues([])}
+            />
+          </div>
+        </div>
+
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-sm font-bold text-forest-950">{t("sameTypeProducts")}</p>
+          <Button type="link" className="px-0 font-semibold" onClick={openPriceGuideModal}>
+            {t("priceGuide")}
+          </Button>
+        </div>
+
         <Form.List name="price_tiers">
-          {(fields, {add, remove}) => (
+          {(fields, {remove}) => (
             <div className="space-y-2.5">
               {fields.map((field) => (
-                <div key={field.key} className="grid gap-2.5 rounded-xl border border-stone-200 bg-stone-50 p-2.5 md:grid-cols-[minmax(0,1fr)_150px_180px_auto] md:items-end">
+                <div key={field.key} className="grid gap-2.5 rounded-xl border border-stone-200 bg-stone-50 p-2.5 md:grid-cols-[minmax(150px,1fr)_minmax(180px,1fr)_auto] md:items-start">
                   <Form.Item name={[field.name, "attribute"]} label={t("priceAttribute")} className="mb-0">
-                    <Select
-                      allowClear
-                      showSearch
-                      placeholder={t("selectAttribute")}
-                      optionFilterProp="label"
-                      options={attributeOptions.map((attribute) => ({value: attribute, label: attribute}))}
-                    />
+                    <Input readOnly className="bg-stone-100 font-semibold" />
                   </Form.Item>
-                  <Button icon={<PlusOutlined />} onClick={() => openAttributeModal(field.name)}>
-                    {t("quickAddAttribute")}
-                  </Button>
-                  <Form.Item name={[field.name, "price"]} label={t("price")} className="mb-0" rules={[{required: true}]}>
+                  <Form.Item
+                    name={[field.name, "price"]}
+                    label={t("price")}
+                    className="mb-0 [&_.ant-form-item-explain-error]:max-w-[220px] [&_.ant-form-item-explain-error]:text-sm [&_.ant-form-item-explain-error]:leading-snug"
+                    rules={[{required: true}]}
+                  >
                     <InputNumber
                       className="w-full"
                       min={0}
@@ -306,12 +489,22 @@ export function ProductForm({
                       parser={parseNumber}
                     />
                   </Form.Item>
-                  <Button danger type="text" icon={<DeleteOutlined />} onClick={() => remove(field.name)} />
+                  <Button
+                    danger
+                    type="text"
+                    icon={<DeleteOutlined />}
+                    className="mt-8"
+                    onClick={() => {
+                      const currentTiers = form.getFieldValue("price_tiers") as PriceTier[] | undefined;
+                      const attribute = currentTiers?.[field.name]?.attribute;
+                      remove(field.name);
+                      if (attribute) {
+                        setAttributeValues((current) => current.filter((value) => value !== attribute));
+                      }
+                    }}
+                  />
                 </div>
               ))}
-              <Button icon={<PlusOutlined />} onClick={() => add({attribute: "", price: undefined})}>
-                {t("addPriceTier")}
-              </Button>
             </div>
           )}
         </Form.List>
@@ -384,16 +577,12 @@ export function ProductForm({
       </Form>
 
       <Modal
-        title={t("createAttribute")}
+        title={editingAttribute ? t("editAttribute") : t("createAttribute")}
         open={attributeModalOpen}
-        okText={t("addAttribute")}
+        okText={t("saveAttribute")}
         cancelText={t("cancel")}
-        onCancel={() => {
-          setAttributeModalOpen(false);
-          setPendingAttributeIndex(null);
-          setNewAttributeName("");
-        }}
-        onOk={handleCreateAttribute}
+        onCancel={closeAttributeModal}
+        onOk={handleSaveAttribute}
         destroyOnHidden
       >
         <div className="pt-2">
@@ -402,9 +591,90 @@ export function ProductForm({
             value={newAttributeName}
             placeholder={t("attributeNamePlaceholder")}
             onChange={(event) => setNewAttributeName(event.target.value)}
-            onPressEnter={handleCreateAttribute}
+            onPressEnter={handleSaveAttribute}
             autoFocus
           />
+        </div>
+      </Modal>
+
+      <Modal
+        title={t("priceGuideTitle")}
+        open={priceGuideOpen}
+        okText={t("save")}
+        cancelText={t("cancel")}
+        onOk={savePriceGuideModal}
+        onCancel={closePriceGuideModal}
+        confirmLoading={isSavingBulkPrices}
+        width={760}
+      >
+        <div className="space-y-4">
+          <p className="text-sm leading-6 text-stone-600">{t("priceGuideIntro")}</p>
+          <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">
+            {initialData.id ? t("priceGuideDirectSaveHint") : t("priceGuideSaveHint")}
+          </p>
+          <div className="space-y-3">
+            {bulkPriceDraft.map((tier, index) => (
+              <div key={index} className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-3 md:grid-cols-[1fr_1fr_1.4fr_auto] md:items-end">
+                <label className="block">
+                  <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("minKg")}</span>
+                  <InputNumber
+                    className="w-full"
+                    min={0}
+                    addonAfter="kg"
+                    value={tier.minKg}
+                    onChange={(value) => {
+                      setBulkPriceDraft((current) =>
+                        current.map((item, itemIndex) => itemIndex === index ? {...item, minKg: Number(value ?? 0)} : item)
+                      );
+                    }}
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("maxKg")}</span>
+                  <InputNumber
+                    className="w-full"
+                    min={0}
+                    addonAfter="kg"
+                    value={tier.maxKg}
+                    onChange={(value) => {
+                      setBulkPriceDraft((current) =>
+                        current.map((item, itemIndex) => itemIndex === index ? {...item, maxKg: Number(value ?? 0)} : item)
+                      );
+                    }}
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("pricePerKg")}</span>
+                  <InputNumber
+                    className="w-full"
+                    min={0}
+                    addonAfter="VNĐ/kg"
+                    value={tier.price}
+                    formatter={formatNumber}
+                    parser={parseNumber}
+                    onChange={(value) => {
+                      setBulkPriceDraft((current) =>
+                        current.map((item, itemIndex) => itemIndex === index ? {...item, price: Number(value ?? 0)} : item)
+                      );
+                    }}
+                  />
+                </label>
+                <Button
+                  danger
+                  type="text"
+                  icon={<DeleteOutlined />}
+                  onClick={() => setBulkPriceDraft((current) => current.filter((_, itemIndex) => itemIndex !== index))}
+                />
+              </div>
+            ))}
+            <Button
+              icon={<PlusOutlined />}
+              onClick={() => setBulkPriceDraft((current) => [...current, {minKg: undefined, maxKg: undefined, price: undefined}])}
+            >
+              {t("addBulkPriceTier")}
+            </Button>
+          </div>
+          <p className="text-sm leading-6 text-stone-500">{t("priceGuideNote")}</p>
         </div>
       </Modal>
     </>

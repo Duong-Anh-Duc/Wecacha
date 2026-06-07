@@ -19,7 +19,7 @@ export default async function EditProductPage({
   const t = await getTranslations("Admin");
   const {supabase} = await requireAdmin(locale);
 
-  const [productResult, categoriesResult] = await Promise.all([
+  const [productResult, categoriesResult, attributesResult] = await Promise.all([
     supabase
       .from("products")
       .select("*")
@@ -28,6 +28,10 @@ export default async function EditProductPage({
     supabase
       .from("product_categories")
       .select("slug, name_vi, name_en")
+      .order("sort_order", {ascending: true}),
+    supabase
+      .from("product_attributes")
+      .select("id, name")
       .order("sort_order", {ascending: true})
   ]);
 
@@ -37,6 +41,7 @@ export default async function EditProductPage({
 
   const data = productResult.data;
   const categories = categoriesResult.error ? [] : categoriesResult.data ?? [];
+  const attributes = attributesResult.error ? [] : attributesResult.data ?? [];
 
   return (
     <div className="space-y-6">
@@ -57,7 +62,7 @@ export default async function EditProductPage({
         </div>
       </div>
 
-      <ProductForm initialData={data} categories={categories} />
+      <ProductForm initialData={data} categories={categories} attributes={attributes} />
     </div>
   );
 }

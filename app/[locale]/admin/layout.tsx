@@ -95,7 +95,7 @@ export default function AdminLayout({children}: {children: ReactNode}) {
   const isDashboard = pathname.endsWith("/admin");
   const isRegistrations = pathname.includes("/admin/registrations");
   const isArticles = pathname.includes("/admin/articles");
-  const isProductCategories = pathname.includes("/admin/product-categories");
+  const isProductSettings = pathname.includes("/admin/product-categories");
   const isProducts = pathname.includes("/admin/products");
   const isOrders = pathname.includes("/admin/orders");
   const navItems = [
@@ -132,10 +132,10 @@ export default function AdminLayout({children}: {children: ReactNode}) {
       mobileIcon: <Package className="h-4 w-4" />
     },
     {
-      key: "productCategories",
+      key: "productSettings",
       href: "/admin/product-categories",
-      label: t("productCategories"),
-      active: isProductCategories,
+      label: t("productSettings"),
+      active: isProductSettings,
       icon: <Tags className="h-5 w-5" />,
       mobileIcon: <Tags className="h-4 w-4" />
     },

@@ -16,23 +16,26 @@ function tierLabel(tier: NonNullable<Product["priceTiers"]>[number]) {
   return tier.attribute || range;
 }
 
+function bulkTierLabel(tier: NonNullable<Product["bulkPriceTiers"]>[number]) {
+  const min = Number(tier.minKg || 0);
+  const max = Number(tier.maxKg || 0);
+  if (min > 0 && max > 0) return `${min}kg - ${max}kg`;
+  if (min > 0) return `>= ${min}kg`;
+  if (max > 0) return `<= ${max}kg`;
+  return "";
+}
+
 export function ProductBuyPanel({product}: {product: Product}) {
   const locale = useLocale() as Locale;
   const t = useTranslations("Common");
   const tProduct = useTranslations("Product");
   const firstTier = product.priceTiers?.[0];
-  const hasWeightTiers = Boolean(product.priceTiers?.length);
-  const minKg = firstTier?.minKg ?? 1;
-  const maxKg = product.priceTiers?.reduce<number | undefined>((max, tier) => {
-    if (!tier.maxKg) return max;
-    return max === undefined ? tier.maxKg : Math.max(max, tier.maxKg);
-  }, undefined);
-  const [quantity, setQuantity] = useState(hasWeightTiers ? minKg : 1);
-  const selectedTier = product.priceTiers?.find((tier) => {
-    const matchesMin = tier.minKg ? quantity >= tier.minKg : true;
-    const matchesMax = tier.maxKg ? quantity <= tier.maxKg : true;
-    return matchesMin && matchesMax;
-  }) ?? firstTier;
+  const hasSizeOptions = Boolean(product.priceTiers?.length);
+  const bulkPriceTiers = (product.bulkPriceTiers ?? []).filter(
+    (tier) => Number(tier.price || 0) > 0 && (Number(tier.minKg || 0) > 0 || Number(tier.maxKg || 0) > 0)
+  );
+  const [quantity, setQuantity] = useState(1);
+  const [selectedTier, setSelectedTier] = useState(firstTier);
   const selectedPrice = selectedTier?.price ?? product.price;
   const selectedOption = selectedTier
     ? {
@@ -44,8 +47,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
   const totalPrice = selectedPrice * quantity;
 
   function updateQuantity(nextQuantity: number) {
-    const normalized = Math.max(hasWeightTiers ? minKg : 1, Math.round(nextQuantity || minKg));
-    setQuantity(maxKg ? Math.min(normalized, maxKg) : normalized);
+    setQuantity(Math.max(1, Math.round(nextQuantity || 1)));
   }
 
   return (
@@ -65,14 +67,11 @@ export function ProductBuyPanel({product}: {product: Product}) {
         <span className="text-[32px] lg:text-[38px] font-bold leading-none text-[#a46131]">
           {formatCurrency(selectedPrice, locale)}
         </span>
-        {hasWeightTiers ? (
-          <span className="pb-1 text-sm font-semibold text-[#142918]/58">/ kg</span>
-        ) : null}
       </div>
 
       {product.priceTiers?.length ? (
         <div className="mb-8 rounded-2xl border border-[#142918]/10 bg-white p-4">
-          <p className="mb-3 text-[13px] font-bold text-[#142918]">{tProduct("buyWeightPrice")}</p>
+          <p className="mb-3 text-[13px] font-bold text-[#142918]">{tProduct("selectWeight")}</p>
           <div className="space-y-2">
             {product.priceTiers.map((tier, index) => {
               const label = tierLabel(tier);
@@ -81,7 +80,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
                 <button
                   key={`${tier.attribute}-${index}`}
                   type="button"
-                  onClick={() => updateQuantity(tier.minKg ?? 1)}
+                  onClick={() => setSelectedTier(tier)}
                   className={
                     isSelected
                       ? "flex w-full items-center justify-between gap-3 rounded-xl border border-[#a46131] bg-[#fff8ed] px-3 py-2 text-left text-sm shadow-[0_0_0_3px_rgba(164,97,49,0.12)]"
@@ -90,8 +89,28 @@ export function ProductBuyPanel({product}: {product: Product}) {
                   aria-pressed={isSelected}
                 >
                   <span className="font-semibold text-[#142918]/78">{label}</span>
-                  <span className="font-bold text-[#a46131]">{formatCurrency(tier.price, locale)}/kg</span>
+                  <span className="font-bold text-[#a46131]">{formatCurrency(tier.price, locale)}</span>
                 </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
+      {bulkPriceTiers.length ? (
+        <div className="mb-8 rounded-2xl border border-[#142918]/10 bg-white p-4">
+          <p className="mb-3 text-[13px] font-bold text-[#142918]">{tProduct("buyWeightPrice")}</p>
+          <div className="space-y-2">
+            {bulkPriceTiers.map((tier, index) => {
+              const label = bulkTierLabel(tier);
+              return (
+                <div
+                  key={`${label}-${index}`}
+                  className="flex w-full items-center justify-between gap-3 rounded-xl bg-[#f8f6f0] px-3 py-2 text-sm"
+                >
+                  <span className="font-semibold text-[#142918]/78">{label}</span>
+                  <span className="font-bold text-[#a46131]">{tProduct("perKgPrice", {price: formatCurrency(tier.price, locale)})}</span>
+                </div>
               );
             })}
           </div>
@@ -117,7 +136,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
 
       <div className="mb-8">
         <p className="mb-3 text-[13px] font-bold text-[#142918]">
-          {hasWeightTiers ? tProduct("kgAmount") : t("quantity")}
+          {t("quantity")}
         </p>
         <div className="flex gap-3 lg:gap-4">
           <div className="inline-flex h-12 lg:h-14 items-center rounded-xl border border-[#142918]/20 bg-white px-2">
@@ -133,10 +152,9 @@ export function ProductBuyPanel({product}: {product: Product}) {
               onChange={(event) => updateQuantity(Number(event.target.value))}
               className="h-full w-14 bg-transparent text-center text-[15px] font-bold text-[#142918] outline-none"
               inputMode="numeric"
-              min={hasWeightTiers ? minKg : 1}
-              max={maxKg}
+              min={1}
               type="number"
-              aria-label={hasWeightTiers ? tProduct("kgAmount") : t("quantity")}
+              aria-label={t("quantity")}
             />
             <button
               className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
@@ -156,7 +174,7 @@ export function ProductBuyPanel({product}: {product: Product}) {
             label={t("addToCart")}
           />
         </div>
-        {hasWeightTiers ? (
+        {hasSizeOptions ? (
           <div className="mt-3 flex items-center justify-between rounded-xl bg-[#f8f6f0] px-4 py-3 text-sm">
             <span className="font-semibold text-[#142918]/70">{tProduct("estimatedTotal")}</span>
             <span className="font-bold text-[#142918]">{formatCurrency(totalPrice, locale)}</span>

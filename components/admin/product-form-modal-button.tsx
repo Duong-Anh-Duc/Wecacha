@@ -4,15 +4,17 @@ import {useState} from "react";
 import {Button, Modal} from "antd";
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 import {useTranslations} from "next-intl";
-import {ProductForm, type ProductCategoryOption, type ProductFormData} from "./product-form";
+import {ProductForm, type ProductAttributeOption, type ProductCategoryOption, type ProductFormData} from "./product-form";
 
 export function ProductFormModalButton({
   categories,
+  attributes = [],
   product,
   mode = "create",
   compact = false
 }: {
   categories: ProductCategoryOption[];
+  attributes?: ProductAttributeOption[];
   product?: ProductFormData;
   mode?: "create" | "edit";
   compact?: boolean;
@@ -55,6 +57,7 @@ export function ProductFormModalButton({
           <ProductForm
             initialData={product}
             categories={categories}
+            attributes={attributes}
             redirectOnSave={false}
             onSaved={() => setOpen(false)}
           />
