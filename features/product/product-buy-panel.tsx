@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import {CreditCard, Minus, Plus} from "lucide-react";
+import {Check, CreditCard, Minus, Package, Percent, Plus, Scale, Tag} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
@@ -50,6 +50,56 @@ export function ProductBuyPanel({product}: {product: Product}) {
     setQuantity(Math.max(1, Math.round(nextQuantity || 1)));
   }
 
+  // Parse weight to kg to check bulk discount tier
+  function parseWeightKg(attribute?: string, minKg?: number) {
+    if (minKg && minKg > 0) return minKg;
+    if (!attribute) return 0;
+    const match = attribute.match(/(\d+(?:\.\d+)?)\s*(kg|g)/i);
+    if (match) {
+      const val = parseFloat(match[1]);
+      const unit = match[2].toLowerCase();
+      return unit === "kg" ? val : val / 1000;
+    }
+    return 0;
+  }
+
+  // Parse weight from product.weight (e.g. "250g", "2 x 250g")
+  function parseProductWeightKg(weightStr?: string) {
+    if (!weightStr) return 0.25; // default 250g
+    const multiplication = weightStr.match(/(\d+)\s*x\s*(\d+(?:\.\d+)?)\s*(kg|g)/i);
+    if (multiplication) {
+      const count = parseInt(multiplication[1]);
+      const val = parseFloat(multiplication[2]);
+      const unit = multiplication[3].toLowerCase();
+      const unitWeight = unit === "kg" ? val : val / 1000;
+      return count * unitWeight;
+    }
+    const match = weightStr.match(/(\d+(?:\.\d+)?)\s*(kg|g)/i);
+    if (match) {
+      const val = parseFloat(match[1]);
+      const unit = match[2].toLowerCase();
+      return unit === "kg" ? val : val / 1000;
+    }
+    return 0.25;
+  }
+
+  const selectedWeightInKg = selectedTier
+    ? parseWeightKg(selectedTier.attribute, selectedTier.minKg)
+    : parseProductWeightKg(product.weight);
+
+  const totalWeightKg = selectedWeightInKg * quantity;
+
+  const activeBulkTierIndex = bulkPriceTiers.findIndex((tier) => {
+    const min = Number(tier.minKg || 0);
+    const max = Number(tier.maxKg || 0);
+    if (min > 0 && max > 0) {
+      return totalWeightKg >= min && totalWeightKg <= max;
+    }
+    if (min > 0) return totalWeightKg >= min;
+    if (max > 0) return totalWeightKg <= max;
+    return false;
+  });
+
   return (
     <aside className="flex flex-col pt-2 relative z-0">
       <h1 className="font-serif text-[32px] lg:text-[42px] leading-[1.1] text-[#142918] mb-4">
@@ -62,73 +112,148 @@ export function ProductBuyPanel({product}: {product: Product}) {
         </p>
       ) : null}
 
-      {/* Price */}
-      <div className="flex items-end gap-3 mb-8">
+      <div className="mb-6 rounded-2xl bg-[#fff8ed] px-5 py-4">
         <span className="text-[32px] lg:text-[38px] font-bold leading-none text-[#a46131]">
           {formatCurrency(selectedPrice, locale)}
         </span>
       </div>
 
-      {product.priceTiers?.length ? (
-        <div className="mb-8 rounded-2xl border border-[#142918]/10 bg-white p-4">
-          <p className="mb-3 text-[13px] font-bold text-[#142918]">{tProduct("selectWeight")}</p>
-          <div className="space-y-2">
-            {product.priceTiers.map((tier, index) => {
-              const label = tierLabel(tier);
-              const isSelected = selectedTier === tier;
-              return (
-                <button
-                  key={`${tier.attribute}-${index}`}
-                  type="button"
-                  onClick={() => setSelectedTier(tier)}
-                  className={
-                    isSelected
-                      ? "flex w-full items-center justify-between gap-3 rounded-xl border border-[#a46131] bg-[#fff8ed] px-3 py-2 text-left text-sm shadow-[0_0_0_3px_rgba(164,97,49,0.12)]"
-                      : "flex w-full items-center justify-between gap-3 rounded-xl border border-transparent bg-[#f8f6f0] px-3 py-2 text-left text-sm transition hover:border-[#a46131]/30 hover:bg-[#fffaf2]"
-                  }
-                  aria-pressed={isSelected}
-                >
-                  <span className="font-semibold text-[#142918]/78">{label}</span>
-                  <span className="font-bold text-[#a46131]">{formatCurrency(tier.price, locale)}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-
-      {bulkPriceTiers.length ? (
-        <div className="mb-8 rounded-2xl border border-[#142918]/10 bg-white p-4">
-          <p className="mb-3 text-[13px] font-bold text-[#142918]">{tProduct("buyWeightPrice")}</p>
-          <div className="space-y-2">
-            {bulkPriceTiers.map((tier, index) => {
-              const label = bulkTierLabel(tier);
-              return (
-                <div
-                  key={`${label}-${index}`}
-                  className="flex w-full items-center justify-between gap-3 rounded-xl bg-[#f8f6f0] px-3 py-2 text-sm"
-                >
-                  <span className="font-semibold text-[#142918]/78">{label}</span>
-                  <span className="font-bold text-[#a46131]">{tProduct("perKgPrice", {price: formatCurrency(tier.price, locale)})}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-
-      {(product.weight || product.baseUnit) ? (
-        <div className="mb-8 grid gap-3 rounded-2xl border border-[#142918]/10 bg-white p-4 text-sm text-[#142918]/78 sm:grid-cols-2">
-          {product.weight ? (
-            <div>
-              <p className="mb-1 text-[12px] font-bold text-[#142918]">{tProduct("weight")}</p>
-              <p>{product.weight}</p>
+      {(product.priceTiers?.length || bulkPriceTiers.length || product.weight || product.baseUnit) ? (
+        <div className="mb-8 rounded-2xl border border-[#142918]/10 bg-white p-5 lg:p-6 shadow-[0_4px_20px_rgba(20,41,24,0.02)] space-y-6">
+          {/* Section 1: Chọn khối lượng */}
+          {product.priceTiers?.length ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2.5">
+                <Scale className="w-4 h-4 text-[#a46131]" />
+                <span className="text-[13px] font-bold tracking-wide text-[#142918]/70 uppercase">
+                  {tProduct("selectWeight")}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {product.priceTiers.map((tier, index) => {
+                  const label = tierLabel(tier);
+                  const isSelected = selectedTier === tier;
+                  return (
+                    <button
+                      key={`${tier.attribute}-${index}`}
+                      type="button"
+                      onClick={() => setSelectedTier(tier)}
+                      className={`
+                        relative flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-all duration-300
+                        ${isSelected
+                          ? "border-[#a46131] bg-[#fff8ed] shadow-[0_0_0_3px_rgba(164,97,49,0.12)]"
+                          : "border-[#142918]/10 bg-[#fbfaf6] hover:border-[#a46131]/40 hover:bg-[#fffaf2]/50"
+                        }
+                      `}
+                      aria-pressed={isSelected}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className={`
+                          flex items-center justify-center w-4 h-4 rounded-full border transition-all duration-200
+                          ${isSelected ? "border-[#a46131] bg-[#a46131]" : "border-[#142918]/20 bg-white"}
+                        `}>
+                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </span>
+                        <span className="font-bold text-[#142918]">{label}</span>
+                      </div>
+                      <span className="whitespace-nowrap font-bold text-[#a46131]">
+                        {formatCurrency(tier.price, locale)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           ) : null}
-          {product.baseUnit ? (
-            <div>
-              <p className="mb-1 text-[12px] font-bold text-[#142918]">{tProduct("packageSpec")}</p>
-              <p>{product.baseUnit}</p>
+
+          {/* Divider 1 */}
+          {product.priceTiers?.length && (bulkPriceTiers.length || product.weight || product.baseUnit) ? (
+            <div className="border-t border-[#142918]/8 my-5" />
+          ) : null}
+
+          {/* Section 2: Giá theo khối lượng mua */}
+          {bulkPriceTiers.length ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2.5">
+                <Tag className="w-4 h-4 text-[#17351f]" />
+                <span className="text-[13px] font-bold tracking-wide text-[#142918]/70 uppercase">
+                  {tProduct("buyWeightPrice")}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {bulkPriceTiers.map((tier, index) => {
+                  const label = bulkTierLabel(tier);
+                  const isApplied = activeBulkTierIndex === index;
+                  return (
+                    <div
+                      key={`${label}-${index}`}
+                      className={`
+                        relative flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-300 border
+                        ${isApplied
+                          ? "border-[#17351f] bg-[#f0f7f1] shadow-[0_0_0_3px_rgba(23,53,31,0.08)]"
+                          : "border-[#142918]/5 bg-[#f8f6f0]"
+                        }
+                      `}
+                    >
+                      <div className="flex items-center gap-2">
+                        {isApplied && (
+                          <span className="flex items-center justify-center w-4 h-4 rounded-full bg-[#17351f] text-white">
+                            <Check className="w-2.5 h-2.5" />
+                          </span>
+                        )}
+                        <span className={`font-semibold ${isApplied ? "text-[#17351f] font-bold" : "text-[#142918]/78"}`}>
+                          {label}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className={`whitespace-nowrap font-bold ${isApplied ? "text-[#17351f] text-[15px]" : "text-[#a46131]"}`}>
+                          {tProduct("perKgPrice", {price: formatCurrency(tier.price, locale)})}
+                        </span>
+                        {isApplied && (
+                          <span className="text-[10px] font-bold text-[#17351f]/70 uppercase tracking-wider mt-0.5">
+                            {locale === "vi" ? "Đang áp dụng" : "Applied"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
+          {/* Divider 2 */}
+          {bulkPriceTiers.length && (product.weight || product.baseUnit) ? (
+            <div className="border-t border-[#142918]/8 my-5" />
+          ) : null}
+
+          {/* Section 3: Quy cách đóng gói */}
+          {(product.weight || product.baseUnit) ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2.5">
+                <Package className="w-4 h-4 text-[#3170a4]" />
+                <span className="text-[13px] font-bold tracking-wide text-[#142918]/70 uppercase">
+                  {tProduct("packageSpec")}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm text-[#142918]/78">
+                {product.weight ? (
+                  <div className="flex items-center gap-3 rounded-xl border border-[#142918]/5 bg-[#fbfaf6] px-4 py-3">
+                    <span className="text-[12px] font-bold text-[#142918] min-w-[100px] border-r border-[#142918]/8 pr-2">
+                      {tProduct("weight")}
+                    </span>
+                    <span className="font-semibold text-[#142918]">{product.weight}</span>
+                  </div>
+                ) : null}
+                {product.baseUnit ? (
+                  <div className="flex items-center gap-3 rounded-xl border border-[#142918]/5 bg-[#fbfaf6] px-4 py-3">
+                    <span className="text-[12px] font-bold text-[#142918] min-w-[100px] border-r border-[#142918]/8 pr-2">
+                      {tProduct("packageSpec")}
+                    </span>
+                    <span className="font-semibold text-[#142918]">{product.baseUnit}</span>
+                  </div>
+                ) : null}
+              </div>
             </div>
           ) : null}
         </div>
