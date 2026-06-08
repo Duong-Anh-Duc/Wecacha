@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useTransition} from "react";
+import {useState} from "react";
 import Image from "next/image";
 import {App, Button, Card, Form, Input, InputNumber, Modal, Select, Space, Switch} from "antd";
 import {DeleteOutlined, EditOutlined, PlusOutlined, SaveOutlined, UploadOutlined} from "@ant-design/icons";
@@ -184,9 +184,9 @@ export function ProductForm({
   const initialBulkPriceTiers = initialData.bulk_price_tiers?.length
     ? initialData.bulk_price_tiers
     : [];
-  const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<string[]>(initialData.images ?? []);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
   const [attributeModalOpen, setAttributeModalOpen] = useState(false);
   const [bulkPriceDraft, setBulkPriceDraft] = useState<BulkPriceTier[]>(initialBulkPriceTiers);
@@ -316,7 +316,10 @@ export function ProductForm({
     }
   }
 
-  function handleSubmit(values: Record<string, unknown>) {
+  async function handleSubmit(values: Record<string, unknown>) {
+    if (isSaving) return;
+    setIsSaving(true);
+
     const formData = new FormData();
     if (initialData.id) formData.set("id", initialData.id);
     if (initialData.slug) formData.set("slug", initialData.slug);
@@ -341,7 +344,7 @@ export function ProductForm({
     formData.set("is_visible", isVisible ? "true" : "false");
     formData.set("featured", initialData.featured ? "true" : "false");
 
-    startTransition(async () => {
+    try {
       const result = await upsertProduct(formData);
       if (result.success) {
         message.success(t("saveSuccess"));
@@ -354,7 +357,9 @@ export function ProductForm({
       } else {
         message.error(`${t("saveError")}${result.error}`);
       }
-    });
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   function handleCancel() {
@@ -367,7 +372,7 @@ export function ProductForm({
   }
 
   function handleFormKeyDown(event: React.KeyboardEvent<HTMLFormElement>) {
-    if (event.key !== "Enter" || event.nativeEvent.isComposing || isPending) return;
+    if (event.key !== "Enter" || event.nativeEvent.isComposing || isSaving) return;
 
     const target = event.target as HTMLElement;
     if (
@@ -686,7 +691,7 @@ export function ProductForm({
           <Button size="large" onClick={handleCancel}>
             {t("skip")}
           </Button>
-          <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isPending} size="large">
+          <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isSaving} disabled={isSaving} size="large">
             {t("saveProduct")}
           </Button>
         </div>

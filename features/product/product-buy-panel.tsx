@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import {Check, CreditCard, Minus, Package, Percent, Plus, Scale, Tag} from "lucide-react";
+import {CreditCard, Minus, Package, Percent, Plus, Scale, Tag} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {AddToCartButton} from "@/components/cart/add-to-cart-button";
 import {BuyNowButton} from "@/components/cart/buy-now-button";
@@ -89,23 +89,6 @@ export function ProductBuyPanel({
     return 0.25;
   }
 
-  const selectedWeightInKg = selectedTier
-    ? parseWeightKg(selectedTier.attribute, selectedTier.minKg)
-    : parseProductWeightKg(product.weight);
-
-  const totalWeightKg = selectedWeightInKg * quantity;
-
-  const activeBulkTierIndex = bulkPriceTiers.findIndex((tier) => {
-    const min = Number(tier.minKg || 0);
-    const max = Number(tier.maxKg || 0);
-    if (min > 0 && max > 0) {
-      return totalWeightKg >= min && totalWeightKg <= max;
-    }
-    if (min > 0) return totalWeightKg >= min;
-    if (max > 0) return totalWeightKg <= max;
-    return false;
-  });
-
   return (
     <aside className="flex flex-col pt-2 relative z-0">
       <h1 className="font-serif text-[32px] lg:text-[42px] leading-[1.1] text-[#142918] mb-4">
@@ -189,37 +172,20 @@ export function ProductBuyPanel({
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {bulkPriceTiers.map((tier, index) => {
                   const label = bulkTierLabel(tier);
-                  const isApplied = activeBulkTierIndex === index;
                   return (
                     <div
                       key={`${label}-${index}`}
-                      className={`
-                        relative flex min-h-[74px] items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-300 border
-                        ${isApplied
-                          ? "border-[#17351f] bg-[#f0f7f1] shadow-[0_0_0_3px_rgba(23,53,31,0.08)]"
-                          : "border-[#142918]/5 bg-[#f8f6f0]"
-                        }
-                      `}
+                      className="relative flex min-h-[74px] items-center justify-between gap-3 rounded-xl border border-[#142918]/5 bg-[#f8f6f0] px-4 py-3 text-sm transition-all duration-300"
                     >
                       <div className="flex min-w-0 items-center gap-2">
-                        {isApplied && (
-                          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#17351f] text-white">
-                            <Check className="w-2.5 h-2.5" />
-                          </span>
-                        )}
-                        <span className={`min-w-0 whitespace-nowrap font-semibold ${isApplied ? "text-[#17351f] font-bold" : "text-[#142918]/78"}`}>
+                        <span className="min-w-0 whitespace-nowrap font-semibold text-[#142918]/78">
                           {label}
                         </span>
                       </div>
                       <div className="flex shrink-0 flex-col items-end">
-                        <span className={`whitespace-nowrap font-bold ${isApplied ? "text-[#17351f] text-[15px]" : "text-[#a46131]"}`}>
+                        <span className="whitespace-nowrap font-bold text-[#a46131]">
                           {tProduct("perKgPrice", {price: formatCurrency(tier.price, locale)})}
                         </span>
-                        {isApplied && (
-                          <span className="text-[10px] font-bold text-[#17351f]/70 uppercase tracking-wider mt-0.5">
-                            {locale === "vi" ? "Đang áp dụng" : "Applied"}
-                          </span>
-                        )}
                       </div>
                     </div>
                   );
