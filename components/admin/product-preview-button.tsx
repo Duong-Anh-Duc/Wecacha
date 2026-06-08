@@ -1,12 +1,15 @@
 "use client";
 
 import {useState} from "react";
-import {Button, Drawer} from "antd";
+import {Button, Drawer, Tabs} from "antd";
 import {Eye} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {ProductCard} from "@/components/shop/product-card";
+import {ProductBuyPanel} from "@/features/product/product-buy-panel";
+import {ProductGallery} from "@/features/product/product-gallery";
 import type {Locale} from "@/i18n/routing";
 import type {Product} from "@/lib/content/types";
+import {localized} from "@/lib/content/helpers";
 import type {ProductCategoryOption} from "./product-form";
 
 export type ProductPreviewData = {
@@ -23,6 +26,11 @@ export type ProductPreviewData = {
   price: number;
   price_tiers?: {
     attribute?: string;
+    minKg?: number;
+    maxKg?: number;
+    price?: number;
+  }[] | null;
+  bulk_price_tiers?: {
     minKg?: number;
     maxKg?: number;
     price?: number;
@@ -77,6 +85,11 @@ export function ProductPreviewButton({
       maxKg: tier.maxKg,
       price: Number(tier.price ?? 0)
     })),
+    bulkPriceTiers: (product.bulk_price_tiers ?? []).map((tier) => ({
+      minKg: tier.minKg,
+      maxKg: tier.maxKg,
+      price: Number(tier.price ?? 0)
+    })),
     originalPrice: product.original_price ?? undefined,
     weight: product.weight || "",
     baseUnit: product.base_unit || undefined,
@@ -103,11 +116,37 @@ export function ProductPreviewButton({
         title={t("previewProduct")}
         open={open}
         onClose={() => setOpen(false)}
-        width={520}
+        width="min(1120px, calc(100vw - 32px))"
       >
-        <div className="mx-auto max-w-[430px]">
-          <ProductCard product={previewProduct} locale={previewLocale} />
-        </div>
+        <Tabs
+          defaultActiveKey="detail"
+          items={[
+            {
+              key: "detail",
+              label: t("previewDetail"),
+              children: (
+                <div className="rounded-[28px] bg-parchment-50 p-4 sm:p-6">
+                  <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr]">
+                    <ProductGallery
+                      images={previewProduct.images}
+                      alt={localized(previewProduct.name, previewLocale)}
+                    />
+                    <ProductBuyPanel product={previewProduct} />
+                  </div>
+                </div>
+              )
+            },
+            {
+              key: "card",
+              label: t("previewCard"),
+              children: (
+                <div className="mx-auto max-w-[430px] py-2">
+                  <ProductCard product={previewProduct} locale={previewLocale} />
+                </div>
+              )
+            }
+          ]}
+        />
       </Drawer>
     </>
   );
