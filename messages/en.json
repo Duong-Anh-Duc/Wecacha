@@ -728,6 +728,8 @@
     "priceGuideSaveHint": "Click Save in this modal to apply it to the form, then click Save product to write it to the DB.",
     "priceGuideDirectSaveHint": "Click Save in this modal to write these price ranges directly to the DB.",
     "priceGuideApplied": "Price ranges applied. Please save the product to write them to the DB.",
+    "priceGuideSummary": "Quantity pricing summary",
+    "priceGuideSummaryEmpty": "No price ranges yet.",
     "priceGuideExampleTitle": "Example",
     "priceGuideRangeOne": "Customer buys from 5kg to 20kg",
     "priceGuideRangeOnePrice": "375,000 VND/kg",

@@ -2,7 +2,7 @@
 
 import {useState, useTransition} from "react";
 import Image from "next/image";
-import {App, Button, Card, Form, Input, InputNumber, Modal, Select, Switch} from "antd";
+import {App, Button, Card, Form, Input, InputNumber, Modal, Select, Space, Switch} from "antd";
 import {DeleteOutlined, EditOutlined, PlusOutlined, SaveOutlined, UploadOutlined} from "@ant-design/icons";
 import {useLocale, useTranslations} from "next-intl";
 import {updateProductBulkPriceTiers, uploadProductImage, upsertProduct, upsertProductAttribute} from "@/actions/product-actions";
@@ -82,6 +82,32 @@ function parseNumber(value: string | undefined) {
   return value?.replace(/,/g, "") ?? "";
 }
 
+function formatBulkTierLabel(tier: BulkPriceTier) {
+  const min = Number(tier.minKg || 0);
+  const max = Number(tier.maxKg || 0);
+  if (min > 0 && max > 0) return `${min}kg - ${max}kg`;
+  if (min > 0) return `${min}kg+`;
+  if (max > 0) return `0-${max}kg`;
+  return "";
+}
+
+function summarizeBulkPriceTiers(tiers: BulkPriceTier[]) {
+  const normalized = tiers.filter(
+    (tier) => Number(tier.price || 0) > 0 && (Number(tier.minKg || 0) > 0 || Number(tier.maxKg || 0) > 0)
+  );
+
+  if (normalized.length <= 2) return normalized;
+
+  const sorted = [...normalized].sort((left, right) => {
+    const leftMin = Number(left.minKg || 0);
+    const rightMin = Number(right.minKg || 0);
+    if (leftMin !== rightMin) return leftMin - rightMin;
+    return Number(left.maxKg || 0) - Number(right.maxKg || 0);
+  });
+
+  return [sorted[0], sorted[sorted.length - 1]];
+}
+
 export function ProductForm({
   initialData = {},
   categories,
@@ -138,6 +164,7 @@ export function ProductForm({
     attributes[0]?.name ?? defaultAttributeGroups[0]
   );
   const [attributeValues, setAttributeValues] = useState<string[]>(initialAttributeValues);
+  const bulkPriceSummaryTiers = summarizeBulkPriceTiers(bulkPriceTiers);
   const isEditing = Boolean(initialData.id);
   const categoryOptions = categories.length > 0
     ? categories
@@ -370,10 +397,6 @@ export function ProductForm({
             <Switch checked={isVisible} onChange={setIsVisible} />
             {isVisible ? t("businessActive") : t("businessStopped")}
           </label>
-          <label className="inline-flex items-center gap-3 text-sm font-medium text-stone-700">
-            <Switch checked={featured} onChange={setFeatured} />
-            {t("featured")}
-          </label>
         </div>
       </Card>
 
@@ -467,6 +490,30 @@ export function ProductForm({
           </Button>
         </div>
 
+        <div className="mb-4 rounded-2xl border border-stone-200 bg-stone-50 p-4">
+          <div className="mb-3">
+            <p className="text-sm font-bold text-forest-950">{t("priceGuideSummary")}</p>
+            <p className="mt-1 text-sm text-stone-500">{t("priceGuideIntro")}</p>
+          </div>
+          {bulkPriceSummaryTiers.length ? (
+            <div className="space-y-2">
+              {bulkPriceSummaryTiers.map((tier, index) => (
+                <div
+                  key={`${tier.minKg ?? 0}-${tier.maxKg ?? 0}-${index}`}
+                  className="flex items-center justify-between gap-4 rounded-xl bg-white px-4 py-3 text-sm"
+                >
+                  <span className="font-semibold text-forest-950">{formatBulkTierLabel(tier)}</span>
+                  <span className="font-bold text-amber-700">
+                    {formatNumber(tier.price ?? 0)} VNĐ/kg
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-stone-500">{t("priceGuideSummaryEmpty")}</p>
+          )}
+        </div>
+
         <Form.List name="price_tiers">
           {(fields, {remove}) => (
             <div className="space-y-2.5">
@@ -481,13 +528,17 @@ export function ProductForm({
                     className="mb-0 [&_.ant-form-item-explain-error]:max-w-[220px] [&_.ant-form-item-explain-error]:text-sm [&_.ant-form-item-explain-error]:leading-snug"
                     rules={[{required: true}]}
                   >
-                    <InputNumber
-                      className="w-full"
-                      min={0}
-                      addonAfter="VNĐ"
-                      formatter={formatNumber}
-                      parser={parseNumber}
-                    />
+                    <Space.Compact className="w-full">
+                      <InputNumber
+                        className="w-full"
+                        min={0}
+                        formatter={formatNumber}
+                        parser={parseNumber}
+                      />
+                      <div className="flex min-w-16 items-center justify-center rounded-r-lg border border-l-0 border-stone-200 bg-stone-100 px-3 text-sm text-stone-500">
+                        VNĐ
+                      </div>
+                    </Space.Compact>
                   </Form.Item>
                   <Button
                     danger
@@ -617,47 +668,59 @@ export function ProductForm({
               <div key={index} className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-3 md:grid-cols-[1fr_1fr_1.4fr_auto] md:items-end">
                 <label className="block">
                   <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("minKg")}</span>
-                  <InputNumber
-                    className="w-full"
-                    min={0}
-                    addonAfter="kg"
-                    value={tier.minKg}
-                    onChange={(value) => {
-                      setBulkPriceDraft((current) =>
-                        current.map((item, itemIndex) => itemIndex === index ? {...item, minKg: Number(value ?? 0)} : item)
-                      );
-                    }}
-                  />
+                  <Space.Compact className="w-full">
+                    <InputNumber
+                      className="w-full"
+                      min={0}
+                      value={tier.minKg}
+                      onChange={(value) => {
+                        setBulkPriceDraft((current) =>
+                          current.map((item, itemIndex) => itemIndex === index ? {...item, minKg: Number(value ?? 0)} : item)
+                        );
+                      }}
+                    />
+                    <div className="flex min-w-12 items-center justify-center rounded-r-lg border border-l-0 border-stone-200 bg-stone-100 px-3 text-sm text-stone-500">
+                      kg
+                    </div>
+                  </Space.Compact>
                 </label>
                 <label className="block">
                   <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("maxKg")}</span>
-                  <InputNumber
-                    className="w-full"
-                    min={0}
-                    addonAfter="kg"
-                    value={tier.maxKg}
-                    onChange={(value) => {
-                      setBulkPriceDraft((current) =>
-                        current.map((item, itemIndex) => itemIndex === index ? {...item, maxKg: Number(value ?? 0)} : item)
-                      );
-                    }}
-                  />
+                  <Space.Compact className="w-full">
+                    <InputNumber
+                      className="w-full"
+                      min={0}
+                      value={tier.maxKg}
+                      onChange={(value) => {
+                        setBulkPriceDraft((current) =>
+                          current.map((item, itemIndex) => itemIndex === index ? {...item, maxKg: Number(value ?? 0)} : item)
+                        );
+                      }}
+                    />
+                    <div className="flex min-w-12 items-center justify-center rounded-r-lg border border-l-0 border-stone-200 bg-stone-100 px-3 text-sm text-stone-500">
+                      kg
+                    </div>
+                  </Space.Compact>
                 </label>
                 <label className="block">
                   <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("pricePerKg")}</span>
-                  <InputNumber
-                    className="w-full"
-                    min={0}
-                    addonAfter="VNĐ/kg"
-                    value={tier.price}
-                    formatter={formatNumber}
-                    parser={parseNumber}
-                    onChange={(value) => {
-                      setBulkPriceDraft((current) =>
-                        current.map((item, itemIndex) => itemIndex === index ? {...item, price: Number(value ?? 0)} : item)
-                      );
-                    }}
-                  />
+                  <Space.Compact className="w-full">
+                    <InputNumber
+                      className="w-full"
+                      min={0}
+                      value={tier.price}
+                      formatter={formatNumber}
+                      parser={parseNumber}
+                      onChange={(value) => {
+                        setBulkPriceDraft((current) =>
+                          current.map((item, itemIndex) => itemIndex === index ? {...item, price: Number(value ?? 0)} : item)
+                        );
+                      }}
+                    />
+                    <div className="flex min-w-16 items-center justify-center rounded-r-lg border border-l-0 border-stone-200 bg-stone-100 px-3 text-sm text-stone-500">
+                      VNĐ/kg
+                    </div>
+                  </Space.Compact>
                 </label>
                 <Button
                   danger
