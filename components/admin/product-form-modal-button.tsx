@@ -71,7 +71,7 @@ export function ProductFormModalButton({
         style={{top: 24}}
         destroyOnHidden
       >
-        <div className="max-h-[calc(100vh-120px)] overflow-y-auto pr-1">
+        <div className="max-h-[calc(100vh-180px)] overflow-y-auto pb-24 pr-1">
           <ProductForm
             initialData={product}
             categories={categories}

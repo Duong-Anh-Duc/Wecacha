@@ -239,6 +239,7 @@
     "ingredient": "Thành phần",
     "weight": "Khối lượng",
     "packageSpec": "Quy cách đóng gói",
+    "packagedAs": "Sản phẩm được đóng dưới dạng {unit}.",
     "expiry": "Hạn sử dụng",
     "expiryValue": "12 tháng kể từ ngày rang",
     "storage": "Bảo quản",

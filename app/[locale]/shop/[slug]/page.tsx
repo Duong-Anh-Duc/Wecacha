@@ -183,8 +183,7 @@ export default async function ProductDetailPage({params}: Props) {
               <div className="flex flex-col gap-5">
                 {[
                   {label: t("productInfo"), value: localized(product.description, locale)},
-                  {label: t("weight"), value: product.weight},
-                  {label: t("packageSpec"), value: product.baseUnit}
+                  {label: t("packageSpec"), value: product.baseUnit ? t("packagedAs", {unit: product.baseUnit}) : ""}
                 ].filter((item) => item.value).map((item, idx) => (
                   <div key={idx} className="grid grid-cols-[120px_1fr] sm:grid-cols-[140px_1fr] gap-4 items-start border-b border-[#142918]/[0.06] pb-5 last:border-0 last:pb-0">
                     <span className="font-bold text-[13px] text-[#142918]">{item.label}</span>

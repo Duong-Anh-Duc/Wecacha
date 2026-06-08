@@ -624,7 +624,7 @@ export function ProductForm({
       </Card>
 
       {showActions ? (
-        <div className="fixed bottom-6 right-6 z-[1200] flex items-center justify-end gap-2 rounded-2xl border border-stone-200 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur">
+        <div className="fixed bottom-10 right-6 z-[1200] flex items-center justify-end gap-2 rounded-2xl border border-stone-200 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur">
           <Button size="large" onClick={handleCancel}>
             {t("skip")}
           </Button>

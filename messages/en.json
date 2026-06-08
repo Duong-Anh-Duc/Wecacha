@@ -239,6 +239,7 @@
     "ingredient": "Ingredients",
     "weight": "Weight",
     "packageSpec": "Packaging",
+    "packagedAs": "This product is packaged as {unit}.",
     "expiry": "Best before",
     "expiryValue": "12 months from roasting date",
     "storage": "Storage",

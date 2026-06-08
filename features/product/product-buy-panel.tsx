@@ -173,7 +173,7 @@ export function ProductBuyPanel({
           ) : null}
 
           {/* Divider 1 */}
-          {product.priceTiers?.length && (bulkPriceTiers.length || product.weight || product.baseUnit) ? (
+          {product.priceTiers?.length && (bulkPriceTiers.length || product.baseUnit) ? (
             <div className="border-t border-[#142918]/8 my-5" />
           ) : null}
 
@@ -194,24 +194,24 @@ export function ProductBuyPanel({
                     <div
                       key={`${label}-${index}`}
                       className={`
-                        relative flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-300 border
+                        relative flex min-h-[74px] items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-300 border
                         ${isApplied
                           ? "border-[#17351f] bg-[#f0f7f1] shadow-[0_0_0_3px_rgba(23,53,31,0.08)]"
                           : "border-[#142918]/5 bg-[#f8f6f0]"
                         }
                       `}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex min-w-0 items-center gap-2">
                         {isApplied && (
-                          <span className="flex items-center justify-center w-4 h-4 rounded-full bg-[#17351f] text-white">
+                          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#17351f] text-white">
                             <Check className="w-2.5 h-2.5" />
                           </span>
                         )}
-                        <span className={`font-semibold ${isApplied ? "text-[#17351f] font-bold" : "text-[#142918]/78"}`}>
+                        <span className={`min-w-0 whitespace-nowrap font-semibold ${isApplied ? "text-[#17351f] font-bold" : "text-[#142918]/78"}`}>
                           {label}
                         </span>
                       </div>
-                      <div className="flex flex-col items-end">
+                      <div className="flex shrink-0 flex-col items-end">
                         <span className={`whitespace-nowrap font-bold ${isApplied ? "text-[#17351f] text-[15px]" : "text-[#a46131]"}`}>
                           {tProduct("perKgPrice", {price: formatCurrency(tier.price, locale)})}
                         </span>
@@ -229,12 +229,12 @@ export function ProductBuyPanel({
           ) : null}
 
           {/* Divider 2 */}
-          {bulkPriceTiers.length && (product.weight || product.baseUnit) ? (
+          {bulkPriceTiers.length && product.baseUnit ? (
             <div className="border-t border-[#142918]/8 my-5" />
           ) : null}
 
           {/* Section 3: Quy cách đóng gói */}
-          {(product.weight || product.baseUnit) ? (
+          {product.baseUnit ? (
             <div className="space-y-4">
               <div className="flex items-center gap-2.5">
                 <Package className="w-4 h-4 text-[#3170a4]" />
@@ -242,23 +242,8 @@ export function ProductBuyPanel({
                   {tProduct("packageSpec")}
                 </span>
               </div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm text-[#142918]/78">
-                {product.weight ? (
-                  <div className="flex items-center gap-3 rounded-xl border border-[#142918]/5 bg-[#fbfaf6] px-4 py-3">
-                    <span className="text-[12px] font-bold text-[#142918] min-w-[100px] border-r border-[#142918]/8 pr-2">
-                      {tProduct("weight")}
-                    </span>
-                    <span className="font-semibold text-[#142918]">{product.weight}</span>
-                  </div>
-                ) : null}
-                {product.baseUnit ? (
-                  <div className="flex items-center gap-3 rounded-xl border border-[#142918]/5 bg-[#fbfaf6] px-4 py-3">
-                    <span className="text-[12px] font-bold text-[#142918] min-w-[100px] border-r border-[#142918]/8 pr-2">
-                      {tProduct("packageSpec")}
-                    </span>
-                    <span className="font-semibold text-[#142918]">{product.baseUnit}</span>
-                  </div>
-                ) : null}
+              <div className="rounded-xl border border-[#142918]/5 bg-[#fbfaf6] px-4 py-3 text-sm font-semibold leading-relaxed text-[#142918]">
+                {tProduct("packagedAs", {unit: product.baseUnit})}
               </div>
             </div>
           ) : null}
