@@ -131,7 +131,7 @@ export function ProductPreviewButton({
                       images={previewProduct.images}
                       alt={localized(previewProduct.name, previewLocale)}
                     />
-                    <ProductBuyPanel product={previewProduct} />
+                    <ProductBuyPanel product={previewProduct} showPurchaseActions={false} />
                   </div>
                 </div>
               )

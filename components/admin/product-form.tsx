@@ -105,32 +105,6 @@ function CompactNumberInput({
   );
 }
 
-function formatBulkTierLabel(tier: BulkPriceTier) {
-  const min = Number(tier.minKg || 0);
-  const max = Number(tier.maxKg || 0);
-  if (min > 0 && max > 0) return `${min}kg - ${max}kg`;
-  if (min > 0) return `${min}kg+`;
-  if (max > 0) return `0-${max}kg`;
-  return "";
-}
-
-function summarizeBulkPriceTiers(tiers: BulkPriceTier[]) {
-  const normalized = tiers.filter(
-    (tier) => Number(tier.price || 0) > 0 && (Number(tier.minKg || 0) > 0 || Number(tier.maxKg || 0) > 0)
-  );
-
-  if (normalized.length <= 1) return normalized;
-
-  const sorted = [...normalized].sort((left, right) => {
-    const leftPrice = Number(left.price || 0);
-    const rightPrice = Number(right.price || 0);
-    if (leftPrice !== rightPrice) return leftPrice - rightPrice;
-    return Number(left.minKg || 0) - Number(right.minKg || 0);
-  });
-
-  return [sorted[0], sorted[sorted.length - 1]];
-}
-
 export function ProductForm({
   initialData = {},
   categories,
@@ -185,7 +159,6 @@ export function ProductForm({
     attributes[0]?.name ?? defaultAttributeGroups[0]
   );
   const [attributeValues, setAttributeValues] = useState<string[]>(initialAttributeValues);
-  const bulkPriceSummaryTiers = summarizeBulkPriceTiers(bulkPriceTiers);
   const isEditing = Boolean(initialData.id);
   const categoryOptions = categories.length > 0
     ? categories
@@ -513,45 +486,9 @@ export function ProductForm({
           </div>
         </div>
 
-        <div className="mb-2 flex items-center justify-between">
-          <p className="text-sm font-bold text-forest-950">{t("sameTypeProducts")}</p>
-        </div>
-
-        <div className="mb-4 rounded-2xl border border-stone-200 bg-stone-50 p-4">
-          <div className="mb-3">
-            <p className="text-sm font-bold text-forest-950">{t("priceGuideSummary")}</p>
-            <p className="mt-1 text-sm text-stone-500">{t("priceGuideIntro")}</p>
-          </div>
-          {bulkPriceSummaryTiers.length ? (
-            bulkPriceSummaryTiers.length === 1 ? (
-              <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-4 py-3 text-sm">
-                <span className="font-semibold text-forest-950">{formatBulkTierLabel(bulkPriceSummaryTiers[0])}</span>
-                <span className="font-bold text-amber-700">
-                  {formatNumber(bulkPriceSummaryTiers[0].price ?? 0)} VNĐ/kg
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-4 py-3 text-sm">
-                <span className="font-semibold text-forest-950">
-                  {t("priceGuideRangeSummary", {
-                    min: `${formatNumber(bulkPriceSummaryTiers[0].price ?? 0)} VNĐ/kg`,
-                    max: `${formatNumber(bulkPriceSummaryTiers[bulkPriceSummaryTiers.length - 1].price ?? 0)} VNĐ/kg`
-                  })}
-                </span>
-              </div>
-            )
-          ) : (
-            <p className="text-sm text-stone-500">{t("priceGuideSummaryEmpty")}</p>
-          )}
-        </div>
-
-        <div className="mb-4 rounded-2xl border border-stone-200 bg-white p-4">
-          <div className="mb-4">
+        <div className="mb-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <div className="mb-4 border-b border-stone-100 pb-3">
             <p className="text-sm font-bold text-forest-950">{t("priceGuideTitle")}</p>
-            <p className="mt-1 text-sm leading-6 text-stone-600">{t("priceGuideIntro")}</p>
-            <p className="mt-2 rounded-xl bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">
-              {initialData.id ? t("priceGuideDirectSaveHint") : t("priceGuideSaveHint")}
-            </p>
           </div>
           <div className="space-y-3">
             {bulkPriceDraft.map((tier, index) => (
@@ -612,13 +549,16 @@ export function ProductForm({
               {t("addBulkPriceTier")}
             </Button>
           </div>
-          <p className="mt-4 text-sm leading-6 text-stone-500">{t("priceGuideNote")}</p>
           <div className="mt-5 flex items-center justify-end gap-2">
             <Button onClick={resetPriceGuideDraft}>{t("cancel")}</Button>
             <Button type="primary" onClick={savePriceGuideModal} loading={isSavingBulkPrices}>
               {t("save")}
             </Button>
           </div>
+        </div>
+
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-sm font-bold text-forest-950">{t("sameTypeProducts")}</p>
         </div>
 
         <Form.List name="price_tiers">

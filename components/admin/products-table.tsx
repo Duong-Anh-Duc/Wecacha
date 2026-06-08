@@ -314,21 +314,19 @@ export function ProductsTable({
       render: (value) => value || "—"
     },
     {
-      title: t("priceTiers"),
+      title: t("price"),
       dataIndex: "price_tiers",
-      width: 260,
+      width: 180,
       render: (_value, row) => {
         const tiers = summarizePriceTiers(row);
         return (
           <div className="space-y-1.5">
             {tiers.map((tier, index) => {
-              const range = [tier.minKg ? `${tier.minKg}kg` : "", tier.maxKg ? `${tier.maxKg}kg` : ""]
-                .filter(Boolean)
-                .join(" - ");
               return (
-                <div key={`${tier.attribute}-${index}`} className="flex items-center justify-between gap-3 rounded-lg bg-stone-50 px-2.5 py-1.5 text-xs">
-                  <span className="font-medium text-stone-600">{tier.attribute || range || "—"}</span>
-                  <span className="font-bold text-ember">{formatCurrency(Number(tier.price ?? 0), locale as "vi" | "en")}</span>
+                <div key={`${tier.price}-${index}`} className="flex justify-end rounded-lg bg-stone-50 px-3 py-1.5 text-xs">
+                  <span className="font-bold text-ember">
+                    {formatCurrency(Number(tier.price ?? 0), locale as "vi" | "en")}
+                  </span>
                 </div>
               );
             })}

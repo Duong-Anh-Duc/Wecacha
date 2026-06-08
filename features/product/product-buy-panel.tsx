@@ -25,7 +25,13 @@ function bulkTierLabel(tier: NonNullable<Product["bulkPriceTiers"]>[number]) {
   return "";
 }
 
-export function ProductBuyPanel({product}: {product: Product}) {
+export function ProductBuyPanel({
+  product,
+  showPurchaseActions = true
+}: {
+  product: Product;
+  showPurchaseActions?: boolean;
+}) {
   const locale = useLocale() as Locale;
   const t = useTranslations("Common");
   const tProduct = useTranslations("Product");
@@ -259,65 +265,67 @@ export function ProductBuyPanel({product}: {product: Product}) {
         </div>
       ) : null}
 
-      <div className="mb-8">
-        <p className="mb-3 text-[13px] font-bold text-[#142918]">
-          {t("quantity")}
-        </p>
-        <div className="flex gap-3 lg:gap-4">
-          <div className="inline-flex h-12 lg:h-14 items-center rounded-xl border border-[#142918]/20 bg-white px-2">
-            <button
-              className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
-              onClick={() => updateQuantity(quantity - 1)}
-              aria-label={t("decreaseQty")}
-            >
-              <Minus className="h-4 w-4" />
-            </button>
-            <input
-              value={quantity}
-              onChange={(event) => updateQuantity(Number(event.target.value))}
-              className="h-full w-14 bg-transparent text-center text-[15px] font-bold text-[#142918] outline-none"
-              inputMode="numeric"
-              min={1}
-              type="number"
-              aria-label={t("quantity")}
+      {showPurchaseActions ? (
+        <div className="mb-8">
+          <p className="mb-3 text-[13px] font-bold text-[#142918]">
+            {t("quantity")}
+          </p>
+          <div className="flex gap-3 lg:gap-4">
+            <div className="inline-flex h-12 lg:h-14 items-center rounded-xl border border-[#142918]/20 bg-white px-2">
+              <button
+                className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
+                onClick={() => updateQuantity(quantity - 1)}
+                aria-label={t("decreaseQty")}
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <input
+                value={quantity}
+                onChange={(event) => updateQuantity(Number(event.target.value))}
+                className="h-full w-14 bg-transparent text-center text-[15px] font-bold text-[#142918] outline-none"
+                inputMode="numeric"
+                min={1}
+                type="number"
+                aria-label={t("quantity")}
+              />
+              <button
+                className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
+                onClick={() => updateQuantity(quantity + 1)}
+                aria-label={t("increaseQty")}
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+            <AddToCartButton
+              product={product}
+              locale={locale}
+              quantity={quantity}
+              variant="default"
+              selectedOption={selectedOption}
+              className="flex-1 h-12 lg:h-14 bg-[#8e5b34] hover:bg-[#754827] text-white rounded-xl text-[14px] lg:text-[15px] font-bold shadow-[0_4px_14px_rgba(80,49,28,0.16)] transition-all hover:-translate-y-0.5 px-2"
+              label={t("addToCart")}
             />
-            <button
-              className="p-2 text-[#142918]/70 hover:text-[#142918] transition-colors"
-              onClick={() => updateQuantity(quantity + 1)}
-              aria-label={t("increaseQty")}
-            >
-              <Plus className="h-4 w-4" />
-            </button>
           </div>
-          <AddToCartButton
+          {hasSizeOptions ? (
+            <div className="mt-3 flex items-center justify-between rounded-xl bg-[#f8f6f0] px-4 py-3 text-sm">
+              <span className="font-semibold text-[#142918]/70">{tProduct("estimatedTotal")}</span>
+              <span className="font-bold text-[#142918]">{formatCurrency(totalPrice, locale)}</span>
+            </div>
+          ) : null}
+          <BuyNowButton
             product={product}
-            locale={locale}
             quantity={quantity}
             variant="default"
             selectedOption={selectedOption}
-            className="flex-1 h-12 lg:h-14 bg-[#8e5b34] hover:bg-[#754827] text-white rounded-xl text-[14px] lg:text-[15px] font-bold shadow-[0_4px_14px_rgba(80,49,28,0.16)] transition-all hover:-translate-y-0.5 px-2"
-            label={t("addToCart")}
-          />
+            className="w-full h-12 lg:h-14 mt-4 rounded-xl bg-[#17351f] text-white text-[15px] lg:text-[16px] font-bold transition-all overflow-hidden relative group shadow-[0_8px_18px_rgba(20,41,24,0.18)] hover:bg-[#102817]"
+          >
+            <span className="relative flex items-center justify-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              <span>{t("buyNow")}</span>
+            </span>
+          </BuyNowButton>
         </div>
-        {hasSizeOptions ? (
-          <div className="mt-3 flex items-center justify-between rounded-xl bg-[#f8f6f0] px-4 py-3 text-sm">
-            <span className="font-semibold text-[#142918]/70">{tProduct("estimatedTotal")}</span>
-            <span className="font-bold text-[#142918]">{formatCurrency(totalPrice, locale)}</span>
-          </div>
-        ) : null}
-        <BuyNowButton
-          product={product}
-          quantity={quantity}
-          variant="default"
-          selectedOption={selectedOption}
-          className="w-full h-12 lg:h-14 mt-4 rounded-xl bg-[#17351f] text-white text-[15px] lg:text-[16px] font-bold transition-all overflow-hidden relative group shadow-[0_8px_18px_rgba(20,41,24,0.18)] hover:bg-[#102817]"
-        >
-          <span className="relative flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            <span>{t("buyNow")}</span>
-          </span>
-        </BuyNowButton>
-      </div>
+      ) : null}
     </aside>
   );
 }
