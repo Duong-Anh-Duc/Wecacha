@@ -190,7 +190,7 @@ export function ProductForm({
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
   const [attributeModalOpen, setAttributeModalOpen] = useState(false);
   const [bulkPriceDraft, setBulkPriceDraft] = useState<BulkPriceTier[]>(initialBulkPriceTiers);
-  const [showAttributeEditor, setShowAttributeEditor] = useState(initialAttributeValues.length > 0);
+  const [showAttributeEditor, setShowAttributeEditor] = useState(true);
   const [newAttributeName, setNewAttributeName] = useState("");
   const [editingAttribute, setEditingAttribute] = useState<ProductAttributeOption | null>(null);
   const [attributeOptions, setAttributeOptions] = useState<ProductAttributeOption[]>(() => {
@@ -200,7 +200,9 @@ export function ProductForm({
     });
     return Array.from(keyed.values());
   });
-  const [selectedAttributeGroup, setSelectedAttributeGroup] = useState<string | undefined>(undefined);
+  const [selectedAttributeGroup, setSelectedAttributeGroup] = useState<string | undefined>(
+    attributes[0]?.name ?? defaultAttributeGroups[0]
+  );
   const [attributeValues, setAttributeValues] = useState<string[]>(initialAttributeValues);
   const categoryOptions = categories.length > 0
     ? categories
@@ -504,14 +506,6 @@ export function ProductForm({
                 tokenSeparators={[","]}
                 options={defaultAttributeValues.map((value) => ({value, label: value}))}
                 onChange={syncAttributeValues}
-              />
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => {
-                  setAttributeValues([]);
-                  setShowAttributeEditor(false);
-                }}
               />
             </div>
           ) : (
