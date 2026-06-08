@@ -656,6 +656,8 @@
     "reorderError": "Không thể cập nhật thứ tự: ",
     "reorderArticlesSuccess": "Đã cập nhật thứ tự bài viết.",
     "reorderArticlesError": "Không thể cập nhật thứ tự bài viết: ",
+    "reorderProductsSuccess": "Product order updated.",
+    "reorderProductsError": "Could not update product order: ",
     "allPlacements": "Tất cả vị trí",
     "searchArticles": "Tìm bài viết hoặc đường dẫn...",
     "productsTitle": "Quản lý sản phẩm",

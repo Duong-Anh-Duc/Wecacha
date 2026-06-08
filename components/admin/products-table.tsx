@@ -1,12 +1,12 @@
 "use client";
 
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState, useTransition} from "react";
 import Image from "next/image";
 import {App, Button, Input, Select, Space, Switch, Table, Tooltip, type TableColumnsType} from "antd";
 import {SearchOutlined} from "@ant-design/icons";
-import {Trash2} from "lucide-react";
+import {GripVertical, Trash2} from "lucide-react";
 import {useTranslations} from "next-intl";
-import {deleteProduct, updateProductVisibility} from "@/actions/product-actions";
+import {deleteProduct, updateProductSortOrder, updateProductVisibility} from "@/actions/product-actions";
 import {formatCurrency} from "@/lib/content/helpers";
 import {createClient} from "@/lib/supabase/client";
 import {ProductFormModalButton} from "./product-form-modal-button";
@@ -92,7 +92,9 @@ export function ProductsTable({
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [orderedProducts, setOrderedProducts] = useState(products);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [visibilityPendingId, setVisibilityPendingId] = useState<string | null>(null);
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
@@ -227,7 +229,49 @@ export function ProductsTable({
     });
   }
 
+  function handleDrop(targetId: string) {
+    if (!draggingId || draggingId === targetId) {
+      setDraggingId(null);
+      return;
+    }
+
+    const fromIndex = orderedProducts.findIndex((product) => product.id === draggingId);
+    const toIndex = orderedProducts.findIndex((product) => product.id === targetId);
+    if (fromIndex < 0 || toIndex < 0) {
+      setDraggingId(null);
+      return;
+    }
+
+    const nextProducts = [...orderedProducts];
+    const [movedProduct] = nextProducts.splice(fromIndex, 1);
+    nextProducts.splice(toIndex, 0, movedProduct);
+    setOrderedProducts(nextProducts);
+    setDraggingId(null);
+
+    startTransition(async () => {
+      const result = await updateProductSortOrder(nextProducts.map((product) => product.id));
+      if (result.success) {
+        message.success(t("reorderProductsSuccess"));
+        window.dispatchEvent(new Event("products:changed"));
+      } else {
+        setOrderedProducts(products);
+        message.error(`${t("reorderProductsError")}${result.error}`);
+      }
+    });
+  }
+
   const columns: TableColumnsType<ProductRow> = [
+    {
+      title: "",
+      key: "drag",
+      width: 46,
+      align: "center",
+      render: () => (
+        <Tooltip title={t("dragToReorder")}>
+          <GripVertical className="mx-auto h-4 w-4 cursor-grab text-stone-400" />
+        </Tooltip>
+      )
+    },
     {
       title: t("colIndex"),
       key: "index",
@@ -378,7 +422,15 @@ export function ProductsTable({
         columns={columns}
         dataSource={filtered}
         loading={isSyncing ? {tip: t("productTableSyncing")} : false}
-        scroll={{x: 1040}}
+        scroll={{x: 1090}}
+        rowClassName={(row) => (row.id === draggingId ? "opacity-50" : "cursor-grab")}
+        onRow={(row) => ({
+          draggable: !isPending && !isSyncing,
+          onDragStart: () => setDraggingId(row.id),
+          onDragOver: (event) => event.preventDefault(),
+          onDrop: () => handleDrop(row.id),
+          onDragEnd: () => setDraggingId(null)
+        })}
         onChange={(nextPagination) => {
           setPagination({
             current: nextPagination.current ?? 1,
