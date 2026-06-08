@@ -730,6 +730,7 @@
     "priceGuideApplied": "Đã áp dụng khoảng giá. Vui lòng lưu sản phẩm để ghi vào DB.",
     "priceGuideSummary": "Tóm tắt giá theo số lượng",
     "priceGuideSummaryEmpty": "Chưa có khoảng giá nào.",
+    "priceGuideRangeSummary": "Từ {min} đến {max}",
     "priceGuideExampleTitle": "Ví dụ áp giá",
     "priceGuideRangeOne": "Khách mua từ 5kg đến 20kg",
     "priceGuideRangeOnePrice": "375.000đ/kg",

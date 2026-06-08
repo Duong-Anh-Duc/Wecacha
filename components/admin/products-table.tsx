@@ -59,6 +59,22 @@ export type ProductRow = {
 
 type StatusFilter = "all" | "active" | "stopped";
 
+function summarizePriceTiers(row: ProductRow) {
+  const tiers = (row.price_tiers?.length ? row.price_tiers : [{attribute: row.weight, price: row.price}])
+    .filter((tier) => Number(tier.price ?? 0) > 0);
+
+  if (tiers.length <= 1) return tiers;
+
+  const sorted = [...tiers].sort((left, right) => {
+    const leftPrice = Number(left.price ?? 0);
+    const rightPrice = Number(right.price ?? 0);
+    if (leftPrice !== rightPrice) return leftPrice - rightPrice;
+    return String(left.attribute ?? "").localeCompare(String(right.attribute ?? ""));
+  });
+
+  return [sorted[0], sorted[sorted.length - 1]];
+}
+
 export function ProductsTable({
   products,
   locale,
@@ -258,7 +274,7 @@ export function ProductsTable({
       dataIndex: "price_tiers",
       width: 260,
       render: (_value, row) => {
-        const tiers = row.price_tiers?.length ? row.price_tiers : [{attribute: row.weight, price: row.price}];
+        const tiers = summarizePriceTiers(row);
         return (
           <div className="space-y-1.5">
             {tiers.map((tier, index) => {
@@ -305,20 +321,26 @@ export function ProductsTable({
       render: (_, row) => (
         <Space>
           <Tooltip title={t("previewProduct")}>
-            <ProductPreviewButton product={row} categories={categories} locale={locale} compact />
+            <span className="inline-flex">
+              <ProductPreviewButton product={row} categories={categories} locale={locale} compact />
+            </span>
           </Tooltip>
           <Tooltip title={t("edit")}>
-            <ProductFormModalButton mode="edit" product={row} categories={categories} attributes={attributes} compact />
+            <span className="inline-flex">
+              <ProductFormModalButton mode="edit" product={row} categories={categories} attributes={attributes} compact />
+            </span>
           </Tooltip>
           <Tooltip title={t("delete")}>
-            <Button
-              danger
-              type="text"
-              icon={<Trash2 className="h-4 w-4" />}
-              loading={deletingId === row.id}
-              onClick={() => handleDelete(row)}
-              className="text-red-600 hover:!bg-red-50 hover:!text-red-700"
-            />
+            <span className="inline-flex">
+              <Button
+                danger
+                type="text"
+                icon={<Trash2 className="h-4 w-4" />}
+                loading={deletingId === row.id}
+                onClick={() => handleDelete(row)}
+                className="text-red-600 hover:!bg-red-50 hover:!text-red-700"
+              />
+            </span>
           </Tooltip>
         </Space>
       )

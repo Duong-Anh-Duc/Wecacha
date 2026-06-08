@@ -82,6 +82,29 @@ function parseNumber(value: string | undefined) {
   return value?.replace(/,/g, "") ?? "";
 }
 
+function CompactNumberInput({
+  suffix,
+  className,
+  ...props
+}: {
+  suffix: string;
+  className?: string;
+  value?: number;
+  min?: number;
+  formatter?: (value?: string | number) => string;
+  parser?: (value?: string) => string | number;
+  onChange?: (value: number | null) => void;
+}) {
+  return (
+    <Space.Compact className={className ?? "w-full"}>
+      <InputNumber {...props} parser={props.parser as never} className="w-full" />
+      <div className="flex min-w-16 items-center justify-center rounded-r-lg border border-l-0 border-stone-200 bg-stone-100 px-3 text-sm text-stone-500">
+        {suffix}
+      </div>
+    </Space.Compact>
+  );
+}
+
 function formatBulkTierLabel(tier: BulkPriceTier) {
   const min = Number(tier.minKg || 0);
   const max = Number(tier.maxKg || 0);
@@ -96,13 +119,13 @@ function summarizeBulkPriceTiers(tiers: BulkPriceTier[]) {
     (tier) => Number(tier.price || 0) > 0 && (Number(tier.minKg || 0) > 0 || Number(tier.maxKg || 0) > 0)
   );
 
-  if (normalized.length <= 2) return normalized;
+  if (normalized.length <= 1) return normalized;
 
   const sorted = [...normalized].sort((left, right) => {
-    const leftMin = Number(left.minKg || 0);
-    const rightMin = Number(right.minKg || 0);
-    if (leftMin !== rightMin) return leftMin - rightMin;
-    return Number(left.maxKg || 0) - Number(right.maxKg || 0);
+    const leftPrice = Number(left.price || 0);
+    const rightPrice = Number(right.price || 0);
+    if (leftPrice !== rightPrice) return leftPrice - rightPrice;
+    return Number(left.minKg || 0) - Number(right.minKg || 0);
   });
 
   return [sorted[0], sorted[sorted.length - 1]];
@@ -145,9 +168,7 @@ export function ProductForm({
   const [images, setImages] = useState<string[]>(initialData.images ?? []);
   const [isUploading, setIsUploading] = useState(false);
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
-  const [featured, setFeatured] = useState(Boolean(initialData.featured));
   const [attributeModalOpen, setAttributeModalOpen] = useState(false);
-  const [priceGuideOpen, setPriceGuideOpen] = useState(false);
   const [bulkPriceTiers, setBulkPriceTiers] = useState<BulkPriceTier[]>(initialBulkPriceTiers);
   const [bulkPriceDraft, setBulkPriceDraft] = useState<BulkPriceTier[]>(initialBulkPriceTiers);
   const [isSavingBulkPrices, setIsSavingBulkPrices] = useState(false);
@@ -242,14 +263,8 @@ export function ProductForm({
     );
   }
 
-  function openPriceGuideModal() {
+  function resetPriceGuideDraft() {
     setBulkPriceDraft(bulkPriceTiers);
-    setPriceGuideOpen(true);
-  }
-
-  function closePriceGuideModal() {
-    setBulkPriceDraft(bulkPriceTiers);
-    setPriceGuideOpen(false);
   }
 
   async function savePriceGuideModal() {
@@ -268,11 +283,9 @@ export function ProductForm({
         window.dispatchEvent(new Event("products:changed"));
       }
       message.success(t("saveSuccess"));
-      setPriceGuideOpen(false);
       return;
     }
 
-    setPriceGuideOpen(false);
     message.success(t("priceGuideApplied"));
   }
 
@@ -323,7 +336,7 @@ export function ProductForm({
     formData.set("bulk_price_tiers", JSON.stringify(bulkPriceTiers));
     formData.set("images", images.join("\n"));
     formData.set("is_visible", isVisible ? "true" : "false");
-    formData.set("featured", featured ? "true" : "false");
+    formData.set("featured", initialData.featured ? "true" : "false");
 
     startTransition(async () => {
       const result = await upsertProduct(formData);
@@ -341,11 +354,28 @@ export function ProductForm({
     });
   }
 
+  function handleFormKeyDown(event: React.KeyboardEvent<HTMLFormElement>) {
+    if (event.key !== "Enter" || event.nativeEvent.isComposing || isPending) return;
+
+    const target = event.target as HTMLElement;
+    if (
+      target.tagName === "TEXTAREA" ||
+      target.closest(".ant-select") ||
+      target.closest("[role='combobox']")
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    form.submit();
+  }
+
   return (
     <>
       <Form
         form={form}
         layout="vertical"
+        onKeyDown={handleFormKeyDown}
         initialValues={{
           ...initialData,
           notes_vi: textFromList(initialData.notes_vi),
@@ -485,9 +515,6 @@ export function ProductForm({
 
         <div className="mb-2 flex items-center justify-between">
           <p className="text-sm font-bold text-forest-950">{t("sameTypeProducts")}</p>
-          <Button type="link" className="px-0 font-semibold" onClick={openPriceGuideModal}>
-            {t("priceGuide")}
-          </Button>
         </div>
 
         <div className="mb-4 rounded-2xl border border-stone-200 bg-stone-50 p-4">
@@ -496,22 +523,102 @@ export function ProductForm({
             <p className="mt-1 text-sm text-stone-500">{t("priceGuideIntro")}</p>
           </div>
           {bulkPriceSummaryTiers.length ? (
-            <div className="space-y-2">
-              {bulkPriceSummaryTiers.map((tier, index) => (
-                <div
-                  key={`${tier.minKg ?? 0}-${tier.maxKg ?? 0}-${index}`}
-                  className="flex items-center justify-between gap-4 rounded-xl bg-white px-4 py-3 text-sm"
-                >
-                  <span className="font-semibold text-forest-950">{formatBulkTierLabel(tier)}</span>
-                  <span className="font-bold text-amber-700">
-                    {formatNumber(tier.price ?? 0)} VNĐ/kg
-                  </span>
-                </div>
-              ))}
-            </div>
+            bulkPriceSummaryTiers.length === 1 ? (
+              <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-4 py-3 text-sm">
+                <span className="font-semibold text-forest-950">{formatBulkTierLabel(bulkPriceSummaryTiers[0])}</span>
+                <span className="font-bold text-amber-700">
+                  {formatNumber(bulkPriceSummaryTiers[0].price ?? 0)} VNĐ/kg
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between gap-4 rounded-xl bg-white px-4 py-3 text-sm">
+                <span className="font-semibold text-forest-950">
+                  {t("priceGuideRangeSummary", {
+                    min: `${formatNumber(bulkPriceSummaryTiers[0].price ?? 0)} VNĐ/kg`,
+                    max: `${formatNumber(bulkPriceSummaryTiers[bulkPriceSummaryTiers.length - 1].price ?? 0)} VNĐ/kg`
+                  })}
+                </span>
+              </div>
+            )
           ) : (
             <p className="text-sm text-stone-500">{t("priceGuideSummaryEmpty")}</p>
           )}
+        </div>
+
+        <div className="mb-4 rounded-2xl border border-stone-200 bg-white p-4">
+          <div className="mb-4">
+            <p className="text-sm font-bold text-forest-950">{t("priceGuideTitle")}</p>
+            <p className="mt-1 text-sm leading-6 text-stone-600">{t("priceGuideIntro")}</p>
+            <p className="mt-2 rounded-xl bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">
+              {initialData.id ? t("priceGuideDirectSaveHint") : t("priceGuideSaveHint")}
+            </p>
+          </div>
+          <div className="space-y-3">
+            {bulkPriceDraft.map((tier, index) => (
+              <div key={index} className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-3 md:grid-cols-[1fr_1fr_1.4fr_auto] md:items-end">
+                <label className="block">
+                  <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("minKg")}</span>
+                  <CompactNumberInput
+                    suffix="kg"
+                    min={0}
+                    value={tier.minKg}
+                    onChange={(value) => {
+                      setBulkPriceDraft((current) =>
+                        current.map((item, itemIndex) => itemIndex === index ? {...item, minKg: Number(value ?? 0)} : item)
+                      );
+                    }}
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("maxKg")}</span>
+                  <CompactNumberInput
+                    suffix="kg"
+                    min={0}
+                    value={tier.maxKg}
+                    onChange={(value) => {
+                      setBulkPriceDraft((current) =>
+                        current.map((item, itemIndex) => itemIndex === index ? {...item, maxKg: Number(value ?? 0)} : item)
+                      );
+                    }}
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("pricePerKg")}</span>
+                  <CompactNumberInput
+                    suffix="VNĐ/kg"
+                    min={0}
+                    value={tier.price}
+                    formatter={formatNumber}
+                    parser={parseNumber}
+                    onChange={(value) => {
+                      setBulkPriceDraft((current) =>
+                        current.map((item, itemIndex) => itemIndex === index ? {...item, price: Number(value ?? 0)} : item)
+                      );
+                    }}
+                  />
+                </label>
+                <Button
+                  danger
+                  type="text"
+                  icon={<DeleteOutlined />}
+                  onClick={() => setBulkPriceDraft((current) => current.filter((_, itemIndex) => itemIndex !== index))}
+                />
+              </div>
+            ))}
+            <Button
+              icon={<PlusOutlined />}
+              onClick={() => setBulkPriceDraft((current) => [...current, {minKg: undefined, maxKg: undefined, price: undefined}])}
+            >
+              {t("addBulkPriceTier")}
+            </Button>
+          </div>
+          <p className="mt-4 text-sm leading-6 text-stone-500">{t("priceGuideNote")}</p>
+          <div className="mt-5 flex items-center justify-end gap-2">
+            <Button onClick={resetPriceGuideDraft}>{t("cancel")}</Button>
+            <Button type="primary" onClick={savePriceGuideModal} loading={isSavingBulkPrices}>
+              {t("save")}
+            </Button>
+          </div>
         </div>
 
         <Form.List name="price_tiers">
@@ -528,17 +635,7 @@ export function ProductForm({
                     className="mb-0 [&_.ant-form-item-explain-error]:max-w-[220px] [&_.ant-form-item-explain-error]:text-sm [&_.ant-form-item-explain-error]:leading-snug"
                     rules={[{required: true}]}
                   >
-                    <Space.Compact className="w-full">
-                      <InputNumber
-                        className="w-full"
-                        min={0}
-                        formatter={formatNumber}
-                        parser={parseNumber}
-                      />
-                      <div className="flex min-w-16 items-center justify-center rounded-r-lg border border-l-0 border-stone-200 bg-stone-100 px-3 text-sm text-stone-500">
-                        VNĐ
-                      </div>
-                    </Space.Compact>
+                    <CompactNumberInput suffix="VNĐ" min={0} formatter={formatNumber} parser={parseNumber} />
                   </Form.Item>
                   <Button
                     danger
@@ -648,98 +745,6 @@ export function ProductForm({
         </div>
       </Modal>
 
-      <Modal
-        title={t("priceGuideTitle")}
-        open={priceGuideOpen}
-        okText={t("save")}
-        cancelText={t("cancel")}
-        onOk={savePriceGuideModal}
-        onCancel={closePriceGuideModal}
-        confirmLoading={isSavingBulkPrices}
-        width={760}
-      >
-        <div className="space-y-4">
-          <p className="text-sm leading-6 text-stone-600">{t("priceGuideIntro")}</p>
-          <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700">
-            {initialData.id ? t("priceGuideDirectSaveHint") : t("priceGuideSaveHint")}
-          </p>
-          <div className="space-y-3">
-            {bulkPriceDraft.map((tier, index) => (
-              <div key={index} className="grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-3 md:grid-cols-[1fr_1fr_1.4fr_auto] md:items-end">
-                <label className="block">
-                  <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("minKg")}</span>
-                  <Space.Compact className="w-full">
-                    <InputNumber
-                      className="w-full"
-                      min={0}
-                      value={tier.minKg}
-                      onChange={(value) => {
-                        setBulkPriceDraft((current) =>
-                          current.map((item, itemIndex) => itemIndex === index ? {...item, minKg: Number(value ?? 0)} : item)
-                        );
-                      }}
-                    />
-                    <div className="flex min-w-12 items-center justify-center rounded-r-lg border border-l-0 border-stone-200 bg-stone-100 px-3 text-sm text-stone-500">
-                      kg
-                    </div>
-                  </Space.Compact>
-                </label>
-                <label className="block">
-                  <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("maxKg")}</span>
-                  <Space.Compact className="w-full">
-                    <InputNumber
-                      className="w-full"
-                      min={0}
-                      value={tier.maxKg}
-                      onChange={(value) => {
-                        setBulkPriceDraft((current) =>
-                          current.map((item, itemIndex) => itemIndex === index ? {...item, maxKg: Number(value ?? 0)} : item)
-                        );
-                      }}
-                    />
-                    <div className="flex min-w-12 items-center justify-center rounded-r-lg border border-l-0 border-stone-200 bg-stone-100 px-3 text-sm text-stone-500">
-                      kg
-                    </div>
-                  </Space.Compact>
-                </label>
-                <label className="block">
-                  <span className="mb-1.5 block text-sm font-medium text-stone-700">{t("pricePerKg")}</span>
-                  <Space.Compact className="w-full">
-                    <InputNumber
-                      className="w-full"
-                      min={0}
-                      value={tier.price}
-                      formatter={formatNumber}
-                      parser={parseNumber}
-                      onChange={(value) => {
-                        setBulkPriceDraft((current) =>
-                          current.map((item, itemIndex) => itemIndex === index ? {...item, price: Number(value ?? 0)} : item)
-                        );
-                      }}
-                    />
-                    <div className="flex min-w-16 items-center justify-center rounded-r-lg border border-l-0 border-stone-200 bg-stone-100 px-3 text-sm text-stone-500">
-                      VNĐ/kg
-                    </div>
-                  </Space.Compact>
-                </label>
-                <Button
-                  danger
-                  type="text"
-                  icon={<DeleteOutlined />}
-                  onClick={() => setBulkPriceDraft((current) => current.filter((_, itemIndex) => itemIndex !== index))}
-                />
-              </div>
-            ))}
-            <Button
-              icon={<PlusOutlined />}
-              onClick={() => setBulkPriceDraft((current) => [...current, {minKg: undefined, maxKg: undefined, price: undefined}])}
-            >
-              {t("addBulkPriceTier")}
-            </Button>
-          </div>
-          <p className="text-sm leading-6 text-stone-500">{t("priceGuideNote")}</p>
-        </div>
-      </Modal>
     </>
   );
 }

@@ -730,6 +730,7 @@
     "priceGuideApplied": "Price ranges applied. Please save the product to write them to the DB.",
     "priceGuideSummary": "Quantity pricing summary",
     "priceGuideSummaryEmpty": "No price ranges yet.",
+    "priceGuideRangeSummary": "From {min} to {max}",
     "priceGuideExampleTitle": "Example",
     "priceGuideRangeOne": "Customer buys from 5kg to 20kg",
     "priceGuideRangeOnePrice": "375,000 VND/kg",
