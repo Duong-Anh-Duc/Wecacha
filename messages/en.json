@@ -723,7 +723,6 @@
     "attributeNamePlaceholder": "Example: WEIGHT, COLOR, VOLUME",
     "attributeNameRequired": "Please enter an attribute name.",
     "attributeValuePlaceholder": "Enter attribute value and press enter",
-    "quickSelect": "Quick select",
     "sameTypeProducts": "Variants",
     "priceGuide": "Explain quantity pricing",
     "priceGuideTitle": "Quantity price ranges",

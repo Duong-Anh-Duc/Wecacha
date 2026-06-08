@@ -82,6 +82,52 @@ function parseNumber(value: string | undefined) {
   return value?.replace(/,/g, "") ?? "";
 }
 
+async function compressImageFile(file: File) {
+  if (!file.type.startsWith("image/")) return file;
+  if (file.size <= 1_500_000) return file;
+
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Không đọc được ảnh."));
+    reader.onload = () => {
+      const img = new window.Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Không nén được ảnh."));
+      img.src = String(reader.result ?? "");
+    };
+    reader.readAsDataURL(file);
+  });
+
+  const maxSide = 1800;
+  const sourceWidth = image.naturalWidth || 1;
+  const sourceHeight = image.naturalHeight || 1;
+  const scale = Math.min(1, maxSide / Math.max(sourceWidth, sourceHeight));
+  const width = Math.max(1, Math.round(sourceWidth * scale));
+  const height = Math.max(1, Math.round(sourceHeight * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  if (!context) return file;
+
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, width, height);
+  context.drawImage(image, 0, 0, width, height);
+
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob((result) => resolve(result), "image/jpeg", 0.82);
+  });
+
+  if (!blob) return file;
+
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "image";
+  return new File([blob], `${baseName}.jpg`, {
+    type: "image/jpeg",
+    lastModified: Date.now()
+  });
+}
+
 function CompactNumberInput({
   suffix,
   className,
@@ -137,13 +183,14 @@ export function ProductForm({
     .filter((attribute): attribute is string => Boolean(attribute));
   const initialBulkPriceTiers = initialData.bulk_price_tiers?.length
     ? initialData.bulk_price_tiers
-    : [{minKg: undefined, maxKg: undefined, price: undefined}];
+    : [];
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<string[]>(initialData.images ?? []);
   const [isUploading, setIsUploading] = useState(false);
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
   const [attributeModalOpen, setAttributeModalOpen] = useState(false);
   const [bulkPriceDraft, setBulkPriceDraft] = useState<BulkPriceTier[]>(initialBulkPriceTiers);
+  const [showAttributeEditor, setShowAttributeEditor] = useState(initialAttributeValues.length > 0);
   const [newAttributeName, setNewAttributeName] = useState("");
   const [editingAttribute, setEditingAttribute] = useState<ProductAttributeOption | null>(null);
   const [attributeOptions, setAttributeOptions] = useState<ProductAttributeOption[]>(() => {
@@ -206,6 +253,7 @@ export function ProductForm({
       setAttributeOptions((current) => current.some((item) => item.name === attributeGroup) ? current : [...current, {name: attributeGroup}]);
       setSelectedAttributeGroup(attributeGroup);
     }
+    setShowAttributeEditor(true);
     message.success(t("saveSuccess"));
     setAttributeModalOpen(false);
     setEditingAttribute(null);
@@ -216,6 +264,13 @@ export function ProductForm({
     setAttributeModalOpen(false);
     setEditingAttribute(null);
     setNewAttributeName("");
+  }
+
+  function startAttributeEditor() {
+    setShowAttributeEditor(true);
+    if (!selectedAttributeGroup && attributeOptions.length) {
+      setSelectedAttributeGroup(attributeOptions[0]?.name);
+    }
   }
 
   function syncAttributeValues(nextValues: string[]) {
@@ -240,7 +295,7 @@ export function ProductForm({
       let uploadedCount = 0;
       for (const file of files) {
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", await compressImageFile(file));
         const result = await uploadProductImage(formData);
 
         if (result.url) {
@@ -395,69 +450,75 @@ export function ProductForm({
           <div>
             <p className="text-sm font-bold text-forest-950">{t("priceAttribute")}</p>
           </div>
-          <div className="grid gap-3 md:grid-cols-[240px_minmax(0,1fr)_140px_auto] md:items-start">
-            <Select
-              value={selectedAttributeGroup}
-              showSearch
-              filterOption={(input, option) =>
-                String(option?.value ?? "").toLowerCase().includes(input.toLowerCase())
-              }
-              popupRender={(menu) => (
-                <>
-                  {menu}
-                  <div className="border-t border-stone-100 p-2">
-                    <Button
-                      type="link"
-                      icon={<PlusOutlined />}
-                      className="px-1 font-semibold"
-                      onMouseDown={(event) => event.preventDefault()}
-                      onClick={openCreateAttributeModal}
-                    >
-                      {t("createAttribute")}
-                    </Button>
-                  </div>
-                </>
-              )}
-              optionRender={(option) => {
-                const attribute = attributeOptions.find((item) => item.name === option.value);
-                return (
-                  <div className="flex items-center justify-between gap-3">
-                    <span>{String(option.label)}</span>
-                    {attribute ? (
+          {showAttributeEditor ? (
+            <div className="grid gap-3 md:grid-cols-[240px_minmax(0,1fr)_140px_auto] md:items-start">
+              <Select
+                value={selectedAttributeGroup}
+                showSearch
+                filterOption={(input, option) =>
+                  String(option?.value ?? "").toLowerCase().includes(input.toLowerCase())
+                }
+                popupRender={(menu) => (
+                  <>
+                    {menu}
+                    <div className="border-t border-stone-100 p-2">
                       <Button
-                        type="text"
-                        size="small"
-                        icon={<EditOutlined />}
-                        aria-label={t("editAttribute")}
-                        onClick={(event) => openEditAttributeModal(attribute, event)}
-                      />
-                    ) : null}
-                  </div>
-                );
-              }}
-              options={attributeOptions.map((attribute) => ({
-                value: attribute.name,
-                label: attribute.name
-              }))}
-              onChange={(value) => setSelectedAttributeGroup(value)}
-            />
-            <Select
-              mode="tags"
-              value={attributeValues}
-              placeholder={t("attributeValuePlaceholder")}
-              tokenSeparators={[","]}
-              options={defaultAttributeValues.map((value) => ({value, label: value}))}
-              onChange={syncAttributeValues}
-            />
-            <Button onClick={() => syncAttributeValues(defaultAttributeValues)}>
-              {t("quickSelect")}
+                        type="link"
+                        icon={<PlusOutlined />}
+                        className="px-1 font-semibold"
+                        onMouseDown={(event) => event.preventDefault()}
+                        onClick={openCreateAttributeModal}
+                      >
+                        {t("createAttribute")}
+                      </Button>
+                    </div>
+                  </>
+                )}
+                optionRender={(option) => {
+                  const attribute = attributeOptions.find((item) => item.name === option.value);
+                  return (
+                    <div className="flex items-center justify-between gap-3">
+                      <span>{String(option.label)}</span>
+                      {attribute ? (
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<EditOutlined />}
+                          aria-label={t("editAttribute")}
+                          onClick={(event) => openEditAttributeModal(attribute, event)}
+                        />
+                      ) : null}
+                    </div>
+                  );
+                }}
+                options={attributeOptions.map((attribute) => ({
+                  value: attribute.name,
+                  label: attribute.name
+                }))}
+                onChange={(value) => setSelectedAttributeGroup(value)}
+              />
+              <Select
+                mode="tags"
+                value={attributeValues}
+                placeholder={t("attributeValuePlaceholder")}
+                tokenSeparators={[","]}
+                options={defaultAttributeValues.map((value) => ({value, label: value}))}
+                onChange={syncAttributeValues}
+              />
+              <Button
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => {
+                  setAttributeValues([]);
+                  setShowAttributeEditor(false);
+                }}
+              />
+            </div>
+          ) : (
+            <Button icon={<PlusOutlined />} onClick={startAttributeEditor}>
+              {t("addAttribute")}
             </Button>
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => syncAttributeValues([])}
-            />
-          </div>
+          )}
         </div>
 
         <div className="mb-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
