@@ -1,8 +1,8 @@
 "use client";
 
-import {useState} from "react";
+import {useId, useState} from "react";
 import {Button, Modal} from "antd";
-import {EditOutlined, PlusOutlined} from "@ant-design/icons";
+import {EditOutlined, PlusOutlined, SaveOutlined} from "@ant-design/icons";
 import {useTranslations} from "next-intl";
 import {ProductForm, type ProductAttributeOption, type ProductCategoryOption, type ProductFormData} from "./product-form";
 
@@ -22,6 +22,8 @@ export function ProductFormModalButton({
   const t = useTranslations("Admin");
   const [open, setOpen] = useState(false);
   const isEdit = mode === "edit";
+  const generatedFormId = useId();
+  const formId = `product-form-${generatedFormId.replace(/:/g, "")}`;
 
   return (
     <>
@@ -48,7 +50,23 @@ export function ProductFormModalButton({
         title={isEdit ? t("editProductTitle") : t("newProductTitle")}
         open={open}
         onCancel={() => setOpen(false)}
-        footer={null}
+        footer={(
+          <div className="flex items-center justify-end gap-2">
+            <Button size="large" onClick={() => setOpen(false)}>
+              {t("skip")}
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              form={formId}
+              icon={<SaveOutlined />}
+              size="large"
+              className="bg-ember hover:!bg-ember/90"
+            >
+              {t("saveProduct")}
+            </Button>
+          </div>
+        )}
         width="min(1180px, calc(100vw - 32px))"
         style={{top: 24}}
         destroyOnHidden
@@ -58,6 +76,8 @@ export function ProductFormModalButton({
             initialData={product}
             categories={categories}
             attributes={attributes}
+            formId={formId}
+            showActions={false}
             redirectOnSave={false}
             onCancel={() => setOpen(false)}
             onSaved={() => setOpen(false)}

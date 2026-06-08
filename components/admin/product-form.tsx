@@ -111,6 +111,8 @@ export function ProductForm({
   attributes = [],
   onSaved,
   onCancel,
+  formId,
+  showActions = true,
   redirectOnSave = true
 }: {
   initialData?: ProductFormData;
@@ -118,6 +120,8 @@ export function ProductForm({
   attributes?: ProductAttributeOption[];
   onSaved?: () => void;
   onCancel?: () => void;
+  formId?: string;
+  showActions?: boolean;
   redirectOnSave?: boolean;
 }) {
   const t = useTranslations("Admin");
@@ -324,6 +328,7 @@ export function ProductForm({
   return (
     <>
       <Form
+        id={formId}
         form={form}
         layout="vertical"
         onKeyDown={handleFormKeyDown}
@@ -618,6 +623,7 @@ export function ProductForm({
         </div>
       </Card>
 
+      {showActions ? (
         <div className="fixed bottom-6 right-6 z-[1200] flex items-center justify-end gap-2 rounded-2xl border border-stone-200 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur">
           <Button size="large" onClick={handleCancel}>
             {t("skip")}
@@ -626,6 +632,7 @@ export function ProductForm({
             {t("saveProduct")}
           </Button>
         </div>
+      ) : null}
       </Form>
 
       <Modal
