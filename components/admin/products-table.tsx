@@ -75,6 +75,21 @@ function summarizePriceTiers(row: ProductRow) {
   return [sorted[0], sorted[sorted.length - 1]];
 }
 
+function formatPriceSummary(row: ProductRow, locale: "vi" | "en") {
+  const tiers = summarizePriceTiers(row);
+  if (!tiers.length) return "—";
+
+  const prices = tiers.map((tier) => Number(tier.price ?? 0));
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  if (minPrice === maxPrice) {
+    return formatCurrency(minPrice, locale);
+  }
+
+  return `${formatCurrency(minPrice, locale)} - ${formatCurrency(maxPrice, locale)}`;
+}
+
 export function ProductsTable({
   products,
   locale,
@@ -320,18 +335,12 @@ export function ProductsTable({
       width: 180,
       align: "center",
       render: (_value, row) => {
-        const tiers = summarizePriceTiers(row);
+        const priceSummary = formatPriceSummary(row, locale as "vi" | "en");
         return (
-          <div className="space-y-1.5">
-            {tiers.map((tier, index) => {
-              return (
-                <div key={`${tier.price}-${index}`} className="flex justify-center rounded-lg bg-stone-50 px-3 py-1.5 text-xs">
-                  <span className="font-bold text-ember">
-                    {formatCurrency(Number(tier.price ?? 0), locale as "vi" | "en")}
-                  </span>
-                </div>
-              );
-            })}
+          <div className="flex justify-center">
+            <div className="rounded-lg bg-stone-50 px-3 py-1.5 text-xs">
+              <span className="font-bold text-ember">{priceSummary}</span>
+            </div>
           </div>
         );
       }

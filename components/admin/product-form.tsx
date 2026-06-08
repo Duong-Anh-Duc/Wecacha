@@ -504,7 +504,10 @@ export function ProductForm({
                 value={attributeValues}
                 placeholder={t("attributeValuePlaceholder")}
                 tokenSeparators={[","]}
-                options={defaultAttributeValues.map((value) => ({value, label: value}))}
+                open={false}
+                showArrow={false}
+                suffixIcon={null}
+                options={[]}
                 onChange={syncAttributeValues}
               />
             </div>
