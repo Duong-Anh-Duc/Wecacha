@@ -59,6 +59,7 @@ export function ProductFormModalButton({
             categories={categories}
             attributes={attributes}
             redirectOnSave={false}
+            onCancel={() => setOpen(false)}
             onSaved={() => setOpen(false)}
           />
         </div>

@@ -5,7 +5,7 @@ import Image from "next/image";
 import {App, Button, Card, Form, Input, InputNumber, Modal, Select, Space, Switch} from "antd";
 import {DeleteOutlined, EditOutlined, PlusOutlined, SaveOutlined, UploadOutlined} from "@ant-design/icons";
 import {useLocale, useTranslations} from "next-intl";
-import {updateProductBulkPriceTiers, uploadProductImage, upsertProduct, upsertProductAttribute} from "@/actions/product-actions";
+import {uploadProductImage, upsertProduct, upsertProductAttribute} from "@/actions/product-actions";
 import {useRouter} from "@/i18n/navigation";
 
 export type ProductFormData = {
@@ -110,12 +110,14 @@ export function ProductForm({
   categories,
   attributes = [],
   onSaved,
+  onCancel,
   redirectOnSave = true
 }: {
   initialData?: ProductFormData;
   categories: ProductCategoryOption[];
   attributes?: ProductAttributeOption[];
   onSaved?: () => void;
+  onCancel?: () => void;
   redirectOnSave?: boolean;
 }) {
   const t = useTranslations("Admin");
@@ -137,9 +139,7 @@ export function ProductForm({
   const [isUploading, setIsUploading] = useState(false);
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
   const [attributeModalOpen, setAttributeModalOpen] = useState(false);
-  const [bulkPriceTiers, setBulkPriceTiers] = useState<BulkPriceTier[]>(initialBulkPriceTiers);
   const [bulkPriceDraft, setBulkPriceDraft] = useState<BulkPriceTier[]>(initialBulkPriceTiers);
-  const [isSavingBulkPrices, setIsSavingBulkPrices] = useState(false);
   const [newAttributeName, setNewAttributeName] = useState("");
   const [editingAttribute, setEditingAttribute] = useState<ProductAttributeOption | null>(null);
   const [attributeOptions, setAttributeOptions] = useState<ProductAttributeOption[]>(() => {
@@ -151,7 +151,6 @@ export function ProductForm({
   });
   const [selectedAttributeGroup, setSelectedAttributeGroup] = useState<string | undefined>(undefined);
   const [attributeValues, setAttributeValues] = useState<string[]>(initialAttributeValues);
-  const isEditing = Boolean(initialData.id);
   const categoryOptions = categories.length > 0
     ? categories
     : [
@@ -228,32 +227,6 @@ export function ProductForm({
     );
   }
 
-  function resetPriceGuideDraft() {
-    setBulkPriceDraft(bulkPriceTiers);
-  }
-
-  async function savePriceGuideModal() {
-    setBulkPriceTiers(bulkPriceDraft);
-    if (initialData.id) {
-      setIsSavingBulkPrices(true);
-      const result = await updateProductBulkPriceTiers(initialData.id, bulkPriceDraft);
-      setIsSavingBulkPrices(false);
-
-      if (!result.success) {
-        message.error(`${t("saveError")}${result.error}`);
-        return;
-      }
-
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("products:changed"));
-      }
-      message.success(t("saveSuccess"));
-      return;
-    }
-
-    message.success(t("priceGuideApplied"));
-  }
-
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
     if (!files.length) return;
@@ -302,7 +275,7 @@ export function ProductForm({
     if (firstTierPrice?.price !== undefined) {
       formData.set("price", String(firstTierPrice.price));
     }
-    formData.set("bulk_price_tiers", JSON.stringify(bulkPriceTiers));
+    formData.set("bulk_price_tiers", JSON.stringify(bulkPriceDraft));
     formData.set("images", images.join("\n"));
     formData.set("is_visible", isVisible ? "true" : "false");
     formData.set("featured", initialData.featured ? "true" : "false");
@@ -321,6 +294,15 @@ export function ProductForm({
         message.error(`${t("saveError")}${result.error}`);
       }
     });
+  }
+
+  function handleCancel() {
+    if (onCancel) {
+      onCancel();
+      return;
+    }
+
+    router.push("/admin/products");
   }
 
   function handleFormKeyDown(event: React.KeyboardEvent<HTMLFormElement>) {
@@ -358,14 +340,6 @@ export function ProductForm({
         onFinish={handleSubmit}
         className="w-full [&_.ant-card-body]:p-4 [&_.ant-card-head]:min-h-12 [&_.ant-card-head]:px-4 [&_.ant-card-head-title]:py-3 [&_.ant-form-item]:mb-3"
       >
-      {isEditing ? (
-        <div className="mb-4 flex items-center justify-end">
-          <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isPending} size="large">
-            {t("saveProduct")}
-          </Button>
-        </div>
-      ) : null}
-
       <Card className="mb-4" title={t("productBasics")}>
         <Form.Item name="short_vi" hidden>
           <Input />
@@ -544,12 +518,6 @@ export function ProductForm({
               {t("addBulkPriceTier")}
             </Button>
           </div>
-          <div className="mt-5 flex items-center justify-end gap-2">
-            <Button onClick={resetPriceGuideDraft}>{t("cancel")}</Button>
-            <Button type="primary" onClick={savePriceGuideModal} loading={isSavingBulkPrices}>
-              {t("save")}
-            </Button>
-          </div>
         </div>
 
         <div className="mb-2 flex items-center justify-between">
@@ -650,13 +618,14 @@ export function ProductForm({
         </div>
       </Card>
 
-      {!isEditing ? (
-        <div className="sticky bottom-0 z-20 -mx-1 flex items-center justify-end border-t border-stone-200 bg-white/95 px-1 py-3 backdrop-blur">
+        <div className="fixed bottom-6 right-6 z-[1200] flex items-center justify-end gap-2 rounded-2xl border border-stone-200 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur">
+          <Button size="large" onClick={handleCancel}>
+            {t("skip")}
+          </Button>
           <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isPending} size="large">
             {t("saveProduct")}
           </Button>
         </div>
-      ) : null}
       </Form>
 
       <Modal
