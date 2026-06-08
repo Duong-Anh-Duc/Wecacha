@@ -311,19 +311,21 @@ export function ProductsTable({
       title: t("packageSpec"),
       dataIndex: "base_unit",
       width: 140,
-      render: (value) => value || "—"
+      align: "center",
+      render: (value) => <span className="block text-center">{value || "—"}</span>
     },
     {
       title: t("price"),
       dataIndex: "price_tiers",
       width: 180,
+      align: "center",
       render: (_value, row) => {
         const tiers = summarizePriceTiers(row);
         return (
           <div className="space-y-1.5">
             {tiers.map((tier, index) => {
               return (
-                <div key={`${tier.price}-${index}`} className="flex justify-end rounded-lg bg-stone-50 px-3 py-1.5 text-xs">
+                <div key={`${tier.price}-${index}`} className="flex justify-center rounded-lg bg-stone-50 px-3 py-1.5 text-xs">
                   <span className="font-bold text-ember">
                     {formatCurrency(Number(tier.price ?? 0), locale as "vi" | "en")}
                   </span>
@@ -359,9 +361,9 @@ export function ProductsTable({
     {
       title: t("colActions"),
       key: "actions",
-      align: "right",
+      align: "center",
       render: (_, row) => (
-        <Space>
+        <Space className="justify-center">
           <Tooltip title={t("previewProduct")}>
             <span className="inline-flex">
               <ProductPreviewButton product={row} categories={categories} locale={locale} compact />

@@ -125,19 +125,13 @@ export function ProductForm({
   const [form] = Form.useForm();
   const initialPriceTiers = initialData.price_tiers?.length
     ? initialData.price_tiers
-    : defaultAttributeValues.map((attribute) => ({
-        attribute,
-        price: initialData.price
-      }));
+    : [];
   const initialAttributeValues = initialPriceTiers
     .map((tier) => tier.attribute?.trim())
     .filter((attribute): attribute is string => Boolean(attribute));
   const initialBulkPriceTiers = initialData.bulk_price_tiers?.length
     ? initialData.bulk_price_tiers
-    : [
-        {minKg: 5, maxKg: 20, price: undefined},
-        {minKg: 21, maxKg: 50, price: undefined}
-      ];
+    : [{minKg: undefined, maxKg: undefined, price: undefined}];
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<string[]>(initialData.images ?? []);
   const [isUploading, setIsUploading] = useState(false);
@@ -155,9 +149,7 @@ export function ProductForm({
     });
     return Array.from(keyed.values());
   });
-  const [selectedAttributeGroup, setSelectedAttributeGroup] = useState(
-    attributes[0]?.name ?? defaultAttributeGroups[0]
-  );
+  const [selectedAttributeGroup, setSelectedAttributeGroup] = useState<string | undefined>(undefined);
   const [attributeValues, setAttributeValues] = useState<string[]>(initialAttributeValues);
   const isEditing = Boolean(initialData.id);
   const categoryOptions = categories.length > 0
@@ -268,18 +260,22 @@ export function ProductForm({
 
     setIsUploading(true);
     try {
+      let uploadedCount = 0;
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
         const result = await uploadProductImage(formData);
 
         if (result.url) {
+          uploadedCount += 1;
           setImages((current) => [...current, result.url!]);
         } else {
           message.error(`${t("uploadError")}${result.error ?? ""}`);
         }
       }
-      message.success(t("uploadSuccess"));
+      if (uploadedCount > 0) {
+        message.success(t("uploadSuccess"));
+      }
     } finally {
       setIsUploading(false);
       event.target.value = "";
@@ -385,16 +381,24 @@ export function ProductForm({
             <Input />
           </Form.Item>
         </div>
-        <Form.Item name="category_slugs" label={t("categoriesOptional")}>
-          <Select
-            mode="multiple"
-            allowClear
-            options={categoryOptions.map((category) => ({
-              value: category.slug,
-              label: locale === "en" ? category.name_en : category.name_vi
-            }))}
-          />
+        <Form.Item name="weight" hidden>
+          <Input />
         </Form.Item>
+        <div className="grid gap-3 md:grid-cols-2">
+          <Form.Item name="category_slugs" label={t("categoriesOptional")}>
+            <Select
+              mode="multiple"
+              allowClear
+              options={categoryOptions.map((category) => ({
+                value: category.slug,
+                label: locale === "en" ? category.name_en : category.name_vi
+              }))}
+            />
+          </Form.Item>
+          <Form.Item name="base_unit" label={t("packageSpec")}>
+            <Input placeholder={t("baseUnitPlaceholder")} />
+          </Form.Item>
+        </div>
         <div className="flex flex-wrap gap-5 pt-1">
           <label className="inline-flex items-center gap-3 text-sm font-medium text-stone-700">
             <Switch checked={isVisible} onChange={setIsVisible} />
@@ -407,19 +411,10 @@ export function ProductForm({
         <Form.Item name="original_price" hidden>
           <InputNumber />
         </Form.Item>
-        <div className="grid gap-3 md:grid-cols-2">
-          <Form.Item name="weight" label={t("weight")}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="base_unit" label={t("packageSpec")}>
-            <Input placeholder={t("baseUnitPlaceholder")} />
-          </Form.Item>
-        </div>
 
         <div className="mb-4 space-y-3 rounded-2xl border border-stone-200 bg-white p-4">
           <div>
             <p className="text-sm font-bold text-forest-950">{t("priceAttribute")}</p>
-            <p className="mt-1 text-sm text-stone-500">{t("attributeHelp")}</p>
           </div>
           <div className="grid gap-3 md:grid-cols-[240px_minmax(0,1fr)_140px_auto] md:items-start">
             <Select

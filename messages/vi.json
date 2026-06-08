@@ -709,7 +709,6 @@
     "priceTiers": "Bảng giá theo thuộc tính",
     "priceAttribute": "Thuộc tính",
     "priceAttributePlaceholder": "Ví dụ: 5kg đến 20kg",
-    "attributeHelp": "Chọn nhóm thuộc tính rồi nhập các giá trị như 1kg, 2kg, 5kg để sinh hàng cùng loại.",
     "selectAttribute": "Chọn thuộc tính",
     "quickAddAttribute": "Thêm nhanh",
     "createAttribute": "Tạo thuộc tính mới",

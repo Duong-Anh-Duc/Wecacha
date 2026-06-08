@@ -709,7 +709,6 @@
     "priceTiers": "Bảng giá theo thuộc tính",
     "priceAttribute": "Thuộc tính",
     "priceAttributePlaceholder": "Ví dụ: 5kg đến 20kg",
-    "attributeHelp": "Select an attribute group, then enter values like 1kg, 2kg, 5kg to generate variants.",
     "selectAttribute": "Select attribute",
     "quickAddAttribute": "Quick add",
     "createAttribute": "Create new attribute",
