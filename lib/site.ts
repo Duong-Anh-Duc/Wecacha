@@ -1,10 +1,8 @@
 import type {Locale} from "@/i18n/routing";
 
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
-  ? process.env.NEXT_PUBLIC_SITE_URL
-  : process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
+const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+
+export const siteUrl = (configuredSiteUrl || "https://sonlaspecialtycoffee.vn").replace(/\/$/, "");
 
 export const siteConfig = {
   name: "Sơn La Coffee",
