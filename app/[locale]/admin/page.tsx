@@ -248,6 +248,7 @@ export default async function AdminDashboardPage({
       {/* Row 1 cards: Grid metrics */}
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
+          sparklineId="total-registrations"
           icon={<UsersRound className="h-5 w-5" />}
           label={t("metricTotal")}
           value={totalCount}
@@ -256,6 +257,7 @@ export default async function AdminDashboardPage({
           sparklineData={recentActivity.map(d => d.count)}
         />
         <SummaryCard
+          sparklineId="today-registrations"
           icon={<Send className="h-5 w-5" />}
           label={t("metricToday")}
           value={todayCount}
@@ -264,6 +266,7 @@ export default async function AdminDashboardPage({
           sparklineData={recentActivity.map((d, i) => (i === 6 ? todayCount : 0))}
         />
         <SummaryCard
+          sparklineId="weekly-registrations"
           icon={<CalendarDays className="h-5 w-5" />}
           label={t("metricLast7Days")}
           value={weekCount}
@@ -272,6 +275,7 @@ export default async function AdminDashboardPage({
           sparklineData={recentActivity.map(d => d.count)}
         />
         <SummaryCard
+          sparklineId="registrations-with-address"
           icon={<MapPinHouse className="h-5 w-5" />}
           label={t("metricAddress")}
           value={withAddressCount}
@@ -659,7 +663,15 @@ export default async function AdminDashboardPage({
   );
 }
 
-function Sparkline({ data, colorClass = "text-brand-green" }: { data: number[]; colorClass?: string }) {
+function Sparkline({
+  data,
+  gradientId,
+  colorClass = "text-brand-green"
+}: {
+  data: number[];
+  gradientId: string;
+  colorClass?: string;
+}) {
   if (!data || data.length === 0) return null;
   const max = Math.max(...data, 1);
   const min = Math.min(...data, 0);
@@ -690,8 +702,7 @@ function Sparkline({ data, colorClass = "text-brand-green" }: { data: number[]; 
   // Generate closed area path for gradient fill
   const areaD = `${pathD} L ${points[points.length - 1].x} ${height} L ${points[0].x} ${height} Z`;
 
-  // Unique id for linear gradient so they don't clash
-  const gradId = `sparkline-grad-${Math.random().toString(36).substring(2, 9)}`;
+  const gradId = `sparkline-grad-${gradientId}`;
   const lastPoint = points[points.length - 1];
 
   return (
@@ -725,6 +736,7 @@ function Sparkline({ data, colorClass = "text-brand-green" }: { data: number[]; 
 }
 
 function SummaryCard({
+  sparklineId,
   icon,
   label,
   value,
@@ -732,6 +744,7 @@ function SummaryCard({
   iconColorClass = "text-[#4A751D]",
   sparklineData = [0, 0, 0, 0, 0, 0, 0]
 }: {
+  sparklineId: string;
   icon: React.ReactElement<{className?: string}>;
   label: string;
   value: number | string;
@@ -760,7 +773,7 @@ function SummaryCard({
       <div className="flex items-end justify-between mt-4">
         <p className="text-[11px] leading-4 text-stone-500 font-medium max-w-[62%]">{caption}</p>
         <div className="shrink-0 -mb-1 select-none">
-          <Sparkline data={sparklineData} colorClass={iconColorClass} />
+          <Sparkline data={sparklineData} gradientId={sparklineId} colorClass={iconColorClass} />
         </div>
       </div>
     </div>

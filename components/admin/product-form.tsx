@@ -157,6 +157,7 @@ export function ProductForm({
   attributes = [],
   onSaved,
   onCancel,
+  onSavingChange,
   formId,
   showActions = true,
   redirectOnSave = true
@@ -166,6 +167,7 @@ export function ProductForm({
   attributes?: ProductAttributeOption[];
   onSaved?: () => void;
   onCancel?: () => void;
+  onSavingChange?: (isSaving: boolean) => void;
   formId?: string;
   showActions?: boolean;
   redirectOnSave?: boolean;
@@ -319,6 +321,7 @@ export function ProductForm({
   async function handleSubmit(values: Record<string, unknown>) {
     if (isSaving) return;
     setIsSaving(true);
+    onSavingChange?.(true);
 
     const formData = new FormData();
     if (initialData.id) formData.set("id", initialData.id);
@@ -359,6 +362,7 @@ export function ProductForm({
       }
     } finally {
       setIsSaving(false);
+      onSavingChange?.(false);
     }
   }
 
@@ -405,6 +409,12 @@ export function ProductForm({
           price_tiers: initialPriceTiers
         }}
         onFinish={handleSubmit}
+        onFinishFailed={({errorFields}) => {
+          const firstError = errorFields[0]?.name;
+          if (firstError) {
+            form.scrollToField(firstError, {behavior: "smooth", block: "center"});
+          }
+        }}
         className="w-full [&_.ant-card-body]:p-4 [&_.ant-card-head]:min-h-12 [&_.ant-card-head]:px-4 [&_.ant-card-head-title]:py-3 [&_.ant-form-item]:mb-3"
       >
       <Card className="mb-4" title={t("productBasics")}>
@@ -510,7 +520,6 @@ export function ProductForm({
                 placeholder={t("attributeValuePlaceholder")}
                 tokenSeparators={[","]}
                 open={false}
-                showArrow={false}
                 suffixIcon={null}
                 options={[]}
                 onChange={syncAttributeValues}

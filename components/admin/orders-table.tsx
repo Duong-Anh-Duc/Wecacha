@@ -216,6 +216,7 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
           className="max-w-xl"
         />
         <Select
+          id="orders-status-filter"
           size="large"
           value={statusFilter}
           onChange={setStatusFilter}
@@ -245,7 +246,7 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
         pagination={{
           current: pagination.current,
           pageSize: pagination.pageSize,
-          showSizeChanger: true,
+          showSizeChanger: {id: "orders-page-size"},
           showTotal: (total) => t("tableTotal", {total})
         }}
       />

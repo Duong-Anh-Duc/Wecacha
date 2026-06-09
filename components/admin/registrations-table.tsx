@@ -201,6 +201,7 @@ export function RegistrationsTable({
       onFilter: (value, row) => row.status === value,
       render: (_, row) => (
         <Select
+          id={`registration-status-${row.id}`}
           size="small"
           value={row.status}
           disabled={isPending}
@@ -263,6 +264,7 @@ export function RegistrationsTable({
           className="max-w-xl"
         />
         <Select
+          id="registrations-status-filter"
           size="large"
           value={statusFilter}
           onChange={setStatusFilter}
@@ -290,7 +292,7 @@ export function RegistrationsTable({
         pagination={{
           current: pagination.current,
           pageSize: pagination.pageSize,
-          showSizeChanger: true,
+          showSizeChanger: {id: "registrations-page-size"},
           showTotal: (total) => t("tableTotal", {total})
         }}
       />

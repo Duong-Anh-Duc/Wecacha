@@ -9,7 +9,6 @@ import {
   FileText,
   Home,
   LayoutDashboard,
-  LoaderCircle,
   LogOut,
   Menu,
   Package,
@@ -39,6 +38,9 @@ const adminTheme = {
     Table: {
       headerBg: "#fafaf8",
       headerColor: "#57534e",
+      headerSortActiveBg: "#fafaf8",
+      headerSortHoverBg: "#fafaf8",
+      bodySortBg: "#ffffff",
       rowHoverBg: "#fafaf8"
     },
     Button: {
@@ -54,8 +56,6 @@ export default function AdminLayout({children}: {children: ReactNode}) {
   const isLoginPage = pathname.includes("/admin/login");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
-  const [pendingHref, setPendingHref] = useState<string | null>(null);
-  const [showRouteLoading, setShowRouteLoading] = useState(false);
 
   useEffect(() => {
     if (isLoginPage) {
@@ -69,20 +69,6 @@ export default function AdminLayout({children}: {children: ReactNode}) {
       document.body.classList.remove("admin-shell-active");
     };
   }, [isLoginPage]);
-
-  useEffect(() => {
-    setPendingHref(null);
-  }, [pathname]);
-
-  useEffect(() => {
-    if (!pendingHref) {
-      setShowRouteLoading(false);
-      return;
-    }
-
-    const timer = window.setTimeout(() => setShowRouteLoading(true), 250);
-    return () => window.clearTimeout(timer);
-  }, [pendingHref]);
 
   if (isLoginPage) {
     return (
@@ -155,16 +141,6 @@ export default function AdminLayout({children}: {children: ReactNode}) {
     await logoutAdmin(locale);
   };
 
-  const handleNavigateStart = (href: string) => {
-    const targetPath = href === "/" ? `/${locale}` : `/${locale}${href}`;
-
-    if (pathname !== targetPath) {
-      setPendingHref(href);
-    }
-  };
-
-  const isRouteLoading = showRouteLoading;
-
   return (
     <ConfigProvider
       locale={viVN}
@@ -202,7 +178,6 @@ export default function AdminLayout({children}: {children: ReactNode}) {
               label={item.label}
               active={item.active}
               collapsed={isSidebarCollapsed}
-              onNavigateStart={handleNavigateStart}
               icon={item.icon}
             />
           ))}
@@ -239,7 +214,7 @@ export default function AdminLayout({children}: {children: ReactNode}) {
                   key: item.key,
                   icon: item.mobileIcon,
                   label: (
-                    <Link href={item.href} onClick={() => handleNavigateStart(item.href)}>
+                    <Link href={item.href}>
                       {item.label}
                     </Link>
                   )
@@ -295,15 +270,6 @@ export default function AdminLayout({children}: {children: ReactNode}) {
           </div>
         </header>
 
-        {isRouteLoading ? (
-          <div className="pointer-events-none absolute left-1/2 top-20 z-30 -translate-x-1/2">
-            <div className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-forest-950 shadow-lg">
-              <LoaderCircle className="h-4 w-4 animate-spin text-ember" />
-              {t("routeLoading")}
-            </div>
-          </div>
-        ) : null}
-
         <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-[#fafafa] p-5 sm:p-8">
           {children}
         </div>
@@ -331,8 +297,7 @@ function AdminNavLink({
   active,
   icon,
   compact = false,
-  collapsed = false,
-  onNavigateStart
+  collapsed = false
 }: {
   href: string;
   label: string;
@@ -340,20 +305,12 @@ function AdminNavLink({
   icon: ReactNode;
   compact?: boolean;
   collapsed?: boolean;
-  onNavigateStart?: (href: string) => void;
 }) {
   return (
     <Link
       aria-label={label}
       title={collapsed ? label : undefined}
       href={href}
-      onClick={(event) => {
-        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-          return;
-        }
-
-        onNavigateStart?.(href);
-      }}
       className={cn(
         "flex items-center gap-3 rounded-xl transition-all duration-300",
         compact

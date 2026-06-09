@@ -116,7 +116,7 @@ export function ProductPreviewButton({
         title={t("previewProduct")}
         open={open}
         onClose={() => setOpen(false)}
-        width="min(1120px, calc(100vw - 32px))"
+        size="min(1120px, calc(100vw - 32px))"
       >
         <Tabs
           defaultActiveKey="detail"

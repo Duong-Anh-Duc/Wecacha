@@ -413,6 +413,7 @@ export function ProductsTable({
           className="max-w-xl"
         />
         <Select
+          id="products-status-filter"
           value={statusFilter === "all" ? undefined : statusFilter}
           onChange={(value) => setStatusFilter(value ?? "all")}
           allowClear
@@ -449,7 +450,7 @@ export function ProductsTable({
         pagination={{
           current: pagination.current,
           pageSize: pagination.pageSize,
-          showSizeChanger: true,
+          showSizeChanger: {id: "products-page-size"},
           showTotal: (total) => t("tableTotal", {total})
         }}
       />

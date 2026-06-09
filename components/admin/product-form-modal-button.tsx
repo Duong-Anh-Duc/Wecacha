@@ -21,6 +21,7 @@ export function ProductFormModalButton({
 }) {
   const t = useTranslations("Admin");
   const [open, setOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const isEdit = mode === "edit";
   const generatedFormId = useId();
   const formId = `product-form-${generatedFormId.replace(/:/g, "")}`;
@@ -57,11 +58,17 @@ export function ProductFormModalButton({
             </Button>
             <Button
               type="primary"
-              htmlType="submit"
-              form={formId}
               icon={<SaveOutlined />}
               size="large"
+              loading={isSaving}
+              disabled={isSaving}
               className="bg-ember hover:!bg-ember/90"
+              onClick={() => {
+                const formElement = document.getElementById(formId);
+                if (formElement instanceof HTMLFormElement) {
+                  formElement.requestSubmit();
+                }
+              }}
             >
               {t("saveProduct")}
             </Button>
@@ -79,6 +86,7 @@ export function ProductFormModalButton({
             formId={formId}
             showActions={false}
             redirectOnSave={false}
+            onSavingChange={setIsSaving}
             onCancel={() => setOpen(false)}
             onSaved={() => setOpen(false)}
           />

@@ -208,6 +208,7 @@ export function ArticlesTable({
           className="max-w-xl"
         />
         <Select
+          id="articles-placement-filter"
           size="large"
           value={placement}
           onChange={setPlacement}
@@ -243,7 +244,7 @@ export function ArticlesTable({
         pagination={{
           current: pagination.current,
           pageSize: pagination.pageSize,
-          showSizeChanger: true,
+          showSizeChanger: {id: "articles-page-size"},
           showTotal: (total) => t("tableTotal", {total})
         }}
       />
