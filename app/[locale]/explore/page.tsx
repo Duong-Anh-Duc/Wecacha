@@ -5,9 +5,12 @@ import type {Locale} from "@/i18n/routing";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {ExploreHeroCard} from "@/features/explore/explore-hero-card";
 import {ArticlesList} from "@/features/explore/articles-list";
-import {NewsCategories} from "@/features/explore/news-categories";
+import {ArticleMagazine} from "@/features/explore/article-magazine";
 import {LeafSketch, LeafSprig} from "@/features/explore/leaf-sketches";
 import {getPageContent, itemsForSection, sectionByKey} from "@/lib/content/cms";
+import {supabase} from "@/lib/supabase";
+
+export const revalidate = 60;
 
 type Props = {
   params: Promise<{locale: Locale}>;
@@ -42,6 +45,14 @@ export default async function ExplorePage({params}: Props) {
   setRequestLocale(locale);
   const tNav = await getTranslations({locale, namespace: "Nav"});
   const content = await getPageContent("explore");
+
+  const {data: articles} = await supabase
+    .from("news_articles")
+    .select("slug, title_vi, title_en, intro_vi, intro_en, image_url, published_at")
+    .eq("is_visible", true)
+    .in("placement", ["news", "both"])
+    .order("sort_order", {ascending: true})
+    .order("published_at", {ascending: false});
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f4f0e6] pb-8 pt-28 text-[#142918]">
@@ -102,7 +113,7 @@ export default async function ExplorePage({params}: Props) {
           <ArticlesList locale={locale} items={itemsForSection(content, "article_cards")} />
         </div>
 
-        <NewsCategories locale={locale} items={itemsForSection(content, "news_categories")} />
+        <ArticleMagazine locale={locale} articles={articles ?? []} />
       </div>
     </main>
   );

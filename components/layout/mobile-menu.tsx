@@ -29,6 +29,7 @@ export function MobileMenu({onLoading}: {solid?: boolean; onLoading: (v: boolean
 
   function handleMobileSwitch() {
     onLoading(true);
+    document.cookie = `NEXT_LOCALE=${nextLocale};path=/;max-age=31536000;SameSite=Lax`;
     router.replace(pathname, {locale: nextLocale, scroll: false});
   }
 

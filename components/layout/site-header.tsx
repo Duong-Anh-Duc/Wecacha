@@ -54,7 +54,7 @@ export function SiteHeader() {
             animate={{opacity: 1}}
             exit={{opacity: 0}}
             transition={{duration: 0.2}}
-            className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#fdfcf8]/75 backdrop-blur-md"
+            className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-[#fdfcf8]/75 backdrop-blur-md"
           >
             <div className="relative w-16 h-16">
               <div className="absolute inset-0 rounded-full border-4 border-[#a46131]/15" />
@@ -67,6 +67,9 @@ export function SiteHeader() {
                 <div className="w-2.5 h-2.5 rounded-full bg-[#a46131]" />
               </div>
             </div>
+            <span className="text-sm font-semibold tracking-wide text-[#a46131]">
+              {t("switching")}
+            </span>
           </motion.div>
         )}
       </AnimatePresence>
