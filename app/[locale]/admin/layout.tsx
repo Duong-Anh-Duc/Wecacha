@@ -14,6 +14,7 @@ import {
   Package,
   PanelLeftClose,
   PanelLeftOpen,
+  PieChart,
   ShoppingBag,
   Tags,
   UserRound,
@@ -84,6 +85,7 @@ export default function AdminLayout({children}: {children: ReactNode}) {
   const isProductSettings = pathname.includes("/admin/product-categories");
   const isProducts = pathname.includes("/admin/products");
   const isOrders = pathname.includes("/admin/orders");
+  const isFlavorStats = pathname.includes("/admin/flavor-stats");
   const navItems = [
     {
       key: "dashboard",
@@ -132,6 +134,14 @@ export default function AdminLayout({children}: {children: ReactNode}) {
       active: isOrders,
       icon: <ShoppingBag className="h-5 w-5" />,
       mobileIcon: <ShoppingBag className="h-4 w-4" />
+    },
+    {
+      key: "flavorStats",
+      href: "/admin/flavor-stats",
+      label: t("flavorStats"),
+      active: isFlavorStats,
+      icon: <PieChart className="h-5 w-5" />,
+      mobileIcon: <PieChart className="h-4 w-4" />
     }
   ];
   const currentNav = navItems.find((item) => item.active) ?? navItems[0];

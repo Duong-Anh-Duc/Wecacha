@@ -20,6 +20,8 @@ import type {Product} from "@/lib/content/types";
 import {formatCurrency, localized} from "@/lib/content/helpers";
 import {cn} from "@/lib/utils";
 import {flavors, productKeywords, questions, type FlavorKey, type FlavorScore} from "./data";
+import {getFlavorQuiz, tx} from "./flavor-quizzes";
+import {recordFlavorEvent} from "@/actions/flavor-actions";
 
 type FlavorQuizPageProps = {
   locale: Locale;
@@ -314,66 +316,69 @@ function recommendedProducts(products: Product[], topKeys: FlavorKey[], locale: 
   return [...matched, ...fallback].slice(0, 3);
 }
 
-export function FlavorQuizPage({locale, products}: FlavorQuizPageProps) {
+export function FlavorQuizPage({locale}: FlavorQuizPageProps) {
   const t = useTranslations("FlavorQuiz");
-  const [stage, setStage] = useState<QuizStage>("intro");
-  const [quizOpen, setQuizOpen] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeGroupKey, setActiveGroupKey] = useState<string | null>(null);
+  const [quizStage, setQuizStage] = useState<"quiz" | "result">("quiz");
+  const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const topKeys = useMemo(() => topFlavorKeys(answers), [answers]);
-  const profileId = profileIdFor(topKeys);
   const [selectedFlavor, setSelectedFlavor] = useState<FlavorKey>("fruity");
-  const suggestions = useMemo(
-    () => recommendedProducts(products, topKeys, locale),
-    [locale, products, topKeys]
-  );
-  const currentQuestion = questions[activeStep];
-  const selectedAnswer = answers[currentQuestion.id];
-  const progress = ((activeStep + 1) / questions.length) * 100;
-  const activeKeys = stage === "result" ? topKeys : [selectedFlavor];
 
-  const chooseAnswer = (answerId: string) => {
-    setAnswers((current) => ({...current, [currentQuestion.id]: answerId}));
+  const quiz = activeGroupKey ? getFlavorQuiz(activeGroupKey) : null;
+
+  const openFlavorQuiz = (groupKey: string) => {
+    const q = getFlavorQuiz(groupKey);
+    if (!q) return;
+    setActiveGroupKey(groupKey);
+    setSelectedFlavor(mapGroupKeyToFlavorKey(groupKey));
+    setStep(0);
+    setAnswers({});
+    setQuizStage("quiz");
+    void recordFlavorEvent(groupKey, "click", locale);
   };
 
-  const nextStep = () => {
-    if (activeStep === questions.length - 1) {
-      setStage("result");
-      setSelectedFlavor(topKeys[0] ?? "fruity");
-      setQuizOpen(true);
+  const closeQuiz = () => setActiveGroupKey(null);
+
+  const chooseAnswer = (questionId: string, answerId: string) => {
+    setAnswers((current) => ({...current, [questionId]: answerId}));
+  };
+
+  const next = () => {
+    if (!quiz) return;
+    if (step === quiz.questions.length - 1) {
+      setQuizStage("result");
+      void recordFlavorEvent(quiz.groupKey, "submit", locale);
       return;
     }
-    setActiveStep((current) => current + 1);
+    setStep((current) => current + 1);
   };
 
   const restart = () => {
+    setStep(0);
     setAnswers({});
-    setActiveStep(0);
-    setSelectedFlavor("fruity");
-    setStage("intro");
-    setQuizOpen(false);
+    setQuizStage("quiz");
   };
 
-  const openQuiz = () => {
-    setStage("quiz");
-    setQuizOpen(true);
-  };
+  const currentQuestion = quiz?.questions[step];
+  const selectedAnswer = currentQuestion ? answers[currentQuestion.id] : undefined;
+  const progress = quiz ? ((step + 1) / quiz.questions.length) * 100 : 0;
+  const isLast = quiz ? step === quiz.questions.length - 1 : false;
 
   return (
     <main className="overflow-hidden bg-parchment-50 text-forest-950">
       <FlavorWheelPoster
         t={t}
-        activeKeys={activeKeys}
+        activeKeys={[selectedFlavor]}
         selectedFlavor={selectedFlavor}
         onSelect={setSelectedFlavor}
-        onStart={openQuiz}
-        stage={stage}
+        onPickFlavor={openFlavorQuiz}
+        onStart={() => openFlavorQuiz("fruity")}
         locale={locale}
       />
 
-      {/* Quiz Modal */}
+      {/* Per-flavor quiz modal */}
       <AnimatePresence>
-        {quizOpen && (
+        {quiz && (
           <motion.div
             key="quiz-modal"
             initial={{opacity: 0}}
@@ -381,35 +386,32 @@ export function FlavorQuizPage({locale, products}: FlavorQuizPageProps) {
             exit={{opacity: 0}}
             transition={{duration: 0.25}}
             className="fixed inset-0 z-[150] flex items-center justify-center bg-parchment-50/60 p-4 backdrop-blur-[2px]"
-            onClick={(e) => { if (e.target === e.currentTarget) setQuizOpen(false); }}
+            onClick={(e) => { if (e.target === e.currentTarget) closeQuiz(); }}
           >
             <motion.div
               initial={{opacity: 0, scale: 0.95, y: 24}}
               animate={{opacity: 1, scale: 1, y: 0}}
               exit={{opacity: 0, scale: 0.95, y: 24}}
               transition={{duration: 0.3, ease: [0.16, 1, 0.3, 1]}}
-              className={cn(
-                "relative w-full rounded-[2rem] bg-parchment-50 shadow-[0_40px_120px_rgba(10,24,10,0.3)]",
-                stage === "result" ? "max-w-3xl" : "max-w-xl"
-              )}
+              className="relative w-full max-w-xl rounded-[2rem] bg-parchment-50 shadow-[0_40px_120px_rgba(10,24,10,0.3)]"
             >
               <button
                 type="button"
-                onClick={() => setQuizOpen(false)}
-                className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-forest-950/10 bg-white text-forest-950/60 transition hover:bg-forest-950 hover:text-white"
+                onClick={closeQuiz}
+                className="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-forest-950/10 bg-white text-forest-950/60 transition hover:bg-forest-950 hover:text-white"
                 aria-label={t("closeWheel")}
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
 
-              {stage === "quiz" ? (
+              {quizStage === "quiz" && currentQuestion ? (
                 <div className="p-6 sm:p-8">
-                  <div className="mb-6">
+                  <div className="mb-6 pr-10">
                     <p className="text-sm font-black uppercase tracking-[0.16em] text-earth-700">
-                      {t("step", {current: activeStep + 1, total: questions.length})}
+                      {tx(quiz.name, locale)} · {step + 1}/{quiz.questions.length}
                     </p>
                     <h2 className="mt-2 font-serif text-2xl leading-tight text-forest-950 sm:text-3xl">
-                      {t(currentQuestion.titleKey)}
+                      {tx(currentQuestion.title, locale)}
                     </h2>
                   </div>
                   <div className="mb-6 h-2 overflow-hidden rounded-full bg-parchment-100">
@@ -426,7 +428,7 @@ export function FlavorQuizPage({locale, products}: FlavorQuizPageProps) {
                         <button
                           key={answer.id}
                           type="button"
-                          onClick={() => chooseAnswer(answer.id)}
+                          onClick={() => chooseAnswer(currentQuestion.id, answer.id)}
                           className={cn(
                             "group min-h-[80px] rounded-2xl border p-4 text-left transition",
                             isSelected
@@ -441,7 +443,7 @@ export function FlavorQuizPage({locale, products}: FlavorQuizPageProps) {
                             )}>
                               {isSelected ? <Check className="h-4 w-4" aria-hidden="true" /> : answer.id.slice(-1).toUpperCase()}
                             </span>
-                            <span className="text-sm font-bold leading-6">{t(answer.labelKey)}</span>
+                            <span className="text-sm font-bold leading-6">{tx(answer.label, locale)}</span>
                           </span>
                         </button>
                       );
@@ -450,8 +452,8 @@ export function FlavorQuizPage({locale, products}: FlavorQuizPageProps) {
                   <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                     <button
                       type="button"
-                      onClick={() => setActiveStep((current) => Math.max(0, current - 1))}
-                      disabled={activeStep === 0}
+                      onClick={() => setStep((current) => Math.max(0, current - 1))}
+                      disabled={step === 0}
                       className="inline-flex items-center gap-2 rounded-full border border-forest-950/10 bg-white px-5 py-3 text-sm font-black text-forest-950 transition hover:border-earth-600/50 disabled:cursor-not-allowed disabled:opacity-45"
                     >
                       <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -459,27 +461,57 @@ export function FlavorQuizPage({locale, products}: FlavorQuizPageProps) {
                     </button>
                     <button
                       type="button"
-                      onClick={nextStep}
+                      onClick={next}
                       disabled={!selectedAnswer}
                       className="inline-flex items-center gap-2 rounded-full bg-forest-950 px-6 py-3 text-sm font-black text-parchment-50 transition hover:bg-forest-900 disabled:cursor-not-allowed disabled:opacity-45"
                     >
-                      {activeStep === questions.length - 1 ? t("seeResult") : t("next")}
+                      {isLast ? t("seeResult") : t("next")}
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className="max-h-[85vh] overflow-y-auto p-6 sm:p-8">
-                  <ResultPanel
-                    t={t}
-                    locale={locale}
-                    profileId={profileId}
-                    topKeys={topKeys}
-                    selectedFlavor={selectedFlavor}
-                    setSelectedFlavor={setSelectedFlavor}
-                    suggestions={suggestions}
-                    restart={restart}
-                  />
+                  <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-earth-600/10 px-3 py-1.5">
+                    <Leaf className="h-3.5 w-3.5 text-earth-700" aria-hidden="true" />
+                    <span className="text-xs font-black uppercase tracking-[0.16em] text-earth-700">
+                      {tx(quiz.name, locale)}
+                    </span>
+                  </div>
+                  <h2 className="mt-3 font-serif text-3xl leading-tight text-forest-950 sm:text-4xl">
+                    {tx(quiz.result.title, locale)}
+                  </h2>
+                  <p className="mt-4 text-sm font-medium leading-7 text-forest-950/72">
+                    {tx(quiz.result.description, locale)}
+                  </p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {quiz.result.traits.map((trait, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-2 rounded-full border border-forest-950/10 bg-white px-3 py-1.5 text-sm font-bold text-forest-950"
+                      >
+                        <span className="h-2 w-2 rounded-full bg-earth-600" />
+                        {tx(trait, locale)}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-7 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={restart}
+                      className="inline-flex items-center gap-2 rounded-full border border-forest-950/10 bg-white px-5 py-2.5 text-sm font-black text-forest-950 transition hover:border-earth-600/50"
+                    >
+                      <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                      {t("restart")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={closeQuiz}
+                      className="inline-flex items-center gap-2 rounded-full bg-forest-950 px-6 py-2.5 text-sm font-black text-parchment-50 transition hover:bg-forest-900"
+                    >
+                      {t("closeWheel")}
+                    </button>
+                  </div>
                 </div>
               )}
             </motion.div>
@@ -496,7 +528,7 @@ function FlavorWheelPoster({
   selectedFlavor,
   onSelect,
   onStart,
-  stage,
+  onPickFlavor,
   locale
 }: {
   t: ReturnType<typeof useTranslations<"FlavorQuiz">>;
@@ -504,7 +536,7 @@ function FlavorWheelPoster({
   selectedFlavor: FlavorKey;
   onSelect: (key: FlavorKey) => void;
   onStart: () => void;
-  stage: QuizStage;
+  onPickFlavor: (groupKey: string) => void;
   locale: Locale;
 }) {
   const [selectedItem, setSelectedItem] = useState<WheelSelection>({
@@ -558,6 +590,7 @@ function FlavorWheelPoster({
                   onItemSelect={setSelectedItem}
                   selectedItem={selectedItem}
                   onStart={onStart}
+                  onPickFlavor={onPickFlavor}
                   variant="poster"
                   locale={locale}
                 />
@@ -809,6 +842,7 @@ function FlavorWheel({
   onItemSelect,
   selectedItem,
   onStart,
+  onPickFlavor,
   variant = "app",
   locale
 }: {
@@ -821,6 +855,7 @@ function FlavorWheel({
   onItemSelect?: (selection: WheelSelection) => void;
   selectedItem?: WheelSelection;
   onStart?: () => void;
+  onPickFlavor?: (groupKey: string) => void;
   variant?: "app" | "poster";
   locale: Locale;
 }) {
@@ -920,12 +955,12 @@ function FlavorWheel({
               aria-label={t(group.labelKey)}
               onClick={() => {
                 onSelect(mapGroupKeyToFlavorKey(group.key));
-                onItemSelect?.(groupSelection);
+                onItemSelect?.(groupSelection); onPickFlavor?.(group.key);
               }}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   onSelect(mapGroupKeyToFlavorKey(group.key));
-                  onItemSelect?.(groupSelection);
+                  onItemSelect?.(groupSelection); onPickFlavor?.(group.key);
                 }
               }}
             />,
@@ -1012,12 +1047,12 @@ function FlavorWheel({
                 aria-label={t(child.labelKey)}
                 onClick={() => {
                   onSelect(mapGroupKeyToFlavorKey(group.key));
-                  onItemSelect?.(childSelection);
+                  onItemSelect?.(childSelection); onPickFlavor?.(group.key);
                 }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
                     onSelect(mapGroupKeyToFlavorKey(group.key));
-                    onItemSelect?.(childSelection);
+                    onItemSelect?.(childSelection); onPickFlavor?.(group.key);
                   }
                 }}
               />
@@ -1116,12 +1151,12 @@ function FlavorWheel({
                     aria-label={t(`wheel.${leaf}`)}
                     onClick={() => {
                       onSelect(mapGroupKeyToFlavorKey(group.key));
-                      onItemSelect?.(leafSelection);
+                      onItemSelect?.(leafSelection); onPickFlavor?.(group.key);
                     }}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         onSelect(mapGroupKeyToFlavorKey(group.key));
-                        onItemSelect?.(leafSelection);
+                        onItemSelect?.(leafSelection); onPickFlavor?.(group.key);
                       }
                     }}
                   />,
@@ -1180,12 +1215,12 @@ function FlavorWheel({
                   aria-label={t(child.labelKey)}
                   onClick={() => {
                     onSelect(mapGroupKeyToFlavorKey(group.key));
-                    onItemSelect?.(childSelection);
+                    onItemSelect?.(childSelection); onPickFlavor?.(group.key);
                   }}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
                       onSelect(mapGroupKeyToFlavorKey(group.key));
-                      onItemSelect?.(childSelection);
+                      onItemSelect?.(childSelection); onPickFlavor?.(group.key);
                     }
                   }}
                 />,

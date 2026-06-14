@@ -109,7 +109,42 @@ export function ProductBuyPanel({
 
       {(product.priceTiers?.length || bulkPriceTiers.length || product.weight || product.baseUnit) ? (
         <div className="mb-8 rounded-2xl border border-[#142918]/10 bg-white p-5 lg:p-6 shadow-[0_4px_20px_rgba(20,41,24,0.02)] space-y-6">
-          {/* Section 1: Chọn khối lượng */}
+          {/* Section 1: Giá theo khối lượng mua (đưa lên trên, ít nổi bật) */}
+          {bulkPriceTiers.length ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Tag className="w-3.5 h-3.5 text-[#142918]/35" />
+                <span className="text-[11px] font-semibold tracking-wide text-[#142918]/45 uppercase">
+                  {tProduct("buyWeightPrice")}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {bulkPriceTiers.map((tier, index) => {
+                  const label = bulkTierLabel(tier);
+                  return (
+                    <div
+                      key={`${label}-${index}`}
+                      className="flex items-center justify-between gap-3 rounded-lg border border-[#142918]/5 bg-[#fbfaf6] px-3 py-2 text-[13px]"
+                    >
+                      <span className="min-w-0 whitespace-nowrap font-medium text-[#142918]/55">
+                        {label}
+                      </span>
+                      <span className="whitespace-nowrap font-medium text-[#142918]/55">
+                        {tProduct("perKgPrice", {price: formatCurrency(tier.price, locale)})}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
+          {/* Divider 1 */}
+          {bulkPriceTiers.length && (product.priceTiers?.length || product.baseUnit) ? (
+            <div className="border-t border-[#142918]/8 my-5" />
+          ) : null}
+
+          {/* Section 2: Chọn khối lượng */}
           {product.priceTiers?.length ? (
             <div className="space-y-4">
               <div className="flex items-center gap-2.5">
@@ -155,47 +190,8 @@ export function ProductBuyPanel({
             </div>
           ) : null}
 
-          {/* Divider 1 */}
-          {product.priceTiers?.length && (bulkPriceTiers.length || product.baseUnit) ? (
-            <div className="border-t border-[#142918]/8 my-5" />
-          ) : null}
-
-          {/* Section 2: Giá theo khối lượng mua */}
-          {bulkPriceTiers.length ? (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2.5">
-                <Tag className="w-4 h-4 text-[#17351f]" />
-                <span className="text-[13px] font-bold tracking-wide text-[#142918]/70 uppercase">
-                  {tProduct("buyWeightPrice")}
-                </span>
-              </div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {bulkPriceTiers.map((tier, index) => {
-                  const label = bulkTierLabel(tier);
-                  return (
-                    <div
-                      key={`${label}-${index}`}
-                      className="relative flex min-h-[74px] items-center justify-between gap-3 rounded-xl border border-[#142918]/5 bg-[#f8f6f0] px-4 py-3 text-sm transition-all duration-300"
-                    >
-                      <div className="flex min-w-0 items-center gap-2">
-                        <span className="min-w-0 whitespace-nowrap font-semibold text-[#142918]/78">
-                          {label}
-                        </span>
-                      </div>
-                      <div className="flex shrink-0 flex-col items-end">
-                        <span className="whitespace-nowrap font-bold text-[#a46131]">
-                          {tProduct("perKgPrice", {price: formatCurrency(tier.price, locale)})}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null}
-
           {/* Divider 2 */}
-          {bulkPriceTiers.length && product.baseUnit ? (
+          {product.priceTiers?.length && product.baseUnit ? (
             <div className="border-t border-[#142918]/8 my-5" />
           ) : null}
 
