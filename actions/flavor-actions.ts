@@ -48,3 +48,35 @@ export async function recordFlavorEvent(
     return {success: false};
   }
 }
+
+export type FlavorCounts = Record<string, {clicks: number; submits: number}>;
+
+/**
+ * Returns aggregated click/submit counts per flavor from the public
+ * `flavor_wheel_counts` view. Returns an empty object if the table/view
+ * does not exist yet (migration not run).
+ */
+export async function getFlavorCounts(): Promise<FlavorCounts> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return {};
+
+  try {
+    const supabase = createClient(url, anonKey, {auth: {persistSession: false}});
+    const {data, error} = await supabase
+      .from("flavor_wheel_counts")
+      .select("flavor_key, clicks, submits");
+    if (error || !data) return {};
+
+    const counts: FlavorCounts = {};
+    for (const row of data as {flavor_key: string; clicks: number; submits: number}[]) {
+      counts[row.flavor_key] = {
+        clicks: Number(row.clicks) || 0,
+        submits: Number(row.submits) || 0
+      };
+    }
+    return counts;
+  } catch {
+    return {};
+  }
+}

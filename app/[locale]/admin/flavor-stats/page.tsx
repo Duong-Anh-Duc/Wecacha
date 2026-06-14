@@ -2,6 +2,7 @@ import {setRequestLocale} from "next-intl/server";
 import type {Locale} from "@/i18n/routing";
 import {requireAdmin} from "@/lib/admin-auth";
 import {RefreshButton} from "@/components/admin/refresh-button";
+import {AdminFlavorWheel} from "@/components/admin/admin-flavor-wheel";
 import {flavorQuizzes, tx} from "@/features/flavor-quiz/flavor-quizzes";
 
 export const revalidate = 0;
@@ -59,6 +60,9 @@ export default async function FlavorStatsPage({
   const totalClicks = stats.reduce((s, r) => s + r.clicks, 0);
   const totalSubmits = stats.reduce((s, r) => s + r.submits, 0);
   const maxVal = Math.max(1, ...stats.map((r) => Math.max(r.clicks, r.submits)));
+  const countsMap = Object.fromEntries(
+    stats.map((r) => [r.key, {clicks: r.clicks, submits: r.submits}])
+  );
 
   return (
     <div className="space-y-6">
@@ -97,6 +101,8 @@ export default async function FlavorStatsPage({
           </p>
         </div>
       ) : (
+        <div className="space-y-6">
+        <AdminFlavorWheel locale={locale} counts={countsMap} />
         <div className="overflow-hidden rounded-2xl border border-forest-950/10 bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead>
@@ -145,6 +151,7 @@ export default async function FlavorStatsPage({
               <span className="h-2.5 w-2.5 rounded-full bg-[#17351f]" /> {isVi ? "Hoàn thành quiz" : "Quiz completions"}
             </span>
           </div>
+        </div>
         </div>
       )}
     </div>

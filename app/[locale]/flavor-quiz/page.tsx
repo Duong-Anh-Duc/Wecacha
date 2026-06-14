@@ -4,6 +4,9 @@ import {ProductsRealtimeRefresh} from "@/components/realtime/products-realtime-r
 import {FlavorQuizPage} from "@/features/flavor-quiz/flavor-quiz-page";
 import type {Locale} from "@/i18n/routing";
 import {getVisibleProducts} from "@/lib/content/cms";
+import {getFlavorCounts} from "@/actions/flavor-actions";
+
+export const revalidate = 30;
 
 type Props = {
   params: Promise<{locale: Locale}>;
@@ -30,12 +33,15 @@ export async function generateMetadata({params}: Props): Promise<Metadata> {
 export default async function FlavorQuizRoute({params}: Props) {
   const {locale} = await params;
   setRequestLocale(locale);
-  const products = await getVisibleProducts();
+  const [products, flavorCounts] = await Promise.all([
+    getVisibleProducts(),
+    getFlavorCounts()
+  ]);
 
   return (
     <>
       <ProductsRealtimeRefresh />
-      <FlavorQuizPage locale={locale} products={products} />
+      <FlavorQuizPage locale={locale} products={products} flavorCounts={flavorCounts} />
     </>
   );
 }

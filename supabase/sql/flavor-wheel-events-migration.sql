@@ -31,3 +31,16 @@ create policy "flavor_wheel_events admin read"
   for select
   to authenticated
   using (true);
+
+-- Aggregated, publicly readable counts per flavor (only totals, never raw rows).
+-- The view bypasses the base-table RLS so anyone can read the counts for the
+-- social-proof modal on the public flavor wheel.
+create or replace view public.flavor_wheel_counts as
+select
+  flavor_key,
+  count(*) filter (where type = 'click') as clicks,
+  count(*) filter (where type = 'submit') as submits
+from public.flavor_wheel_events
+group by flavor_key;
+
+grant select on public.flavor_wheel_counts to anon, authenticated;

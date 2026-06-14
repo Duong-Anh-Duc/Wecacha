@@ -26,6 +26,7 @@ import {recordFlavorEvent} from "@/actions/flavor-actions";
 type FlavorQuizPageProps = {
   locale: Locale;
   products: Product[];
+  flavorCounts?: Record<string, {clicks: number; submits: number}>;
 };
 
 type QuizStage = "intro" | "quiz" | "result";
@@ -45,7 +46,7 @@ type WheelGroup = {
   children: WheelChild[];
 };
 
-type WheelSelection = {
+export type WheelSelection = {
   groupKey: string;
   groupLabelKey: string;
   itemLabelKey: string;
@@ -316,15 +317,17 @@ function recommendedProducts(products: Product[], topKeys: FlavorKey[], locale: 
   return [...matched, ...fallback].slice(0, 3);
 }
 
-export function FlavorQuizPage({locale}: FlavorQuizPageProps) {
+export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
   const t = useTranslations("FlavorQuiz");
+  const isVi = locale === "vi";
   const [activeGroupKey, setActiveGroupKey] = useState<string | null>(null);
-  const [quizStage, setQuizStage] = useState<"quiz" | "result">("quiz");
+  const [quizStage, setQuizStage] = useState<"intro" | "quiz" | "result">("intro");
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selectedFlavor, setSelectedFlavor] = useState<FlavorKey>("fruity");
 
   const quiz = activeGroupKey ? getFlavorQuiz(activeGroupKey) : null;
+  const activeCount = activeGroupKey ? flavorCounts?.[activeGroupKey] : undefined;
 
   const openFlavorQuiz = (groupKey: string) => {
     const q = getFlavorQuiz(groupKey);
@@ -333,7 +336,7 @@ export function FlavorQuizPage({locale}: FlavorQuizPageProps) {
     setSelectedFlavor(mapGroupKeyToFlavorKey(groupKey));
     setStep(0);
     setAnswers({});
-    setQuizStage("quiz");
+    setQuizStage("intro");
     void recordFlavorEvent(groupKey, "click", locale);
   };
 
@@ -346,8 +349,11 @@ export function FlavorQuizPage({locale}: FlavorQuizPageProps) {
   const next = () => {
     if (!quiz) return;
     if (step === quiz.questions.length - 1) {
-      setQuizStage("result");
       void recordFlavorEvent(quiz.groupKey, "submit", locale);
+      // Clear all answers and reset to question 1 once submitted.
+      setAnswers({});
+      setStep(0);
+      setQuizStage("result");
       return;
     }
     setStep((current) => current + 1);
@@ -404,7 +410,46 @@ export function FlavorQuizPage({locale}: FlavorQuizPageProps) {
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
 
-              {quizStage === "quiz" && currentQuestion ? (
+              {quizStage === "intro" ? (
+                <div className="p-6 sm:p-8">
+                  <div className="pr-10">
+                    <span
+                      className="inline-block h-2.5 w-12 rounded-full"
+                      style={{backgroundColor: selectedFlavor && flavors.find((f) => f.key === selectedFlavor)?.color}}
+                    />
+                    <p className="mt-4 text-sm font-black uppercase tracking-[0.16em] text-earth-700">
+                      {isVi ? "Hương vị" : "Flavor"}
+                    </p>
+                    <h2 className="mt-1 font-serif text-3xl leading-tight text-forest-950 sm:text-4xl">
+                      {tx(quiz.name, locale)}
+                    </h2>
+                  </div>
+                  <div className="mt-5 rounded-2xl border border-forest-950/10 bg-white p-5">
+                    <p className="text-4xl font-black text-earth-700">
+                      {(activeCount?.clicks ?? 0).toLocaleString(isVi ? "vi-VN" : "en-US")}
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-forest-950/70">
+                      {isVi ? "người đã chọn vị này" : "people picked this flavor"}
+                    </p>
+                    <p className="mt-2 text-xs font-semibold text-forest-950/45">
+                      {isVi
+                        ? `${(activeCount?.submits ?? 0).toLocaleString("vi-VN")} người đã hoàn thành quiz`
+                        : `${(activeCount?.submits ?? 0).toLocaleString("en-US")} completed the quiz`}
+                    </p>
+                  </div>
+                  <p className="mt-5 text-sm font-medium leading-7 text-forest-950/72">
+                    {tx(quiz.intro, locale)}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setQuizStage("quiz")}
+                    className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-forest-950 px-6 py-3.5 text-sm font-black text-parchment-50 transition hover:bg-forest-900 sm:w-auto"
+                  >
+                    {t("start")}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </div>
+              ) : quizStage === "quiz" && currentQuestion ? (
                 <div className="p-6 sm:p-8">
                   <div className="mb-6 pr-10">
                     <p className="text-sm font-black uppercase tracking-[0.16em] text-earth-700">
@@ -471,31 +516,19 @@ export function FlavorQuizPage({locale}: FlavorQuizPageProps) {
                   </div>
                 </div>
               ) : (
-                <div className="max-h-[85vh] overflow-y-auto p-6 sm:p-8">
-                  <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-earth-600/10 px-3 py-1.5">
-                    <Leaf className="h-3.5 w-3.5 text-earth-700" aria-hidden="true" />
-                    <span className="text-xs font-black uppercase tracking-[0.16em] text-earth-700">
-                      {tx(quiz.name, locale)}
-                    </span>
+                <div className="p-8 text-center sm:p-10">
+                  <div className="mx-auto inline-flex h-16 w-16 items-center justify-center rounded-full bg-earth-600 text-white">
+                    <Check className="h-8 w-8" aria-hidden="true" />
                   </div>
-                  <h2 className="mt-3 font-serif text-3xl leading-tight text-forest-950 sm:text-4xl">
-                    {tx(quiz.result.title, locale)}
+                  <h2 className="mt-6 font-serif text-3xl leading-tight text-forest-950 sm:text-4xl">
+                    {isVi ? "Cảm ơn bạn!" : "Thank you!"}
                   </h2>
-                  <p className="mt-4 text-sm font-medium leading-7 text-forest-950/72">
-                    {tx(quiz.result.description, locale)}
+                  <p className="mx-auto mt-4 max-w-md text-sm font-medium leading-7 text-forest-950/72">
+                    {isVi
+                      ? "Cảm ơn vì đã cho chúng tôi biết cảm nhận của bạn về cà phê. Phản hồi của bạn giúp Wecacha phục vụ bạn tốt hơn."
+                      : "Thanks for sharing your coffee taste with us. Your feedback helps Wecacha serve you better."}
                   </p>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {quiz.result.traits.map((trait, i) => (
-                      <span
-                        key={i}
-                        className="inline-flex items-center gap-2 rounded-full border border-forest-950/10 bg-white px-3 py-1.5 text-sm font-bold text-forest-950"
-                      >
-                        <span className="h-2 w-2 rounded-full bg-earth-600" />
-                        {tx(trait, locale)}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="mt-7 flex flex-wrap gap-3">
+                  <div className="mt-8 flex flex-wrap justify-center gap-3">
                     <button
                       type="button"
                       onClick={restart}
@@ -832,7 +865,7 @@ function mapGroupKeyToFlavorKey(groupKey: string): FlavorKey {
   return groupKey as FlavorKey;
 }
 
-function FlavorWheel({
+export function FlavorWheel({
   id,
   idPrefix = "wheel",
   t,
@@ -898,7 +931,7 @@ function FlavorWheel({
         <circle
           cx={WHEEL_CENTER}
           cy={WHEEL_CENTER}
-          r="299"
+          r="241"
           fill={variant === "poster" ? "#f4f4f1" : "#f9f6ef"}
           stroke="#d9d8d3"
           strokeWidth="1.2"
@@ -944,7 +977,7 @@ function FlavorWheel({
           const pieces = [
             <path
               key={`${group.key}-inner`}
-              d={describeSegment(groupStart + 0.3, groupEnd - 0.3, 303, 403)}
+              d={describeSegment(groupStart + 0.3, groupEnd - 0.3, 245, 403)}
               fill={group.color}
               opacity={variant === "poster" ? 1 : groupActive ? 1 : 0.42}
               stroke={groupItemSelected ? "#142918" : "#ffffff"}
@@ -1255,7 +1288,7 @@ function FlavorWheel({
         <circle
           cx={WHEEL_CENTER}
           cy={WHEEL_CENTER}
-          r="303"
+          r="245"
           fill={variant === "poster" ? "#f4f4f1" : "#f9f6ef"}
           stroke="#d9d8d3"
           strokeWidth="1.2"
@@ -1269,13 +1302,13 @@ function FlavorWheel({
             aria-label={t("start")}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onStart(); }}
           >
-            <circle cx={WHEEL_CENTER} cy={WHEEL_CENTER} r="280" fill="#142918" opacity="0" className="transition-opacity duration-300 hover:opacity-5" />
-            <circle cx={WHEEL_CENTER} cy={WHEEL_CENTER} r="200" fill="#f9f6ef" stroke="#a46131" strokeWidth="2.5" />
-            <circle cx={WHEEL_CENTER} cy={WHEEL_CENTER} r="200" fill="transparent" className="transition duration-300 hover:fill-[#a46131]/8" />
-            <text x={WHEEL_CENTER} y={WHEEL_CENTER - 14} textAnchor="middle" dominantBaseline="middle" className="pointer-events-none fill-forest-950 font-serif" style={{fontSize: "38px"}}>
+            <circle cx={WHEEL_CENTER} cy={WHEEL_CENTER} r="224" fill="#142918" opacity="0" className="transition-opacity duration-300 hover:opacity-5" />
+            <circle cx={WHEEL_CENTER} cy={WHEEL_CENTER} r="172" fill="#f9f6ef" stroke="#a46131" strokeWidth="2.5" />
+            <circle cx={WHEEL_CENTER} cy={WHEEL_CENTER} r="172" fill="transparent" className="transition duration-300 hover:fill-[#a46131]/8" />
+            <text x={WHEEL_CENTER} y={WHEEL_CENTER - 12} textAnchor="middle" dominantBaseline="middle" className="pointer-events-none fill-forest-950 font-serif" style={{fontSize: "32px"}}>
               Wecacha
             </text>
-            <text x={WHEEL_CENTER} y={WHEEL_CENTER + 22} textAnchor="middle" dominantBaseline="middle" className="pointer-events-none fill-forest-950/55 font-bold uppercase" style={{fontSize: "11px", letterSpacing: "0.18em"}}>
+            <text x={WHEEL_CENTER} y={WHEEL_CENTER + 20} textAnchor="middle" dominantBaseline="middle" className="pointer-events-none fill-forest-950/55 font-bold uppercase" style={{fontSize: "10px", letterSpacing: "0.16em"}}>
               {locale === "vi" ? "KHÁM PHÁ GU CÀ PHÊ" : "EXPLORE YOUR TASTE"}
             </text>
           </g>
