@@ -424,8 +424,6 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
     setQuizResult(false);
   };
 
-  const progress = quizQueue.length > 0 ? ((quizStep + 1) / quizQueue.length) * 100 : 0;
-
   return (
     <main className="overflow-hidden bg-parchment-50 text-forest-950">
       <FlavorWheelPoster
@@ -535,14 +533,16 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
                   <p className="mt-1 text-xs font-semibold text-forest-950/50">
                     {isVi ? "Có thể chọn nhiều hương vị." : "You can pick several."}
                   </p>
-                  <div className="my-5 h-2 overflow-hidden rounded-full bg-parchment-100">
-                    <motion.div
-                      className="h-full rounded-full bg-earth-600"
-                      animate={{width: `${progress}%`}}
-                      transition={{duration: 0.35}}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  <div className="mt-5" />
+                  <div
+                    className={
+                      currentQ.options.length === 4
+                        ? "grid grid-cols-2 gap-2"
+                        : currentQ.options.length <= 2
+                        ? "grid grid-cols-1 gap-2 sm:grid-cols-2"
+                        : "grid grid-cols-2 gap-2 sm:grid-cols-3"
+                    }
+                  >
                     {currentQ.options.map((opt) => {
                       const isSelected = currentSel.includes(opt.key);
                       return (

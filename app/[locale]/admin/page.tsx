@@ -219,12 +219,12 @@ export default async function AdminDashboardPage({
       {/* Header section */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-white p-6 rounded-2xl border border-stone-200/50 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-[#4A751D] border border-emerald-100/50">
-            <div className="grid grid-cols-2 gap-0.5 w-3.5 h-3.5">
-              <div className="rounded-[1px] bg-[#4A751D] w-1.5 h-1.5" />
-              <div className="rounded-[1px] bg-[#4A751D] w-1.5 h-1.5" />
-              <div className="rounded-[1px] bg-[#4A751D] w-1.5 h-1.5" />
-              <div className="rounded-[1px] bg-[#4A751D] w-1.5 h-1.5" />
+          <div className="flex shrink-0 items-center justify-center text-[#4A751D]">
+            <div className="grid grid-cols-2 gap-0.5">
+              <div className="rounded-[1px] bg-[#4A751D] w-2 h-2" />
+              <div className="rounded-[1px] bg-[#4A751D] w-2 h-2" />
+              <div className="rounded-[1px] bg-[#4A751D] w-2 h-2" />
+              <div className="rounded-[1px] bg-[#4A751D] w-2 h-2" />
             </div>
           </div>
           <div>
@@ -521,13 +521,13 @@ export default async function AdminDashboardPage({
 
             <div className="grid gap-4 pt-2 sm:grid-cols-2 xl:grid-cols-1">
               <QualityInsightCard
-                icon={<AlertCircle className="h-4.5 w-4.5 text-amber-600 animate-pulse" />}
+                icon={<AlertCircle className="h-5 w-5 text-amber-600 animate-pulse" />}
                 label={t("needsAddress")}
                 value={missingAddressCount}
                 caption={t("needsAddressDesc")}
               />
               <QualityInsightCard
-                icon={<Clock className="h-4.5 w-4.5 text-[#4A751D] shrink-0" />}
+                icon={<Clock className="h-5 w-5 text-[#4A751D] shrink-0" />}
                 label={t("latestCapture")}
                 value={latestRegistrations[0] ? formatLatestTime(latestRegistrations[0].created_at) : "--"}
                 caption={t("latestCaptureDesc")}
@@ -745,15 +745,13 @@ function SummaryCard({
   iconColorClass?: string;
   sparklineData?: number[];
 }) {
-  const bgClass = "bg-[#4A751D]/6 border-[#4A751D]/10";
-
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-stone-200 bg-white p-5 flex flex-col justify-between min-h-[155px] shadow-[0_2px_8px_rgba(0,0,0,0.015)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 hover:border-stone-300 transition-all duration-300">
       <div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className={cn("inline-flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-300 shadow-inner group-hover:scale-105", bgClass, iconColorClass)}>
-              {React.cloneElement(icon, { className: "h-4.5 w-4.5 stroke-[2]" })}
+            <div className={cn("inline-flex items-center justify-center transition-all duration-300 group-hover:scale-105", iconColorClass)}>
+              {React.cloneElement(icon, { className: "h-5 w-5 stroke-[2]" })}
             </div>
             <h4 className="text-xs font-bold text-stone-700 tracking-tight">{label}</h4>
           </div>
@@ -784,14 +782,12 @@ function CmsCard({
   caption?: string;
   iconColor?: string;
 }) {
-  const bgClass = "bg-[#4A751D]/6 border-[#4A751D]/10";
-
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-stone-200 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.015)] min-h-[135px] flex flex-col justify-between transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 hover:border-stone-300">
       <div>
         <div className="flex items-center gap-2">
-          <div className={cn("inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-all duration-300 shadow-inner", bgClass, iconColor)}>
-            {React.cloneElement(icon, { className: "h-4 w-4 stroke-[2]" })}
+          <div className={cn("inline-flex items-center justify-center transition-all duration-300", iconColor)}>
+            {React.cloneElement(icon, { className: "h-5 w-5 stroke-[2]" })}
           </div>
           <span className="text-xs font-bold text-stone-800 tracking-tight">{label}</span>
         </div>
@@ -849,7 +845,7 @@ function QualityInsightCard({
   caption?: string;
 }) {
   return (
-    <div className="rounded-xl border border-stone-200 bg-[#fafafa]/50 p-4.5 relative overflow-hidden flex flex-col justify-between min-h-[90px] transition-all duration-200 hover:border-stone-300">
+    <div className="rounded-xl border border-stone-200 bg-[#fafafa]/50 p-5 relative overflow-hidden flex flex-col justify-between min-h-[90px] transition-all duration-200 hover:border-stone-300">
       <div>
         <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{label}</span>
         <div className="flex items-center gap-2 mt-2">
