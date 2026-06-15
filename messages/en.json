@@ -364,7 +364,10 @@
     "addressPlaceholder": "Enter your address",
     "cityPlaceholder": "Select your city/province",
     "notePlaceholder": "Add a note for your order (e.g. delivery time, leave at door...)",
-    "orderError": "Could not create the order. Please try again."
+    "orderError": "Could not create the order. Please try again.",
+    "unavailableTitle": "Some products are no longer available",
+    "unavailableDesc": "These products have been discontinued or removed: {names}. Please remove them from your cart to continue checkout.",
+    "removeUnavailable": "Remove from cart"
   },
   "About": {
     "kicker": "About Us",

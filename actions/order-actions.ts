@@ -20,6 +20,31 @@ function revalidateAdminPaths(path: string) {
   }
 }
 
+// Returns the slugs (from the given list) whose product was deleted or stopped.
+export async function getUnavailableProducts(slugs: string[]): Promise<string[]> {
+  const unique = Array.from(new Set(slugs)).filter(Boolean);
+  if (!unique.length) return [];
+
+  let supabase;
+  try {
+    supabase = createAdminClient();
+  } catch {
+    return [];
+  }
+
+  const {data, error} = await supabase
+    .from("products")
+    .select("slug, is_visible")
+    .in("slug", unique);
+
+  if (error) return [];
+
+  const available = new Set(
+    (data ?? []).filter((p) => p.is_visible === true).map((p) => p.slug as string)
+  );
+  return unique.filter((slug) => !available.has(slug));
+}
+
 export async function createOrder(data: {
   customer_name: string;
   phone: string;
@@ -41,6 +66,30 @@ export async function createOrder(data: {
     supabase = createAdminClient();
   } catch {
     return {success: false, error: "Order service is not configured"};
+  }
+
+  // Guard: reject items whose product was deleted or stopped (is_visible = false).
+  const slugs = Array.from(new Set(data.items.map((item) => item.slug)));
+  const {data: products, error: productError} = await supabase
+    .from("products")
+    .select("slug, is_visible")
+    .in("slug", slugs);
+
+  if (productError) {
+    return {success: false, error: productError.message};
+  }
+
+  const availableBySlug = new Map((products ?? []).map((p) => [p.slug as string, p.is_visible as boolean]));
+  const unavailable = Array.from(
+    new Map(
+      data.items
+        .filter((item) => availableBySlug.get(item.slug) !== true)
+        .map((item) => [item.slug, {slug: item.slug, name: item.name}])
+    ).values()
+  );
+
+  if (unavailable.length > 0) {
+    return {success: false, code: "unavailable" as const, unavailable};
   }
 
   const {data: order, error} = await supabase

@@ -447,6 +447,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
         onHoverMove={handleHoverMove}
         onStart={openQuiz}
         locale={locale}
+        flavorCounts={flavorCounts}
       />
 
       {/* Hover preview — small card that follows the cursor */}
@@ -696,7 +697,8 @@ function FlavorWheelPoster({
   onHoverMove,
   highlightGroups = [],
   quizActive = false,
-  locale
+  locale,
+  flavorCounts
 }: {
   t: ReturnType<typeof useTranslations<"FlavorQuiz">>;
   activeKeys: FlavorKey[];
@@ -709,6 +711,7 @@ function FlavorWheelPoster({
   highlightGroups?: string[];
   quizActive?: boolean;
   locale: Locale;
+  flavorCounts?: Record<string, {clicks: number; submits: number}>;
 }) {
   const [selectedItem, setSelectedItem] = useState<WheelSelection>({
     groupKey: "fruity",
@@ -767,6 +770,7 @@ function FlavorWheelPoster({
                   highlightGroups={highlightGroups}
                   variant="poster"
                   locale={locale}
+                  flavorCounts={flavorCounts}
                 />
               </div>
             </div>
@@ -920,7 +924,8 @@ export function FlavorWheel({
   onHoverMove,
   highlightGroups = [],
   variant = "app",
-  locale
+  locale,
+  flavorCounts
 }: {
   id?: string;
   idPrefix?: string;
@@ -937,8 +942,20 @@ export function FlavorWheel({
   highlightGroups?: string[];
   variant?: "app" | "poster";
   locale: Locale;
+  flavorCounts?: Record<string, {clicks: number; submits: number}>;
 }) {
-  const totalWeight = wheelGroups.reduce((sum, group) => sum + group.weight, 0);
+  // Each group's wedge grows with how often it was picked (group-level submits),
+  // keeping its base weight as a floor so unpicked groups never disappear.
+  const POPULARITY_SCALE = 0.85;
+  const maxGroupSubmits = Math.max(
+    1,
+    ...wheelGroups.map((g) => flavorCounts?.[g.key]?.submits ?? 0)
+  );
+  const groupWeightOf = (group: (typeof wheelGroups)[number]) =>
+    flavorCounts
+      ? group.weight * (1 + POPULARITY_SCALE * ((flavorCounts[group.key]?.submits ?? 0) / maxGroupSubmits))
+      : group.weight;
+  const totalWeight = wheelGroups.reduce((sum, group) => sum + groupWeightOf(group), 0);
   let cursor = -7;
 
   return (
@@ -986,7 +1003,7 @@ export function FlavorWheel({
         />
         {wheelGroups.flatMap((group) => {
           const groupStart = cursor;
-          const groupEnd = cursor + (group.weight / totalWeight) * 360;
+          const groupEnd = cursor + (groupWeightOf(group) / totalWeight) * 360;
           cursor = groupEnd;
           const groupActive = isGroupActive(group.key, activeKeys);
           const groupSelected = isGroupSelected(group.key, selectedFlavor);

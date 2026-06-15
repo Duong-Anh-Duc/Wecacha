@@ -11,7 +11,7 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
-import {createOrder} from "@/actions/order-actions";
+import {createOrder, getUnavailableProducts} from "@/actions/order-actions";
 import {cartItemId, getCartTotals, useCartStore, type CartItem} from "@/features/cart/cart-store";
 import {Link} from "@/i18n/navigation";
 import type {Locale} from "@/i18n/routing";
@@ -44,6 +44,7 @@ export function CheckoutForm() {
   const clearBuyNow = useCartStore((state) => state.clearBuyNow);
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [unavailable, setUnavailable] = useState<{slug: string; name: string}[]>([]);
   const [minQtyWarning, setMinQtyWarning] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
@@ -91,6 +92,37 @@ export function CheckoutForm() {
     return () => clearTimeout(id);
   }, [minQtyWarning]);
 
+  // Proactively flag cart items whose product was deleted/stopped doing business.
+  const slugKey = items.map((item) => item.slug).join("|");
+  useEffect(() => {
+    if (success) return;
+    const currentSlugs = slugKey ? slugKey.split("|") : [];
+    if (!currentSlugs.length) {
+      setUnavailable([]);
+      return;
+    }
+    let active = true;
+    getUnavailableProducts(currentSlugs)
+      .then((badSlugs) => {
+        if (!active) return;
+        const bad = new Set(badSlugs);
+        const seen = new Set<string>();
+        const list: {slug: string; name: string}[] = [];
+        for (const item of items) {
+          if (bad.has(item.slug) && !seen.has(item.slug)) {
+            seen.add(item.slug);
+            list.push({slug: item.slug, name: item.name});
+          }
+        }
+        setUnavailable(list);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slugKey, success]);
+
   function handleDecrease(item: CartItem) {
     if (item.quantity <= 1) {
       setMinQtyWarning(true);
@@ -119,8 +151,19 @@ export function CheckoutForm() {
     setLoadingWards(false);
   }
 
+  function removeUnavailableFromCart() {
+    if (isBuyNow) {
+      clearBuyNow();
+    } else {
+      const slugs = new Set(unavailable.map((u) => u.slug));
+      cartItems.filter((item) => slugs.has(item.slug)).forEach((item) => removeItem(cartItemId(item)));
+    }
+    setUnavailable([]);
+  }
+
   async function onSubmit(values: CheckoutValues) {
     setSubmitError(null);
+    setUnavailable([]);
     const result = await createOrder({
       customer_name: values.fullName,
       phone: values.phone,
@@ -142,7 +185,11 @@ export function CheckoutForm() {
     });
 
     if (!result.success) {
-      setSubmitError(result.error ?? t("orderError"));
+      if ("unavailable" in result && result.unavailable && result.unavailable.length > 0) {
+        setUnavailable(result.unavailable);
+      } else {
+        setSubmitError(("error" in result ? result.error : undefined) ?? t("orderError"));
+      }
       return;
     }
 
@@ -257,9 +304,30 @@ export function CheckoutForm() {
             </Field>
           </div>
 
-          <Button className="mt-10 bg-[#1a3020] hover:bg-[#142918] text-white rounded-xl h-14 px-8 font-medium transition-all shadow-md hover:-translate-y-0.5 w-fit" disabled={isSubmitting}>
+          <Button className="mt-10 bg-[#1a3020] hover:bg-[#142918] text-white rounded-xl h-14 px-8 font-medium transition-all shadow-md hover:-translate-y-0.5 w-fit disabled:opacity-60 disabled:hover:translate-y-0" disabled={isSubmitting || unavailable.length > 0}>
             <ShoppingBag className="w-4 h-4 mr-2" /> {t("placeOrder")}
           </Button>
+          {unavailable.length > 0 ? (
+            <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3.5 text-sm text-amber-900">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                <div>
+                  <p className="font-bold">{t("unavailableTitle")}</p>
+                  <p className="mt-1 leading-6 text-amber-800">
+                    {t("unavailableDesc", {names: unavailable.map((u) => u.name).join(", ")})}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={removeUnavailableFromCart}
+                    className="mt-3 inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-amber-700"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    {t("removeUnavailable")}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : null}
           {submitError ? (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
               {submitError}

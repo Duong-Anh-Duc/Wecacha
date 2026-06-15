@@ -364,7 +364,10 @@
     "addressPlaceholder": "Nhập địa chỉ",
     "cityPlaceholder": "Chọn tỉnh, thành phố",
     "notePlaceholder": "Nhập ghi chú cho đơn hàng (ví dụ: giao hàng giờ hành chính, để trước cửa...)",
-    "orderError": "Không thể tạo đơn hàng. Vui lòng thử lại."
+    "orderError": "Không thể tạo đơn hàng. Vui lòng thử lại.",
+    "unavailableTitle": "Một số sản phẩm đã ngừng kinh doanh",
+    "unavailableDesc": "Sản phẩm sau đã ngừng kinh doanh hoặc không còn tồn tại: {names}. Vui lòng xóa khỏi giỏ hàng để tiếp tục thanh toán.",
+    "removeUnavailable": "Xóa khỏi giỏ hàng"
   },
   "About": {
     "kicker": "Về chúng tôi",
