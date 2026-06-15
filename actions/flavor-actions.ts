@@ -1,20 +1,12 @@
 "use server";
 
 import {createClient} from "@supabase/supabase-js";
+import {ALL_FLAVOR_KEYS} from "@/features/flavor-quiz/wheel-data";
 
 type FlavorEventType = "click" | "submit";
 
-const VALID_FLAVORS = new Set([
-  "floral",
-  "fruity",
-  "sourFermented",
-  "green",
-  "other",
-  "roasted",
-  "spicy",
-  "nutty",
-  "sweet"
-]);
+// Any flavor on the wheel: groups (level 1), families (level 2) and leaves (level 3).
+const VALID_FLAVORS = new Set(ALL_FLAVOR_KEYS);
 
 /**
  * Records a flavor-wheel event (a flavor selection "click" or a quiz "submit").
@@ -43,6 +35,36 @@ export async function recordFlavorEvent(
         locale: locale === "en" ? "en" : "vi"
       }
     ]);
+    return {success: !error};
+  } catch {
+    return {success: false};
+  }
+}
+
+/**
+ * Records the same event type for many flavor keys at once (e.g. all the flavors a
+ * user selected across the quiz). Invalid keys are skipped. Fails silently.
+ */
+export async function recordFlavorEvents(
+  flavorKeys: string[],
+  type: FlavorEventType,
+  locale: string
+): Promise<{success: boolean}> {
+  const keys = [...new Set(flavorKeys)].filter((k) => VALID_FLAVORS.has(k));
+  if (keys.length === 0 || (type !== "click" && type !== "submit")) return {success: false};
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return {success: false};
+
+  try {
+    const supabase = createClient(url, anonKey, {auth: {persistSession: false}});
+    const rows = keys.map((flavorKey) => ({
+      flavor_key: flavorKey,
+      type,
+      locale: locale === "en" ? "en" : "vi"
+    }));
+    const {error} = await supabase.from("flavor_wheel_events").insert(rows);
     return {success: !error};
   } catch {
     return {success: false};

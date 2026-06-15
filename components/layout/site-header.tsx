@@ -25,10 +25,6 @@ export function SiteHeader() {
   const isGreenHome = pathname === "/green";
   // const showHomeVariantToggle = isHome || isGreenHome;
 
-  if (pathname.startsWith("/admin")) {
-    return null;
-  }
-
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 24);
@@ -40,6 +36,11 @@ export function SiteHeader() {
     window.addEventListener("scroll", onScroll, {passive: true});
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Header is hidden on admin pages — keep this AFTER all hooks (Rules of Hooks).
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   const solid = scrolled || !isHome;
   const lightHeader = false;

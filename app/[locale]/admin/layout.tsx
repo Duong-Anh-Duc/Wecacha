@@ -215,16 +215,14 @@ export default function AdminLayout({children}: {children: ReactNode}) {
             <button
               type="button"
               onClick={() => setIsSidebarCollapsed((value) => !value)}
-              className="hidden lg:inline-flex h-9 w-9 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-500 transition hover:bg-stone-50 hover:text-forest-950 shadow-sm"
+              className="hidden lg:inline-flex h-9 w-9 items-center justify-center rounded-xl text-stone-500 transition hover:text-forest-950"
               aria-label={isSidebarCollapsed ? t("expandSidebar") : t("collapseSidebar")}
             >
               {isSidebarCollapsed ? <PanelLeftOpen className="h-4.5 w-4.5" /> : <PanelLeftClose className="h-4.5 w-4.5" />}
             </button>
 
             <h1 className="flex min-w-0 items-center gap-2 text-[14px] font-black tracking-wider text-forest-950 uppercase">
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-ember/10 text-ember">
-                <LayoutDashboard className="h-4 w-4" />
-              </span>
+              <LayoutDashboard className="h-5 w-5 text-ember" />
               <span className="truncate">{t("systemTitle")}</span>
             </h1>
           </div>
@@ -261,13 +259,11 @@ export default function AdminLayout({children}: {children: ReactNode}) {
                 href="/admin/product-categories"
                 aria-label={t("productSettings")}
                 className={cn(
-                  "inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors",
-                  isProductSettings
-                    ? "border-ember/40 bg-ember/10 text-ember"
-                    : "border-stone-200 bg-[#fafaf8] text-forest-950 hover:border-ember/40 hover:text-ember"
+                  "inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors",
+                  isProductSettings ? "text-ember" : "text-forest-950 hover:text-ember"
                 )}
               >
-                <Settings className="h-4.5 w-4.5" />
+                <Settings className="h-5 w-5" />
               </Link>
             </Tooltip>
 

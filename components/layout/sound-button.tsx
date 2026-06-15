@@ -16,10 +16,6 @@ export function SoundButton() {
   const tooltipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isGreenHome = pathname.includes("/green");
 
-  if (pathname.includes("/admin")) {
-    return null;
-  }
-
   useEffect(() => {
     // Sử dụng âm thanh thiên nhiên từ kho âm thanh miễn phí
     // Bạn có thể đổi sang file mp3 cục bộ bằng cách đặt link "/audio/sound.mp3" nếu đã có file
@@ -37,6 +33,11 @@ export function SoundButton() {
       }
     };
   }, []);
+
+  // Hidden on admin pages — keep this AFTER all hooks (Rules of Hooks).
+  if (pathname.includes("/admin")) {
+    return null;
+  }
 
   const toggleSound = () => {
     if (!audioRef.current) return;

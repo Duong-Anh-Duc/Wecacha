@@ -30,7 +30,14 @@ import {formatCurrency, localized} from "@/lib/content/helpers";
 import {cn} from "@/lib/utils";
 import {flavors, productKeywords, questions, type FlavorKey, type FlavorScore} from "./data";
 import {flavorQuizzes, tx} from "./flavor-quizzes";
-import {recordFlavorEvent} from "@/actions/flavor-actions";
+import {
+  wheelGroups,
+  wheelShortLabelsVi,
+  wheelShortLabelsEn,
+  childShortLabelsVi,
+  childShortLabelsEn
+} from "./wheel-data";
+import {recordFlavorEvent, recordFlavorEvents} from "@/actions/flavor-actions";
 
 
 type FlavorQuizPageProps = {
@@ -40,21 +47,6 @@ type FlavorQuizPageProps = {
 };
 
 type QuizStage = "intro" | "quiz" | "result";
-
-type WheelChild = {
-  id: string;
-  labelKey: string;
-  color: string;
-  leaves: string[];
-};
-
-type WheelGroup = {
-  key: FlavorKey | string;
-  labelKey: string;
-  color: string;
-  weight: number;
-  children: WheelChild[];
-};
 
 export type WheelSelection = {
   groupKey: string;
@@ -71,109 +63,6 @@ const profileMatchers: {
   {id: "bright", keys: ["fruity", "citrus", "floral"]},
   {id: "balanced", keys: ["chocolate", "sweet", "nutty"]},
   {id: "bold", keys: ["roasted", "earthy", "chocolate"]}
-];
-
-const wheelGroups: WheelGroup[] = [
-  {
-    key: "floral",
-    labelKey: "flavors.floral.label",
-    color: "#ec008c",
-    weight: 4,
-    children: [
-      { id: "blackTea", labelKey: "wheel.blackTea", color: "#ae667d", leaves: [] },
-      { id: "flower", labelKey: "wheel.flower", color: "#f05794", leaves: ["chamomile", "rose", "jasmine"] }
-    ]
-  },
-  {
-    key: "fruity",
-    labelKey: "flavors.fruity.label",
-    color: "#ee1d23",
-    weight: 18,
-    children: [
-      { id: "berryFruit", labelKey: "wheel.berryFruit", color: "#ed2c4b", leaves: ["blackberry", "raspberry", "blueberry", "strawberry"] },
-      { id: "driedFruit", labelKey: "wheel.driedFruit", color: "#d7444f", leaves: ["raisin", "prune"] },
-      { id: "otherFruit", labelKey: "wheel.otherFruit", color: "#f26648", leaves: ["coconut", "cherry", "pomegranate", "pineapple", "grape", "apple", "peach", "pear"] },
-      { id: "citrusFruit", labelKey: "wheel.citrusFruit", color: "#fcb914", leaves: ["grapefruit", "orange", "lemon", "lime"] }
-    ]
-  },
-  {
-    key: "sourFermented",
-    labelKey: "wheel.sourFermented",
-    color: "#c2b21a",
-    weight: 9,
-    children: [
-      { id: "sour", labelKey: "wheel.sour", color: "#e2d925", leaves: ["sourAroma", "vinegar", "yogurt", "isovalericAcid", "citricAcid", "malicAcid"] },
-      { id: "fermented", labelKey: "wheel.fermented", color: "#b2a113", leaves: ["wine", "whisky", "ferment", "overripe"] }
-    ]
-  },
-  {
-    key: "green",
-    labelKey: "wheel.green",
-    color: "#17803b",
-    weight: 10,
-    children: [
-      { id: "oliveOil", labelKey: "wheel.oliveOil", color: "#a0b127", leaves: [] },
-      { id: "raw", labelKey: "wheel.raw", color: "#6c8c39", leaves: [] },
-      { id: "green", labelKey: "wheel.green", color: "#21b252", leaves: ["underRipe", "peapod", "fresh", "darkGreen", "vegetative", "hay", "herb"] },
-      { id: "beany", labelKey: "wheel.beany", color: "#6f9f95", leaves: [] }
-    ]
-  },
-  {
-    key: "other",
-    labelKey: "wheel.other",
-    color: "#7ba6bc",
-    weight: 9,
-    children: [
-      { id: "earth", labelKey: "wheel.earth", color: "#9bbccc", leaves: ["stale", "cardboard", "papery", "woody", "moldy", "dust", "dampEarth", "animal", "meatyBrothy", "phenolic"] },
-      { id: "chemical", labelKey: "wheel.chemical", color: "#61c6dd", leaves: ["bitter", "salty", "rubber", "wintergreen", "petrol", "medicinal"] }
-    ]
-  },
-  {
-    key: "roasted",
-    labelKey: "flavors.roasted.label",
-    color: "#d33727",
-    weight: 8,
-    children: [
-      { id: "tobacco", labelKey: "wheel.tobacco", color: "#cfb480", leaves: [] },
-      { id: "pipeTobacco", labelKey: "wheel.pipeTobacco", color: "#bda06a", leaves: [] },
-      { id: "roasted", labelKey: "wheel.roasted", color: "#b6804d", leaves: ["acrid", "ashy", "smoke", "toast"] },
-      { id: "cereal", labelKey: "wheel.cereal", color: "#e4bd2d", leaves: ["grain", "malt"] }
-    ]
-  },
-  {
-    key: "spicy",
-    labelKey: "flavors.spicy.label",
-    color: "#b90d41",
-    weight: 6,
-    children: [
-      { id: "drySpice", labelKey: "wheel.drySpice", color: "#be404c", leaves: ["licorice", "nutmeg", "cinnamon", "clove"] },
-      { id: "pepper", labelKey: "wheel.pepper", color: "#bc4747", leaves: [] },
-      { id: "pungent", labelKey: "wheel.pungent", color: "#734864", leaves: [] }
-    ]
-  },
-  {
-    key: "nutty",
-    labelKey: "flavors.nutty.label",
-    color: "#9a7b79",
-    weight: 5,
-    children: [
-      { id: "nut", labelKey: "wheel.nut", color: "#b59287", leaves: ["peanut", "hazelnut", "almond"] },
-      { id: "cacao", labelKey: "wheel.cacao", color: "#b37122", leaves: ["cocoa", "darkChocolate"] }
-    ]
-  },
-  {
-    key: "sweet",
-    labelKey: "flavors.sweet.label",
-    color: "#f36421",
-    weight: 8,
-    children: [
-      { id: "brownSugar", labelKey: "wheel.brownSugar", color: "#ce7c92", leaves: ["molasses", "maple", "caramel", "honey"] },
-      { id: "vanilla", labelKey: "wheel.vanilla", color: "#f6997d", leaves: [] },
-      { id: "vanillin", labelKey: "wheel.vanillin", color: "#f38088", leaves: [] },
-      { id: "overallSweet", labelKey: "wheel.overallSweet", color: "#de707a", leaves: [] },
-      { id: "sweetAroma", labelKey: "wheel.sweetAroma", color: "#ce3e6c", leaves: [] }
-    ]
-  }
 ];
 
 const WHEEL_CENTER = 700;
@@ -327,6 +216,16 @@ function recommendedProducts(products: Product[], topKeys: FlavorKey[], locale: 
   return [...matched, ...fallback].slice(0, 3);
 }
 
+type QuizQ = {
+  id: string;
+  title: string;
+  options: {key: string; label: string; color: string}[];
+};
+
+// Round 1 splits the 9 main groups across two questions (arc Cacao&Nuts → Fruity, then the rest).
+const ROUND1_A = ["fruity", "floral", "sweet", "nutty"];
+const ROUND1_B = ["sourFermented", "green", "other", "roasted", "spicy"];
+
 const FLAVOR_ICONS: Record<string, LucideIcon> = {
   floral: Flower2,
   fruity: Cherry,
@@ -373,29 +272,17 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
   const [hoverPos, setHoverPos] = useState<{x: number; y: number} | null>(null);
   const hoverHideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [quizOpen, setQuizOpen] = useState(false);
-  const [quizStage, setQuizStage] = useState<"pick" | "questions" | "result">("pick");
-  const [pickedFlavor, setPickedFlavor] = useState<string | null>(null);
-  const [pickedItemLabel, setPickedItemLabel] = useState<string | null>(null);
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [quizResult, setQuizResult] = useState(false);
+  const [quizStep, setQuizStep] = useState(0);
+  const [quizPhase, setQuizPhase] = useState<"r1" | "r2" | "r3">("r1");
+  const [quizQueue, setQuizQueue] = useState<QuizQ[]>([]);
+  const [quizSel, setQuizSel] = useState<Record<string, string[]>>({});
 
   const flavorName = (key: string) => {
     const q = flavorQuizzes[key];
     return q ? tx(q.name, locale) : key;
   };
   const flavorColor = (key: string) => wheelGroups.find((g) => g.key === key)?.color ?? "#a46131";
-
-  // All specific flavors on the wheel (outer-ring notes), grouped by their main flavor group.
-  const quizGroups = wheelGroups.map((group) => ({
-    groupKey: group.key,
-    groupName: flavorName(group.key),
-    color: group.color,
-    items: group.children.flatMap((child) =>
-      child.leaves.length > 0
-        ? child.leaves.map((leaf) => ({key: leaf, label: t(`wheel.${leaf}`), color: child.color}))
-        : [{key: child.id, label: t(child.labelKey), color: child.color}]
-    )
-  }));
 
   // Clicking a flavor on the wheel shows the hovered flavor in the preview and records a click.
   const handlePickFlavor = (groupKey: string, label?: string) => {
@@ -426,59 +313,118 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
 
   const handleHoverMove = (x: number, y: number) => setHoverPos({x, y});
 
-  const quiz = pickedFlavor ? flavorQuizzes[pickedFlavor] : null;
-  const currentQuestion = quiz?.questions[step];
-  const isLastQuestion = quiz ? step === quiz.questions.length - 1 : false;
-  const selectedAnswer = currentQuestion ? answers[currentQuestion.id] : undefined;
-  const progress = quiz ? ((step + 1) / quiz.questions.length) * 100 : 0;
+  // ---- Drill-down quiz (round 1: groups → round 2: families → round 3: notes) ----
+  const groupQuestion = (id: string, title: string, keys: string[]): QuizQ => ({
+    id,
+    title,
+    options: keys.map((k) => ({key: k, label: flavorName(k), color: flavorColor(k)}))
+  });
+
+  const initialQuizQueue = (): QuizQ[] => [
+    groupQuestion("r1a", isVi ? "Bạn thích nhóm hương vị nào?" : "Which flavor groups do you like?", ROUND1_A),
+    groupQuestion("r1b", isVi ? "Còn nhóm hương vị nào nữa?" : "Any other flavor groups?", ROUND1_B)
+  ];
+
+  const currentQ = quizQueue[quizStep];
+  const currentSel = currentQ ? quizSel[currentQ.id] ?? [] : [];
+
+  const chosenFamiliesWithLeaves = () => {
+    const fams = Object.entries(quizSel)
+      .filter(([id]) => id.startsWith("l2-"))
+      .flatMap(([, v]) => v);
+    return wheelGroups.flatMap((g) => g.children).filter((c) => fams.includes(c.id) && c.leaves.length > 0);
+  };
+
+  const wouldBeLast = () => {
+    if (quizStep < quizQueue.length - 1) return false;
+    if (quizPhase === "r1") return [...(quizSel.r1a ?? []), ...(quizSel.r1b ?? [])].length === 0;
+    if (quizPhase === "r2") return chosenFamiliesWithLeaves().length === 0;
+    return true;
+  };
+
+  const finishQuiz = () => {
+    const allKeys = Object.values(quizSel).flat();
+    if (allKeys.length > 0) void recordFlavorEvents(allKeys, "submit", locale);
+    setQuizResult(true);
+  };
+
+  const advanceQuiz = () => {
+    if (quizStep < quizQueue.length - 1) {
+      setQuizStep((s) => s + 1);
+      return;
+    }
+    if (quizPhase === "r1") {
+      const chosenGroups = [...(quizSel.r1a ?? []), ...(quizSel.r1b ?? [])];
+      const l2 = wheelGroups
+        .filter((g) => chosenGroups.includes(g.key))
+        .map((g) =>
+          ({
+            id: `l2-${g.key}`,
+            title: isVi
+              ? `Trong "${flavorName(g.key)}", bạn thích họ vị nào?`
+              : `Within "${flavorName(g.key)}", which families?`,
+            options: g.children.map((c) => ({key: c.id, label: t(c.labelKey), color: c.color}))
+          } as QuizQ)
+        );
+      if (l2.length === 0) return finishQuiz();
+      setQuizQueue((q) => [...q, ...l2]);
+      setQuizPhase("r2");
+      setQuizStep((s) => s + 1);
+      return;
+    }
+    if (quizPhase === "r2") {
+      const l3 = chosenFamiliesWithLeaves().map((c) =>
+        ({
+          id: `l3-${c.id}`,
+          title: isVi
+            ? `Trong "${t(c.labelKey)}", bạn thích vị nào?`
+            : `Within "${t(c.labelKey)}", which notes?`,
+          options: c.leaves.map((leaf) => ({key: leaf, label: t(`wheel.${leaf}`), color: c.color}))
+        } as QuizQ)
+      );
+      if (l3.length === 0) return finishQuiz();
+      setQuizQueue((q) => [...q, ...l3]);
+      setQuizPhase("r3");
+      setQuizStep((s) => s + 1);
+      return;
+    }
+    finishQuiz();
+  };
+
+  const toggleQuizOption = (qid: string, optKey: string) => {
+    setQuizSel((cur) => {
+      const list = cur[qid] ?? [];
+      const next = list.includes(optKey) ? list.filter((k) => k !== optKey) : [...list, optKey];
+      return {...cur, [qid]: next};
+    });
+  };
 
   const openQuiz = () => {
     setHoverFlavor(null);
-    setQuizStage("pick");
-    setPickedFlavor(null);
-    setStep(0);
-    setAnswers({});
+    setQuizQueue(initialQuizQueue());
+    setQuizPhase("r1");
+    setQuizStep(0);
+    setQuizSel({});
+    setQuizResult(false);
     setQuizOpen(true);
   };
 
   const closeQuiz = () => setQuizOpen(false);
 
-  const pickQuizFlavor = (groupKey: string, itemLabel: string) => {
-    setPickedFlavor(groupKey);
-    setPickedItemLabel(itemLabel);
-    setStep(0);
-    setAnswers({});
-    setQuizStage("questions");
-  };
-
-  const chooseAnswer = (questionId: string, answerId: string) =>
-    setAnswers((cur) => ({...cur, [questionId]: answerId}));
-
-  const nextQuestion = () => {
-    if (!quiz) return;
-    if (isLastQuestion) {
-      void recordFlavorEvent(quiz.groupKey, "submit", locale);
-      setQuizStage("result");
-      return;
-    }
-    setStep((s) => s + 1);
-  };
-
-  const backQuestion = () => {
-    if (step > 0) {
-      setStep((s) => s - 1);
-    } else {
-      setQuizStage("pick");
-      setPickedFlavor(null);
-    }
+  const backQuiz = () => {
+    if (quizStep > 0) setQuizStep((s) => s - 1);
+    else closeQuiz();
   };
 
   const restartQuiz = () => {
-    setQuizStage("pick");
-    setPickedFlavor(null);
-    setStep(0);
-    setAnswers({});
+    setQuizQueue(initialQuizQueue());
+    setQuizPhase("r1");
+    setQuizStep(0);
+    setQuizSel({});
+    setQuizResult(false);
   };
+
+  const progress = quizQueue.length > 0 ? ((quizStep + 1) / quizQueue.length) * 100 : 0;
 
   return (
     <main className="overflow-hidden bg-parchment-50 text-forest-950">
@@ -578,51 +524,17 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
 
-              {quizStage === "pick" ? (
+              {!quizResult && currentQ ? (
                 <div className="overflow-y-auto p-6 sm:p-8">
                   <p className="text-sm font-black uppercase tracking-[0.16em] text-earth-700">
                     {isVi ? "Khám phá gu cà phê" : "Explore your taste"}
                   </p>
-                  <h2 className="mt-2 pr-10 font-serif text-2xl leading-tight text-forest-950 sm:text-3xl">
-                    {isVi ? "Chọn hương vị bạn yêu thích nhất" : "Pick the flavor you love most"}
-                  </h2>
-                  <div className="mt-6 space-y-5">
-                    {quizGroups.map((group) => {
-                      const GroupIcon = FLAVOR_ICONS[group.groupKey] || Sparkles;
-                      return (
-                        <div key={group.groupKey}>
-                          <div className="mb-2 flex items-center gap-2">
-                            <GroupIcon className="h-4 w-4" strokeWidth={1.9} style={{color: group.color}} aria-hidden="true" />
-                            <p className="text-xs font-black uppercase tracking-[0.12em] text-forest-950/55">
-                              {group.groupName}
-                            </p>
-                          </div>
-                          <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4 lg:grid-cols-5">
-                            {group.items.map((item) => (
-                              <button
-                                key={`${group.groupKey}-${item.key}`}
-                                type="button"
-                                onClick={() => pickQuizFlavor(group.groupKey, item.label)}
-                                className="rounded-lg border px-2.5 py-1.5 text-center text-xs font-bold leading-tight text-forest-950 transition hover:-translate-y-0.5"
-                                style={{borderColor: `${item.color}40`, backgroundColor: `${item.color}14`}}
-                              >
-                                {item.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : quizStage === "questions" && quiz && currentQuestion ? (
-                <div className="overflow-y-auto p-6 sm:p-8">
-                  <p className="text-sm font-black uppercase tracking-[0.16em] text-earth-700">
-                    {pickedItemLabel ?? tx(quiz.name, locale)} · {step + 1}/{quiz.questions.length}
-                  </p>
                   <h2 className="mt-2 pr-10 font-serif text-xl leading-tight text-forest-950 sm:text-2xl">
-                    {tx(currentQuestion.title, locale)}
+                    {currentQ.title}
                   </h2>
+                  <p className="mt-1 text-xs font-semibold text-forest-950/50">
+                    {isVi ? "Có thể chọn nhiều hương vị." : "You can pick several."}
+                  </p>
                   <div className="my-5 h-2 overflow-hidden rounded-full bg-parchment-100">
                     <motion.div
                       className="h-full rounded-full bg-earth-600"
@@ -630,32 +542,23 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
                       transition={{duration: 0.35}}
                     />
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {currentQuestion.answers.map((answer) => {
-                      const isSelected = selectedAnswer === answer.id;
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {currentQ.options.map((opt) => {
+                      const isSelected = currentSel.includes(opt.key);
                       return (
                         <button
-                          key={answer.id}
+                          key={`${currentQ.id}-${opt.key}`}
                           type="button"
-                          onClick={() => chooseAnswer(currentQuestion.id, answer.id)}
-                          className={cn(
-                            "group min-h-[72px] rounded-2xl border p-4 text-left transition",
+                          onClick={() => toggleQuizOption(currentQ.id, opt.key)}
+                          className="flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-left text-[13px] font-bold leading-tight transition hover:-translate-y-0.5"
+                          style={
                             isSelected
-                              ? "border-earth-600 bg-earth-600 text-white shadow-[0_18px_44px_rgba(181,112,58,0.24)]"
-                              : "border-forest-950/10 bg-white text-forest-950 hover:-translate-y-0.5 hover:border-earth-600/50"
-                          )}
+                              ? {backgroundColor: opt.color, borderColor: opt.color, color: "#fff"}
+                              : {backgroundColor: `${opt.color}14`, borderColor: `${opt.color}40`, color: "#142918"}
+                          }
                         >
-                          <span className="flex items-start gap-3">
-                            <span
-                              className={cn(
-                                "mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-sm font-black",
-                                isSelected ? "border-white bg-white text-earth-700" : "border-forest-950/15 bg-white text-earth-700"
-                              )}
-                            >
-                              {isSelected ? <Check className="h-4 w-4" aria-hidden="true" /> : answer.id.slice(-1).toUpperCase()}
-                            </span>
-                            <span className="text-sm font-bold leading-6">{tx(answer.label, locale)}</span>
-                          </span>
+                          <span>{opt.label}</span>
+                          {isSelected && <Check className="h-4 w-4 shrink-0" aria-hidden="true" />}
                         </button>
                       );
                     })}
@@ -663,7 +566,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
                   <div className="mt-6 flex items-center justify-between gap-3">
                     <button
                       type="button"
-                      onClick={backQuestion}
+                      onClick={backQuiz}
                       className="inline-flex items-center gap-2 rounded-full border border-forest-950/10 bg-white px-5 py-3 text-sm font-black text-forest-950 transition hover:border-earth-600/50"
                     >
                       <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -671,11 +574,10 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
                     </button>
                     <button
                       type="button"
-                      onClick={nextQuestion}
-                      disabled={!selectedAnswer}
-                      className="inline-flex items-center gap-2 rounded-full bg-forest-950 px-6 py-3 text-sm font-black text-parchment-50 transition hover:bg-forest-900 disabled:cursor-not-allowed disabled:opacity-45"
+                      onClick={advanceQuiz}
+                      className="inline-flex items-center gap-2 rounded-full bg-forest-950 px-6 py-3 text-sm font-black text-parchment-50 transition hover:bg-forest-900"
                     >
-                      {isLastQuestion ? t("seeResult") : t("next")}
+                      {wouldBeLast() ? t("seeResult") : t("next")}
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </div>
@@ -879,98 +781,6 @@ function IntroPanel({t}: {t: ReturnType<typeof useTranslations<"FlavorQuiz">>}) 
     </div>
   );
 }
-
-const wheelShortLabelsVi: Record<string, string> = {
-  floral: "HOA",
-  fruity: "TRÁI CÂY",
-  sourFermented: "LÊN MEN CHUA",
-  green: "TƯƠI XANH / THỰC VẬT",
-  other: "MÙI VỊ KHÁC",
-  roasted: "RANG",
-  spicy: "GIA VỊ",
-  nutty: "CA CAO & HẠT",
-  sweet: "NGỌT"
-};
-
-const wheelShortLabelsEn: Record<string, string> = {
-  floral: "FLORAL",
-  fruity: "FRUITY",
-  sourFermented: "SOUR / FERMENTED",
-  green: "GREEN / VEG",
-  other: "OTHER",
-  roasted: "ROASTED",
-  spicy: "SPICES",
-  nutty: "NUTTY / COCOA",
-  sweet: "SWEET"
-};
-
-const childShortLabelsVi: Record<string, string> = {
-  flower: "HOA",
-  berryFruit: "QUẢ MỌNG",
-  driedFruit: "QUẢ KHÔ",
-  otherFruit: "CÁC LOẠI QUẢ KHÁC",
-  citrusFruit: "QUẢ CÓ MÚI",
-  sour: "CHUA",
-  fermented: "LÊN MEN RƯỢU",
-  green: "TƯƠI XANH / THỰC VẬT",
-  oliveOil: "DẦU Ô LIU",
-  raw: "TƯƠI SỐNG",
-  beany: "ĐẬU (HẠT)",
-  earth: "GIẤY / MỘC",
-  animal: "ĐỘNG VẬT",
-  bitter: "VỊ ĐẮNG",
-  salty: "VỊ MẶN",
-  chemical: "HÓA CHẤT",
-  tobacco: "THUỐC LÁ",
-  pipeTobacco: "THUỐC LÀO",
-  roasted: "RANG / NƯỚNG",
-  cereal: "NGŨ CỐC",
-  drySpice: "GIA VỊ KHÔ",
-  pepper: "TIÊU ĐEN",
-  pungent: "HĂNG CAY",
-  nut: "HẠT",
-  cacao: "CA CAO",
-  brownSugar: "ĐƯỜNG NÂU",
-  vanilla: "QUẢ VA-NI KHÔ",
-  vanillin: "KẸO VA-NI",
-  overallSweet: "NGỌT",
-  sweetAroma: "NGỌT NGÀO",
-  blackTea: "TRÀ ĐEN"
-};
-
-const childShortLabelsEn: Record<string, string> = {
-  flower: "FLOWER",
-  berryFruit: "BERRY",
-  driedFruit: "DRIED FRUIT",
-  otherFruit: "OTHER FRUIT",
-  citrusFruit: "CITRUS FRUIT",
-  sour: "SOUR",
-  fermented: "ALCOHOL / FERMENTED",
-  green: "GREEN / VEG",
-  oliveOil: "OLIVE OIL",
-  raw: "RAW",
-  beany: "BEANY",
-  earth: "PAPERY/MUSTY",
-  animal: "ANIMALIC",
-  bitter: "BITTER",
-  salty: "SALTY",
-  chemical: "CHEMICAL",
-  tobacco: "TOBACCO",
-  pipeTobacco: "PIPE TOBACCO",
-  roasted: "ROASTED",
-  cereal: "CEREAL",
-  drySpice: "BROWN SPICE",
-  pepper: "PEPPER",
-  pungent: "PUNGENT",
-  nut: "NUTTY",
-  cacao: "COCOA",
-  brownSugar: "BROWN SUGAR",
-  vanilla: "VANILLA",
-  vanillin: "VANILLIN",
-  overallSweet: "OVERALL SWEET",
-  sweetAroma: "SWEET AROMATICS",
-  blackTea: "BLACK TEA"
-};
 
 function getTextColorForGroup(groupKey: string, childId: string, defaultColor: string) {
   const darkColors: Record<string, string> = {

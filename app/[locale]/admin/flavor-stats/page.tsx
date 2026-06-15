@@ -1,23 +1,13 @@
-import {setRequestLocale} from "next-intl/server";
+import {getTranslations, setRequestLocale} from "next-intl/server";
 import type {Locale} from "@/i18n/routing";
 import {requireAdmin} from "@/lib/admin-auth";
 import {RefreshButton} from "@/components/admin/refresh-button";
-import {AdminFlavorWheel} from "@/components/admin/admin-flavor-wheel";
+import {getFlavorCounts} from "@/actions/flavor-actions";
+import {wheelGroups} from "@/features/flavor-quiz/wheel-data";
 import {flavorQuizzes, tx} from "@/features/flavor-quiz/flavor-quizzes";
+import {FlavorStatsTree} from "@/components/admin/flavor-stats-tree";
 
 export const revalidate = 0;
-
-const GROUP_ORDER = [
-  "floral",
-  "fruity",
-  "sourFermented",
-  "green",
-  "other",
-  "roasted",
-  "spicy",
-  "nutty",
-  "sweet"
-];
 
 export default async function FlavorStatsPage({
   params
@@ -27,42 +17,69 @@ export default async function FlavorStatsPage({
   const {locale} = await params;
   setRequestLocale(locale);
   const isVi = locale === "vi";
+  const t = await getTranslations({locale, namespace: "FlavorQuiz"});
   const {supabase} = await requireAdmin(locale);
 
-  // Count clicks + submits per flavor group (parallel, accurate at any volume).
-  const queries = GROUP_ORDER.flatMap((key) => [
-    supabase
-      .from("flavor_wheel_events")
-      .select("*", {count: "exact", head: true})
-      .eq("flavor_key", key)
-      .eq("type", "click")
-      .then((r) => ({key, type: "click" as const, count: r.count ?? 0, error: r.error})),
-    supabase
-      .from("flavor_wheel_events")
-      .select("*", {count: "exact", head: true})
-      .eq("flavor_key", key)
-      .eq("type", "submit")
-      .then((r) => ({key, type: "submit" as const, count: r.count ?? 0, error: r.error}))
-  ]);
-
-  const results = await Promise.all(queries);
-  const tableMissing = results.some(
-    (r) => r.error && /relation .*flavor_wheel_events.* does not exist|could not find the table/i.test(r.error.message)
+  // Probe whether the events table exists.
+  const probe = await supabase.from("flavor_wheel_events").select("id", {head: true, count: "exact"});
+  const tableMissing = Boolean(
+    probe.error && /does not exist|could not find the table/i.test(probe.error.message)
   );
 
-  const stats = GROUP_ORDER.map((key) => {
-    const clicks = results.find((r) => r.key === key && r.type === "click")?.count ?? 0;
-    const submits = results.find((r) => r.key === key && r.type === "submit")?.count ?? 0;
-    const name = flavorQuizzes[key] ? tx(flavorQuizzes[key].name, locale) : key;
-    return {key, name, clicks, submits};
-  }).sort((a, b) => b.clicks + b.submits - (a.clicks + a.submits));
+  const counts = tableMissing ? {} : await getFlavorCounts();
+  const c = (key: string) => counts[key] ?? {clicks: 0, submits: 0};
 
-  const totalClicks = stats.reduce((s, r) => s + r.clicks, 0);
-  const totalSubmits = stats.reduce((s, r) => s + r.submits, 0);
-  const maxVal = Math.max(1, ...stats.map((r) => Math.max(r.clicks, r.submits)));
-  const countsMap = Object.fromEntries(
-    stats.map((r) => [r.key, {clicks: r.clicks, submits: r.submits}])
-  );
+  // Build the 3-level tree (group → family → leaf) in wheel order.
+  const groupsTree = wheelGroups.map((group) => ({
+    key: group.key,
+    label: flavorQuizzes[group.key] ? tx(flavorQuizzes[group.key].name, locale) : group.key,
+    color: group.color,
+    ...c(group.key),
+    families: group.children.map((child) => ({
+      key: child.id,
+      label: t(child.labelKey),
+      color: child.color,
+      ...c(child.id),
+      leaves: child.leaves.map((leaf) => ({
+        key: leaf,
+        label: t(`wheel.${leaf}`),
+        color: child.color,
+        ...c(leaf)
+      }))
+    }))
+  }));
+
+  const totalClicks = wheelGroups.reduce((s, g) => s + c(g.key).clicks, 0);
+
+  // Total submits per main group (group + its families + leaves) for the donut chart.
+  const groupSubmitTotals = groupsTree.map((g) => ({
+    key: g.key,
+    label: g.label,
+    color: g.color,
+    value:
+      g.submits +
+      g.families.reduce((fs, f) => fs + f.submits + f.leaves.reduce((ls, l) => ls + l.submits, 0), 0)
+  }));
+  const totalSubmits = groupSubmitTotals.reduce((s, d) => s + d.value, 0);
+
+  // Donut slices (stroke-dasharray technique).
+  const R = 70;
+  const CIRC = 2 * Math.PI * R;
+  let acc = 0;
+  const donutSlices = groupSubmitTotals
+    .filter((d) => d.value > 0)
+    .map((d) => {
+      const frac = totalSubmits > 0 ? d.value / totalSubmits : 0;
+      const slice = {
+        ...d,
+        frac,
+        dash: frac * CIRC,
+        gap: CIRC - frac * CIRC,
+        offset: -acc * CIRC
+      };
+      acc += frac;
+      return slice;
+    });
 
   return (
     <div className="space-y-6">
@@ -71,11 +88,6 @@ export default async function FlavorStatsPage({
           <h2 className="text-3xl text-forest-950">
             {isVi ? "Thống kê Gu cà phê" : "Coffee Taste Stats"}
           </h2>
-          <p className="mt-1 max-w-2xl text-sm leading-7 text-stone-500">
-            {isVi
-              ? "Số lượt khách chọn từng vị trên vòng tròn hương vị (click) và số lượt hoàn thành quiz (submit)."
-              : "How many visitors selected each flavor on the wheel (clicks) and completed the quiz (submits)."}
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <RefreshButton />
@@ -87,13 +99,9 @@ export default async function FlavorStatsPage({
 
       {tableMissing ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm leading-7 text-amber-800">
-          <p className="font-bold">
-            {isVi ? "Chưa tạo bảng thống kê" : "Stats table not created yet"}
-          </p>
+          <p className="font-bold">{isVi ? "Chưa tạo bảng thống kê" : "Stats table not created yet"}</p>
           <p className="mt-1">
-            {isVi
-              ? "Hãy chạy file SQL "
-              : "Run the SQL file "}
+            {isVi ? "Hãy chạy file SQL " : "Run the SQL file "}
             <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-[12px]">
               supabase/sql/flavor-wheel-events-migration.sql
             </code>
@@ -102,56 +110,61 @@ export default async function FlavorStatsPage({
         </div>
       ) : (
         <div className="space-y-6">
-        <AdminFlavorWheel locale={locale} counts={countsMap} />
-        <div className="overflow-hidden rounded-2xl border border-forest-950/10 bg-white shadow-sm">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-forest-950/10 bg-stone-50 text-left text-xs uppercase tracking-wide text-stone-500">
-                <th className="px-5 py-3 font-bold">{isVi ? "Hương vị" : "Flavor"}</th>
-                <th className="px-5 py-3 font-bold">{isVi ? "Lượt chọn (click)" : "Selections (click)"}</th>
-                <th className="px-5 py-3 font-bold">{isVi ? "Hoàn thành (submit)" : "Completions (submit)"}</th>
-                <th className="px-5 py-3 font-bold">{isVi ? "Tỉ lệ" : "Activity"}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.map((row) => (
-                <tr key={row.key} className="border-b border-forest-950/5 last:border-0">
-                  <td className="px-5 py-3 font-bold text-forest-950">{row.name}</td>
-                  <td className="px-5 py-3 text-forest-950/80">{row.clicks}</td>
-                  <td className="px-5 py-3 text-forest-950/80">{row.submits}</td>
-                  <td className="px-5 py-3">
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 w-40 overflow-hidden rounded-full bg-stone-100">
-                          <div
-                            className="h-full rounded-full bg-[#a46131]"
-                            style={{width: `${(row.clicks / maxVal) * 100}%`}}
-                          />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 w-40 overflow-hidden rounded-full bg-stone-100">
-                          <div
-                            className="h-full rounded-full bg-[#17351f]"
-                            style={{width: `${(row.submits / maxVal) * 100}%`}}
-                          />
-                        </div>
-                      </div>
+          {/* Donut chart — submit distribution per main flavor group */}
+          <div className="rounded-2xl border border-forest-950/10 bg-white p-6 shadow-sm">
+            <h3 className="text-base font-bold text-forest-950">
+              {isVi ? "Tỉ lệ hoàn thành quiz theo nhóm" : "Quiz submits by group"}
+            </h3>
+            {totalSubmits === 0 ? (
+              <p className="mt-6 text-center text-sm font-medium text-stone-400">
+                {isVi ? "Chưa có lượt hoàn thành quiz nào." : "No quiz submits yet."}
+              </p>
+            ) : (
+              <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-10">
+                <div className="relative shrink-0">
+                  <svg width="180" height="180" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r={R} fill="none" stroke="#f1efe9" strokeWidth="26" />
+                    {donutSlices.map((s) => (
+                      <circle
+                        key={s.key}
+                        cx="100"
+                        cy="100"
+                        r={R}
+                        fill="none"
+                        stroke={s.color}
+                        strokeWidth="26"
+                        strokeDasharray={`${s.dash} ${s.gap}`}
+                        strokeDashoffset={s.offset}
+                        transform="rotate(-90 100 100)"
+                      />
+                    ))}
+                  </svg>
+                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="font-serif text-3xl font-black text-forest-950">{totalSubmits}</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wide text-stone-400">submit</span>
+                  </div>
+                </div>
+                <div className="grid w-full grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
+                  {donutSlices.map((s) => (
+                    <div key={s.key} className="flex items-center justify-between gap-3 text-sm">
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span className="inline-block h-3 w-3 shrink-0 rounded-full" style={{backgroundColor: s.color}} />
+                        <span className="truncate font-semibold text-forest-950/80">{s.label}</span>
+                      </span>
+                      <span className="shrink-0 font-bold text-forest-950">
+                        {s.value}{" "}
+                        <span className="text-xs font-semibold text-stone-400">
+                          ({Math.round(s.frac * 100)}%)
+                        </span>
+                      </span>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="flex items-center gap-5 border-t border-forest-950/10 bg-stone-50 px-5 py-3 text-xs text-stone-500">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#a46131]" /> {isVi ? "Lượt chọn" : "Selections"}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#17351f]" /> {isVi ? "Hoàn thành quiz" : "Quiz completions"}
-            </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+
+          <FlavorStatsTree groups={groupsTree} isVi={isVi} />
         </div>
       )}
     </div>

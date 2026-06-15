@@ -100,7 +100,9 @@ export function ArticlesTable({
     });
   }
 
-  const columns: TableColumnsType<ArticleRow> = [
+  // Tạm ẩn tính năng kéo-thả đổi vị trí (đặt true để bật lại).
+  const SHOW_REORDER = false;
+  const columns: TableColumnsType<ArticleRow> = ([
     {
       title: "",
       key: "drag",
@@ -193,7 +195,7 @@ export function ArticlesTable({
         </Space>
       )
     }
-  ];
+  ] as TableColumnsType<ArticleRow>).filter((col) => SHOW_REORDER || (col as {key?: string}).key !== "drag");
 
   return (
     <div className="space-y-4">
@@ -227,9 +229,9 @@ export function ArticlesTable({
         columns={columns}
         dataSource={filtered}
         scroll={{x: 1060}}
-        rowClassName={(row) => (row.id === draggingId ? "opacity-50" : "cursor-grab")}
+        rowClassName={(row) => (row.id === draggingId ? "opacity-50" : SHOW_REORDER ? "cursor-grab" : "")}
         onRow={(row) => ({
-          draggable: !isPending,
+          draggable: SHOW_REORDER && !isPending,
           onDragStart: () => setDraggingId(row.id),
           onDragOver: (event) => event.preventDefault(),
           onDrop: () => handleDrop(row.id),
