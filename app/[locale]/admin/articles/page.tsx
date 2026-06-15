@@ -8,6 +8,9 @@ import {requireAdmin} from "@/lib/admin-auth";
 
 export const revalidate = 0;
 
+// Tạm ẩn tính năng chỉnh sửa/thêm bài viết (đặt true để bật lại).
+const SHOW_ARTICLE_EDIT = false;
+
 export default async function ArticlesPage({
   params
 }: {
@@ -43,13 +46,15 @@ export default async function ArticlesPage({
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <RefreshButton />
-          <Link
-            href="/admin/articles/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-ember px-4 py-2.5 font-medium text-white shadow-sm transition hover:bg-ember/90"
-          >
-            <Plus className="h-5 w-5" />
-            {t("addArticle")}
-          </Link>
+          {SHOW_ARTICLE_EDIT && (
+            <Link
+              href="/admin/articles/new"
+              className="inline-flex items-center gap-2 rounded-xl bg-ember px-4 py-2.5 font-medium text-white shadow-sm transition hover:bg-ember/90"
+            >
+              <Plus className="h-5 w-5" />
+              {t("addArticle")}
+            </Link>
+          )}
         </div>
       </div>
 

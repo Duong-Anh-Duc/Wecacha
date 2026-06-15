@@ -102,6 +102,8 @@ export function ArticlesTable({
 
   // Tạm ẩn tính năng kéo-thả đổi vị trí (đặt true để bật lại).
   const SHOW_REORDER = false;
+  // Tạm ẩn tính năng chỉnh sửa bài viết (đặt true để bật lại).
+  const SHOW_ARTICLE_EDIT = false;
   const columns: TableColumnsType<ArticleRow> = ([
     {
       title: "",
@@ -183,15 +185,17 @@ export function ArticlesTable({
           <Tooltip title={t("previewArticle")}>
             <ArticlePreviewButton article={row} compact />
           </Tooltip>
-          <Tooltip title={t("edit")}>
-            <Link href={`/admin/articles/${row.id}`}>
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                className="text-ember hover:!bg-transparent hover:!text-forest-950"
-              />
-            </Link>
-          </Tooltip>
+          {SHOW_ARTICLE_EDIT && (
+            <Tooltip title={t("edit")}>
+              <Link href={`/admin/articles/${row.id}`}>
+                <Button
+                  type="text"
+                  icon={<EditOutlined />}
+                  className="text-ember hover:!bg-transparent hover:!text-forest-950"
+                />
+              </Link>
+            </Tooltip>
+          )}
         </Space>
       )
     }
