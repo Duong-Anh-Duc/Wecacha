@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useState, type ReactNode} from "react";
-import {App as AntApp, ConfigProvider, Dropdown, Modal} from "antd";
+import {App as AntApp, ConfigProvider, Dropdown, Modal, Tooltip} from "antd";
 import viVN from "antd/locale/vi_VN";
 import {
   ChevronDown,
@@ -15,8 +15,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   PieChart,
+  Settings,
   ShoppingBag,
-  Tags,
   UserRound,
   Users
 } from "lucide-react";
@@ -120,14 +120,6 @@ export default function AdminLayout({children}: {children: ReactNode}) {
       mobileIcon: <Package className="h-4 w-4" />
     },
     {
-      key: "productSettings",
-      href: "/admin/product-categories",
-      label: t("productSettings"),
-      active: isProductSettings,
-      icon: <Tags className="h-5 w-5" />,
-      mobileIcon: <Tags className="h-4 w-4" />
-    },
-    {
       key: "orders",
       href: "/admin/orders",
       label: t("orders"),
@@ -145,6 +137,13 @@ export default function AdminLayout({children}: {children: ReactNode}) {
     }
   ];
   const currentNav = navItems.find((item) => item.active) ?? navItems[0];
+
+  const navGroups: {label: string | null; keys: string[]}[] = [
+    {label: null, keys: ["dashboard"]},
+    {label: t("navGroupSales"), keys: ["products", "orders"]},
+    {label: t("navGroupContent"), keys: ["articles", "flavorStats"]},
+    {label: t("navGroupCustomers"), keys: ["registrations"]}
+  ];
 
   const handleLogout = async () => {
     setIsLogoutConfirmOpen(false);
@@ -180,16 +179,31 @@ export default function AdminLayout({children}: {children: ReactNode}) {
           </div>
         </div>
 
-        <nav className="flex-1 space-y-2 p-4 pt-6">
-          {navItems.map((item) => (
-            <AdminNavLink
-              key={item.key}
-              href={item.href}
-              label={item.label}
-              active={item.active}
-              collapsed={isSidebarCollapsed}
-              icon={item.icon}
-            />
+        <nav className="flex-1 space-y-1 p-4 pt-6">
+          {navGroups.map((group, groupIndex) => (
+            <div key={group.label ?? `group-${groupIndex}`} className="space-y-1">
+              {isSidebarCollapsed
+                ? groupIndex > 0 && <div className="mx-auto my-3 h-px w-8 bg-white/12" />
+                : group.label && (
+                    <p className="px-4 pb-1 pt-4 text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
+                      {group.label}
+                    </p>
+                  )}
+              {group.keys.map((key) => {
+                const item = navItems.find((navItem) => navItem.key === key);
+                if (!item) return null;
+                return (
+                  <AdminNavLink
+                    key={item.key}
+                    href={item.href}
+                    label={item.label}
+                    active={item.active}
+                    collapsed={isSidebarCollapsed}
+                    icon={item.icon}
+                  />
+                );
+              })}
+            </div>
           ))}
         </nav>
 
@@ -241,6 +255,21 @@ export default function AdminLayout({children}: {children: ReactNode}) {
                 <ChevronDown className="h-4 w-4 shrink-0 text-stone-400" />
               </button>
             </Dropdown>
+
+            <Tooltip title={t("productSettings")} placement="bottom">
+              <Link
+                href="/admin/product-categories"
+                aria-label={t("productSettings")}
+                className={cn(
+                  "inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors",
+                  isProductSettings
+                    ? "border-ember/40 bg-ember/10 text-ember"
+                    : "border-stone-200 bg-[#fafaf8] text-forest-950 hover:border-ember/40 hover:text-ember"
+                )}
+              >
+                <Settings className="h-4.5 w-4.5" />
+              </Link>
+            </Tooltip>
 
             <Dropdown
               trigger={["click"]}
@@ -316,10 +345,9 @@ function AdminNavLink({
   compact?: boolean;
   collapsed?: boolean;
 }) {
-  return (
+  const link = (
     <Link
       aria-label={label}
-      title={collapsed ? label : undefined}
       href={href}
       className={cn(
         "flex items-center gap-3 rounded-xl transition-all duration-300",
@@ -336,5 +364,13 @@ function AdminNavLink({
       {icon}
       <span className={cn(compact ? "hidden sm:inline" : undefined, collapsed && "sr-only")}>{label}</span>
     </Link>
+  );
+
+  return collapsed ? (
+    <Tooltip title={label} placement="right">
+      {link}
+    </Tooltip>
+  ) : (
+    link
   );
 }

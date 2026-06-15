@@ -1,8 +1,8 @@
 "use client";
 
-import {useMemo, useState, useTransition} from "react";
-import {App, Button, Drawer, Input, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
-import {EditOutlined, EyeOutlined, SearchOutlined, SaveOutlined} from "@ant-design/icons";
+import {useMemo, useState} from "react";
+import {App, Button, Drawer, Dropdown, Input, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
+import {DownOutlined, EditOutlined, EyeOutlined, SearchOutlined, SaveOutlined} from "@ant-design/icons";
 import Image from "next/image";
 import {useTranslations} from "next-intl";
 import {updateOrderWorkflow} from "@/actions/order-actions";
@@ -44,14 +44,14 @@ const statusColors = {
 
 export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: string}) {
   const t = useTranslations("Admin");
-  const {message} = App.useApp();
+  const {message, modal} = App.useApp();
+  const isVi = locale === "vi";
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewing, setViewing] = useState<OrderRow | null>(null);
   const [editing, setEditing] = useState<OrderRow | null>(null);
   const [draftStatus, setDraftStatus] = useState<OrderRow["status"]>("new");
   const [draftNote, setDraftNote] = useState("");
-  const [isPending, startTransition] = useTransition();
   const [pagination, setPagination] = useState({current: 1, pageSize: 10});
 
   const dateFormatter = useMemo(
@@ -89,29 +89,83 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
     return t("orderNew");
   }
 
+  const statusOptions: {value: OrderRow["status"]; label: string}[] = [
+    {value: "new", label: t("orderNew")},
+    {value: "confirmed", label: t("orderConfirmed")},
+    {value: "shipping", label: t("orderShipping")},
+    {value: "completed", label: t("orderCompleted")},
+    {value: "cancelled", label: t("orderCancelled")}
+  ];
+
+  function changeStatus(order: OrderRow, next: OrderRow["status"]) {
+    if (next === order.status) return;
+    modal.confirm({
+      title: isVi ? "Đổi trạng thái đơn hàng" : "Change order status",
+      content: isVi
+        ? `Chuyển trạng thái từ "${statusLabel(order.status)}" sang "${statusLabel(next)}"?`
+        : `Change status from "${statusLabel(order.status)}" to "${statusLabel(next)}"?`,
+      okText: isVi ? "Xác nhận" : "Confirm",
+      cancelText: isVi ? "Huỷ" : "Cancel",
+      onOk: async () => {
+        const formData = new FormData();
+        formData.set("id", order.id);
+        formData.set("status", next);
+        formData.set("admin_note", order.admin_note ?? "");
+        const result = await updateOrderWorkflow(formData);
+        if (result.success) {
+          message.success(t("saveSuccess"));
+        } else {
+          message.error(`${t("saveError")}${result.error}`);
+          throw new Error(result.error);
+        }
+      }
+    });
+  }
+
   function openEdit(order: OrderRow) {
     setEditing(order);
     setDraftStatus(order.status);
     setDraftNote(order.admin_note ?? "");
   }
 
-  function save() {
-    if (!editing) return;
-
+  async function persistOrder(order: OrderRow, status: OrderRow["status"], note: string) {
     const formData = new FormData();
-    formData.set("id", editing.id);
-    formData.set("status", draftStatus);
-    formData.set("admin_note", draftNote);
+    formData.set("id", order.id);
+    formData.set("status", status);
+    formData.set("admin_note", note);
+    const result = await updateOrderWorkflow(formData);
+    if (result.success) {
+      message.success(t("saveSuccess"));
+      return true;
+    }
+    message.error(`${t("saveError")}${result.error}`);
+    return false;
+  }
 
-    startTransition(async () => {
-      const result = await updateOrderWorkflow(formData);
-      if (result.success) {
-        message.success(t("saveSuccess"));
-        setEditing(null);
-      } else {
-        message.error(`${t("saveError")}${result.error}`);
+  // Status dropdown inside the drawer → confirm → save status to DB immediately.
+  function handleDrawerStatusChange(next: OrderRow["status"]) {
+    if (!editing || next === draftStatus) return;
+    const order = editing;
+    modal.confirm({
+      title: isVi ? "Đổi trạng thái đơn hàng" : "Change order status",
+      content: isVi
+        ? `Chuyển trạng thái từ "${statusLabel(draftStatus)}" sang "${statusLabel(next)}"?`
+        : `Change status from "${statusLabel(draftStatus)}" to "${statusLabel(next)}"?`,
+      okText: isVi ? "Xác nhận" : "Confirm",
+      cancelText: isVi ? "Huỷ" : "Cancel",
+      onOk: async () => {
+        const ok = await persistOrder(order, next, order.admin_note ?? "");
+        if (!ok) throw new Error("update failed");
+        setDraftStatus(next);
+        setEditing({...order, status: next});
       }
     });
+  }
+
+  // Save button → saves the internal note only (status is handled by the dropdown).
+  function saveNote() {
+    if (!editing) return;
+    void persistOrder(editing, editing.status, draftNote);
   }
 
   const columns: TableColumnsType<OrderRow> = [
@@ -150,7 +204,25 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
         {text: t("orderCancelled"), value: "cancelled"}
       ],
       onFilter: (value, row) => row.status === value,
-      render: (value) => <Tag color={statusColors[value as OrderRow["status"]]}>{statusLabel(value)}</Tag>
+      render: (value, row) => (
+        <Dropdown
+          trigger={["click"]}
+          menu={{
+            selectable: true,
+            selectedKeys: [row.status],
+            items: statusOptions.map((opt) => ({key: opt.value, label: opt.label})),
+            onClick: ({key}) => changeStatus(row, key as OrderRow["status"])
+          }}
+        >
+          <Tag
+            color={statusColors[value as OrderRow["status"]]}
+            className="cursor-pointer select-none"
+            style={{marginInlineEnd: 0}}
+          >
+            {statusLabel(value)} <DownOutlined style={{fontSize: 9}} />
+          </Tag>
+        </Dropdown>
+      )
     },
     {
       title: t("orderItems"),
@@ -218,8 +290,10 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
         <Select
           id="orders-status-filter"
           size="large"
-          value={statusFilter}
-          onChange={setStatusFilter}
+          allowClear
+          value={statusFilter === "all" ? undefined : statusFilter}
+          placeholder={t("allStatuses")}
+          onChange={(value) => setStatusFilter(value ?? "all")}
           className="min-w-52"
           options={[
             {label: t("allStatuses"), value: "all"},
@@ -327,11 +401,6 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
         open={Boolean(editing)}
         onClose={() => setEditing(null)}
         size="large"
-        extra={
-          <Button type="primary" icon={<SaveOutlined />} loading={isPending} onClick={save}>
-            {t("save")}
-          </Button>
-        }
       >
         {editing ? (
           <div className="space-y-5">
@@ -340,7 +409,7 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
               <Select
                 className="mt-2 w-full"
                 value={draftStatus}
-                onChange={setDraftStatus}
+                onChange={handleDrawerStatusChange}
                 options={[
                   {label: t("orderNew"), value: "new"},
                   {label: t("orderConfirmed"), value: "confirmed"},
@@ -359,6 +428,16 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
                 onChange={(event) => setDraftNote(event.target.value)}
                 placeholder={t("adminNotePlaceholder")}
               />
+              <Button
+                type="primary"
+                size="large"
+                block
+                icon={<SaveOutlined />}
+                onClick={saveNote}
+                className="mt-3 !h-12 !font-bold"
+              >
+                {isVi ? "Lưu ghi chú" : "Save note"}
+              </Button>
             </div>
             <div className="rounded-2xl border border-stone-200 p-4">
               <p className="font-semibold text-forest-950">{t("orderItems")}</p>

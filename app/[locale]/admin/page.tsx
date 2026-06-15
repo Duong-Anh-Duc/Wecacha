@@ -231,9 +231,6 @@ export default async function AdminDashboardPage({
             <h2 className="font-sans text-2xl font-black tracking-tight text-forest-950">
               {t("dashboard")}
             </h2>
-            <p className="mt-1 text-xs font-semibold text-stone-500">
-              {t("dashboardDesc")}
-            </p>
           </div>
         </div>
 
@@ -314,10 +311,9 @@ export default async function AdminDashboardPage({
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
         {/* Chart card */}
         <section className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.015)] flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b border-stone-100 px-6 py-4.5">
+          <div className="flex items-center justify-between px-6 py-4.5">
             <div>
               <h3 className="font-sans text-base font-bold text-stone-900">{t("activityTitle")}</h3>
-              <p className="mt-0.5 text-xs text-stone-400 font-semibold">{t("activityDesc")}</p>
             </div>
 
             {/* Small Select dropdown in card header */}
@@ -507,7 +503,6 @@ export default async function AdminDashboardPage({
         <section className="overflow-hidden rounded-3xl border border-stone-220/80 bg-white/90 backdrop-blur-md shadow-[0_10px_35px_rgba(0,0,0,0.015)] flex flex-col justify-between">
           <div className="flex flex-col border-b border-stone-100/80 bg-stone-50/40 px-6 py-5">
             <h3 className=" text-xl font-bold text-forest-950">{t("qualityTitle")}</h3>
-            <p className="mt-1 text-xs font-semibold text-stone-400">{t("qualityDesc")}</p>
           </div>
 
           <div className="space-y-6 px-6 py-6 flex-1">
@@ -547,7 +542,6 @@ export default async function AdminDashboardPage({
         <div className="flex flex-col gap-3 border-b border-stone-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="font-sans text-base font-bold text-stone-900">{t("latestTitle")}</h3>
-            <p className="mt-0.5 text-xs text-stone-400 font-semibold">{t("latestDesc")}</p>
           </div>
           <Link
             href="/admin/registrations"
@@ -740,7 +734,6 @@ function SummaryCard({
   icon,
   label,
   value,
-  caption,
   iconColorClass = "text-[#4A751D]",
   sparklineData = [0, 0, 0, 0, 0, 0, 0]
 }: {
@@ -748,7 +741,7 @@ function SummaryCard({
   icon: React.ReactElement<{className?: string}>;
   label: string;
   value: number | string;
-  caption: string;
+  caption?: string;
   iconColorClass?: string;
   sparklineData?: number[];
 }) {
@@ -770,8 +763,7 @@ function SummaryCard({
         </p>
       </div>
 
-      <div className="flex items-end justify-between mt-4">
-        <p className="text-[11px] leading-4 text-stone-500 font-medium max-w-[62%]">{caption}</p>
+      <div className="flex items-end justify-end mt-4">
         <div className="shrink-0 -mb-1 select-none">
           <Sparkline data={sparklineData} gradientId={sparklineId} colorClass={iconColorClass} />
         </div>
@@ -784,13 +776,12 @@ function CmsCard({
   icon,
   label,
   value,
-  caption,
   iconColor = "text-[#4A751D]"
 }: {
   icon: React.ReactElement<{className?: string}>;
   label: string;
   value: number | string;
-  caption: string;
+  caption?: string;
   iconColor?: string;
 }) {
   const bgClass = "bg-[#4A751D]/6 border-[#4A751D]/10";
@@ -808,8 +799,6 @@ function CmsCard({
           {value}
         </p>
       </div>
-      <p className="mt-2 text-[11px] leading-4 text-stone-500 font-medium z-10">{caption}</p>
-
       {/* Large Outline Background Icon at bottom right */}
       <div className={cn("absolute right-4 bottom-2 pointer-events-none select-none w-16 h-16 flex items-center justify-center opacity-20 transition-all duration-500 ease-out group-hover:scale-105", iconColor)}>
         {React.cloneElement(icon, { className: "w-16 h-16 stroke-[0.75]" })}
@@ -852,16 +841,15 @@ function CompletionMeter({
 function QualityInsightCard({
   icon,
   label,
-  value,
-  caption
+  value
 }: {
   icon?: ReactNode;
   label: string;
   value: string | number;
-  caption: string;
+  caption?: string;
 }) {
   return (
-    <div className="rounded-xl border border-stone-200 bg-[#fafafa]/50 p-4.5 relative overflow-hidden flex flex-col justify-between min-h-[110px] transition-all duration-200 hover:border-stone-300">
+    <div className="rounded-xl border border-stone-200 bg-[#fafafa]/50 p-4.5 relative overflow-hidden flex flex-col justify-between min-h-[90px] transition-all duration-200 hover:border-stone-300">
       <div>
         <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{label}</span>
         <div className="flex items-center gap-2 mt-2">
@@ -869,7 +857,6 @@ function QualityInsightCard({
           <p className="text-base font-black text-forest-950">{value}</p>
         </div>
       </div>
-      <p className="mt-2 text-[10px] leading-4 text-stone-500 font-semibold">{caption}</p>
     </div>
   );
 }
