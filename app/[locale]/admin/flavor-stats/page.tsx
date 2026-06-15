@@ -6,6 +6,7 @@ import {getFlavorCounts} from "@/actions/flavor-actions";
 import {wheelGroups} from "@/features/flavor-quiz/wheel-data";
 import {flavorQuizzes, tx} from "@/features/flavor-quiz/flavor-quizzes";
 import {FlavorStatsTree} from "@/components/admin/flavor-stats-tree";
+import {SubmissionsTimeChart} from "@/components/admin/submissions-time-chart";
 
 export const revalidate = 0;
 
@@ -29,6 +30,30 @@ export default async function FlavorStatsPage({
   const counts = tableMissing ? {} : await getFlavorCounts();
   const c = (key: string) => counts[key] ?? {clicks: 0, submits: 0};
 
+  // Each completed form inserts all its flavor rows in one batch → they share the
+  // exact same created_at. Distinct timestamps among "submit" rows = number of submissions.
+  const submitRows = tableMissing
+    ? []
+    : (await supabase.from("flavor_wheel_events").select("created_at").eq("type", "submit")).data ?? [];
+  const submissionTimestamps = Array.from(new Set(submitRows.map((r) => r.created_at as string)));
+  const totalSubmissions = submissionTimestamps.length;
+
+  // Submissions bucketed by day (Asia/Ho_Chi_Minh) → passed to the client chart.
+  const dayKeyFmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+  const submissionDayCounts: Record<string, number> = {};
+  submissionTimestamps.forEach((ts) => {
+    const k = dayKeyFmt.format(new Date(ts));
+    submissionDayCounts[k] = (submissionDayCounts[k] ?? 0) + 1;
+  });
+  const today = new Date();
+  const todayKey = dayKeyFmt.format(today);
+  const defaultFromKey = dayKeyFmt.format(new Date(today.getTime() - 13 * 86_400_000));
+
   // Build the 3-level tree (group → family → leaf) in wheel order.
   const groupsTree = wheelGroups.map((group) => ({
     key: group.key,
@@ -49,16 +74,12 @@ export default async function FlavorStatsPage({
     }))
   }));
 
-  const totalClicks = wheelGroups.reduce((s, g) => s + c(g.key).clicks, 0);
-
-  // Total submits per main group (group + its families + leaves) for the donut chart.
+  // Selections per main group (group-level only) — matches the group rows in the table.
   const groupSubmitTotals = groupsTree.map((g) => ({
     key: g.key,
     label: g.label,
     color: g.color,
-    value:
-      g.submits +
-      g.families.reduce((fs, f) => fs + f.submits + f.leaves.reduce((ls, l) => ls + l.submits, 0), 0)
+    value: g.submits
   }));
   const totalSubmits = groupSubmitTotals.reduce((s, d) => s + d.value, 0);
 
@@ -91,8 +112,9 @@ export default async function FlavorStatsPage({
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <RefreshButton />
-          <div className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-500 shadow-sm">
-            {isVi ? "Tổng" : "Total"}: {totalClicks} {isVi ? "click" : "clicks"} · {totalSubmits} submit
+          <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-500 shadow-sm">
+            <span>{isVi ? "Số người nộp form" : "Form submissions"}:</span>
+            <span className="font-black text-forest-950">{totalSubmissions}</span>
           </div>
         </div>
       </div>
@@ -110,14 +132,23 @@ export default async function FlavorStatsPage({
         </div>
       ) : (
         <div className="space-y-6">
+          {/* Time series — form submissions per day, with date-range filter */}
+          <SubmissionsTimeChart
+            dayCounts={submissionDayCounts}
+            defaultFrom={defaultFromKey}
+            defaultTo={todayKey}
+            total={totalSubmissions}
+            isVi={isVi}
+          />
+
           {/* Donut chart — submit distribution per main flavor group */}
           <div className="rounded-2xl border border-forest-950/10 bg-white p-6 shadow-sm">
             <h3 className="text-base font-bold text-forest-950">
-              {isVi ? "Tỉ lệ hoàn thành quiz theo nhóm" : "Quiz submits by group"}
+              {isVi ? "Tỉ lệ lượt chọn theo nhóm" : "Selections by group"}
             </h3>
             {totalSubmits === 0 ? (
               <p className="mt-6 text-center text-sm font-medium text-stone-400">
-                {isVi ? "Chưa có lượt hoàn thành quiz nào." : "No quiz submits yet."}
+                {isVi ? "Chưa có lượt chọn nào." : "No selections yet."}
               </p>
             ) : (
               <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-10">
@@ -141,7 +172,9 @@ export default async function FlavorStatsPage({
                   </svg>
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                     <span className="font-serif text-3xl font-black text-forest-950">{totalSubmits}</span>
-                    <span className="text-[11px] font-bold uppercase tracking-wide text-stone-400">submit</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wide text-stone-400">
+                      {isVi ? "lượt chọn" : "selections"}
+                    </span>
                   </div>
                 </div>
                 <div className="grid w-full grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">

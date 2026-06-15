@@ -8,20 +8,15 @@ type LeafNode = {key: string; label: string; color: string; clicks: number; subm
 type FamilyNode = LeafNode & {leaves: LeafNode[]};
 type GroupNode = LeafNode & {families: FamilyNode[]};
 
-function CountCells({clicks, submits}: {clicks: number; submits: number}) {
+function CountCells({submits}: {submits: number}) {
   return (
-    <>
-      <td className="px-5 py-2.5 text-right tabular-nums text-forest-950/80">
-        {clicks > 0 ? clicks : <span className="text-stone-300">0</span>}
-      </td>
-      <td className="px-5 py-2.5 text-right tabular-nums">
-        {submits > 0 ? (
-          <span className="font-bold text-[#17351f]">{submits}</span>
-        ) : (
-          <span className="text-stone-300">0</span>
-        )}
-      </td>
-    </>
+    <td className="px-5 py-2.5 text-right tabular-nums">
+      {submits > 0 ? (
+        <span className="font-bold text-[#17351f]">{submits}</span>
+      ) : (
+        <span className="text-stone-300">0</span>
+      )}
+    </td>
   );
 }
 
@@ -40,8 +35,7 @@ export function FlavorStatsTree({groups, isVi}: {groups: GroupNode[]; isVi: bool
         <thead>
           <tr className="border-b border-forest-950/10 bg-stone-50 text-left text-xs uppercase tracking-wide text-stone-500">
             <th className="px-5 py-3 font-bold">{isVi ? "Hương vị" : "Flavor"}</th>
-            <th className="px-5 py-3 font-bold text-right">{isVi ? "Lượt chọn" : "Clicks"}</th>
-            <th className="px-5 py-3 font-bold text-right">{isVi ? "Hoàn thành" : "Submits"}</th>
+            <th className="px-5 py-3 font-bold text-right">{isVi ? "Lượt chọn" : "Selections"}</th>
           </tr>
         </thead>
         <tbody>
@@ -63,7 +57,7 @@ export function FlavorStatsTree({groups, isVi}: {groups: GroupNode[]; isVi: bool
                       <span className="text-xs font-semibold text-stone-400">({group.families.length})</span>
                     </span>
                   </td>
-                  <CountCells clicks={group.clicks} submits={group.submits} />
+                  <CountCells submits={group.submits} />
                 </tr>
 
                 {groupOpen &&
@@ -95,19 +89,19 @@ export function FlavorStatsTree({groups, isVi}: {groups: GroupNode[]; isVi: bool
                               )}
                             </span>
                           </td>
-                          <CountCells clicks={family.clicks} submits={family.submits} />
+                          <CountCells submits={family.submits} />
                         </tr>
 
                         {familyOpen &&
                           family.leaves.map((leaf) => (
                             <tr key={leaf.key} className="border-t border-forest-950/5 bg-stone-50/20">
                               <td className="px-5 py-2">
-                                <span className="inline-flex items-center gap-2" style={{paddingLeft: 48}}>
+                                <span className="inline-flex items-center gap-2" style={{paddingLeft: 66}}>
                                   <span className="inline-block h-2 w-2 rounded-full" style={{backgroundColor: leaf.color}} />
                                   <span className="font-medium text-forest-950/65">{leaf.label}</span>
                                 </span>
                               </td>
-                              <CountCells clicks={leaf.clicks} submits={leaf.submits} />
+                              <CountCells submits={leaf.submits} />
                             </tr>
                           ))}
                       </FragmentRows>

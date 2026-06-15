@@ -277,6 +277,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
   const [quizPhase, setQuizPhase] = useState<"r1" | "r2" | "r3">("r1");
   const [quizQueue, setQuizQueue] = useState<QuizQ[]>([]);
   const [quizSel, setQuizSel] = useState<Record<string, string[]>>({});
+  const [confirmExit, setConfirmExit] = useState(false);
 
   const flavorName = (key: string) => {
     const q = flavorQuizzes[key];
@@ -406,10 +407,20 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
     setQuizStep(0);
     setQuizSel({});
     setQuizResult(false);
+    setConfirmExit(false);
     setQuizOpen(true);
   };
 
-  const closeQuiz = () => setQuizOpen(false);
+  const closeQuiz = () => {
+    setConfirmExit(false);
+    setQuizOpen(false);
+  };
+
+  // Closing mid-quiz needs confirmation; the thank-you screen can close right away.
+  const requestClose = () => {
+    if (quizResult) closeQuiz();
+    else setConfirmExit(true);
+  };
 
   const backQuiz = () => {
     if (quizStep > 0) setQuizStep((s) => s - 1);
@@ -504,7 +515,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
             exit={{opacity: 0}}
             transition={{duration: 0.25}}
             className="fixed inset-0 z-[160] flex items-center justify-center bg-forest-950/40 p-4 backdrop-blur-[2px]"
-            onClick={(e) => { if (e.target === e.currentTarget) closeQuiz(); }}
+            onClick={(e) => { if (e.target === e.currentTarget) requestClose(); }}
           >
             <motion.div
               initial={{opacity: 0, scale: 0.96, y: 20}}
@@ -515,7 +526,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
             >
               <button
                 type="button"
-                onClick={closeQuiz}
+                onClick={requestClose}
                 className="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-forest-950/10 bg-white text-forest-950/60 transition hover:bg-forest-950 hover:text-white"
                 aria-label={t("closeWheel")}
               >
@@ -564,14 +575,18 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
                     })}
                   </div>
                   <div className="mt-6 flex items-center justify-between gap-3">
-                    <button
-                      type="button"
-                      onClick={backQuiz}
-                      className="inline-flex items-center gap-2 rounded-full border border-forest-950/10 bg-white px-5 py-3 text-sm font-black text-forest-950 transition hover:border-earth-600/50"
-                    >
-                      <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-                      {t("back")}
-                    </button>
+                    {quizStep > 0 ? (
+                      <button
+                        type="button"
+                        onClick={backQuiz}
+                        className="inline-flex items-center gap-2 rounded-full border border-forest-950/10 bg-white px-5 py-3 text-sm font-black text-forest-950 transition hover:border-earth-600/50"
+                      >
+                        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                        {t("back")}
+                      </button>
+                    ) : (
+                      <span />
+                    )}
                     <button
                       type="button"
                       onClick={advanceQuiz}
@@ -614,6 +629,54 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
                   </div>
                 </div>
               )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Confirm before leaving the quiz mid-way */}
+      <AnimatePresence>
+        {confirmExit && (
+          <motion.div
+            key="quiz-exit-confirm"
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            transition={{duration: 0.2}}
+            className="fixed inset-0 z-[170] flex items-center justify-center bg-forest-950/55 p-4 backdrop-blur-sm"
+            onClick={(e) => { if (e.target === e.currentTarget) setConfirmExit(false); }}
+          >
+            <motion.div
+              initial={{opacity: 0, scale: 0.94, y: 14}}
+              animate={{opacity: 1, scale: 1, y: 0}}
+              exit={{opacity: 0, scale: 0.94, y: 14}}
+              transition={{duration: 0.24, ease: [0.16, 1, 0.3, 1]}}
+              className="w-full max-w-sm rounded-3xl bg-parchment-50 p-7 text-center shadow-[0_40px_120px_rgba(10,24,10,0.3)]"
+            >
+              <h3 className="font-serif text-2xl leading-tight text-forest-950">
+                {isVi ? "Bạn có chắc chắn muốn thoát?" : "Are you sure you want to leave?"}
+              </h3>
+              <p className="mx-auto mt-3 max-w-xs text-sm font-medium leading-6 text-forest-950/65">
+                {isVi
+                  ? "Lựa chọn của bạn sẽ không được lưu nếu thoát bây giờ."
+                  : "Your selections won't be saved if you leave now."}
+              </p>
+              <div className="mt-7 flex justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setConfirmExit(false)}
+                  className="inline-flex items-center gap-2 rounded-full border border-forest-950/10 bg-white px-6 py-2.5 text-sm font-black text-forest-950 transition hover:border-earth-600/50"
+                >
+                  {isVi ? "Ở lại" : "Stay"}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeQuiz}
+                  className="inline-flex items-center gap-2 rounded-full bg-forest-950 px-6 py-2.5 text-sm font-black text-parchment-50 transition hover:bg-forest-900"
+                >
+                  {isVi ? "Thoát" : "Leave"}
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
