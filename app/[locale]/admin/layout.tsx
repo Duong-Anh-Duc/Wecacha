@@ -275,7 +275,11 @@ export default function AdminLayout({children}: {children: ReactNode}) {
                   {
                     key: "home",
                     icon: <Home className="h-4 w-4 text-[#4A751D]" />,
-                    label: <Link href="/">{t("home")}</Link>
+                    label: (
+                      <Link href="/" target="_blank" rel="noopener noreferrer">
+                        {t("home")}
+                      </Link>
+                    )
                   },
                   {
                     type: "divider"
