@@ -7,7 +7,7 @@ import {ExploreHeroCard} from "@/features/explore/explore-hero-card";
 import {ArticlesList} from "@/features/explore/articles-list";
 import {ArticleMagazine} from "@/features/explore/article-magazine";
 import {LeafSketch, LeafSprig} from "@/features/explore/leaf-sketches";
-import {getPageContent, itemsForSection, sectionByKey} from "@/lib/content/cms";
+import {getPageContent, sectionByKey} from "@/lib/content/cms";
 import {supabase} from "@/lib/supabase";
 
 export const revalidate = 60;
@@ -50,9 +50,13 @@ export default async function ExplorePage({params}: Props) {
     .from("news_articles")
     .select("slug, title_vi, title_en, intro_vi, intro_en, image_url, published_at")
     .eq("is_visible", true)
-    .in("placement", ["news", "both"])
     .order("sort_order", {ascending: true})
     .order("published_at", {ascending: false});
+
+  // 3 thẻ "Khám phá" và magazine cùng lấy từ news_articles (1 nguồn dữ liệu).
+  const allArticles = articles ?? [];
+  const cardArticles = allArticles.slice(0, 3);
+  const magazineArticles = allArticles.slice(3);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f4f0e6] pb-8 pt-28 text-[#142918]">
@@ -110,10 +114,10 @@ export default async function ExplorePage({params}: Props) {
 
         <div className="grid items-stretch gap-6 lg:grid-cols-12">
           <ExploreHeroCard locale={locale} section={sectionByKey(content, "hero_card")} />
-          <ArticlesList locale={locale} items={itemsForSection(content, "article_cards")} />
+          <ArticlesList locale={locale} articles={cardArticles} />
         </div>
 
-        <ArticleMagazine locale={locale} articles={articles ?? []} />
+        <ArticleMagazine locale={locale} articles={magazineArticles} />
       </div>
     </main>
   );
