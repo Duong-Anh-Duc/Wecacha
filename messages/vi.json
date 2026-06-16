@@ -932,19 +932,34 @@
       "copy": "Kết quả không chỉ để xem cho vui, mà còn giúp bạn chọn dòng cà phê hợp khẩu vị hơn."
     },
     "flavors": {
+      "sourFermented": {
+        "label": "Chua / Lên men",
+        "shortDesc": "Chua thanh, lên men, phức hợp."
+      },
+      "green": {
+        "label": "Tươi xanh / Thực vật",
+        "shortDesc": "Tươi xanh, thực vật, cỏ non."
+      },
+      "other": {
+        "label": "Mùi vị khác",
+        "shortDesc": "Nhóm hương vị khác biệt, đa dạng."
+      },
       "floral": {
         "label": "Hương hoa",
         "desc": "Nhẹ, thanh và tinh tế, thường xuất hiện ở cà phê rang sáng hoặc những mẻ có độ sạch cao.",
+        "shortDesc": "Thanh tao, dịu nhẹ, thơm ngát.",
         "children": "Gợi ý: hoa trắng, nhài, trà hoa, mật hoa."
       },
       "fruity": {
         "label": "Hương trái cây",
         "desc": "Tươi, mọng nước và có cảm giác chua ngọt tự nhiên, hợp với người thích cà phê nhiều tầng hương.",
+        "shortDesc": "Tươi mát, chua nhẹ, giàu sức sống.",
         "children": "Gợi ý: táo, đào, mận, trái cây nhiệt đới."
       },
       "citrus": {
         "label": "Hương cam chanh",
         "desc": "Chua sáng, thanh và sạch miệng, tạo cảm giác nhẹ nhàng khi uống đen hoặc pha lạnh.",
+        "shortDesc": "Chua sáng, thanh thoát, sảng khoái.",
         "children": "Gợi ý: cam, chanh, quýt, vỏ cam."
       },
       "berry": {
@@ -955,6 +970,7 @@
       "sweet": {
         "label": "Hương ngọt",
         "desc": "Êm, dễ uống và có hậu vị ngọt dịu như mật ong, đường nâu hoặc caramel.",
+        "shortDesc": "Ấm áp, dễ chịu, hậu vị ngọt ngào.",
         "children": "Gợi ý: mật ong, caramel, đường nâu, vani."
       },
       "chocolate": {
@@ -965,21 +981,25 @@
       "nutty": {
         "label": "Hương hạt",
         "desc": "Gợi nhớ hạt rang, ngũ cốc và bánh nướng, tạo cảm giác dễ uống hằng ngày.",
+        "shortDesc": "Đậm đà, béo ngậy, mộc mạc, sâu lắng.",
         "children": "Gợi ý: hạnh nhân, hạt điều, óc chó, ngũ cốc."
       },
       "spicy": {
         "label": "Hương gia vị",
         "desc": "Có chiều sâu và hơi lạ miệng, phù hợp với người thích trải nghiệm mới hoặc tầng hương phức tạp.",
+        "shortDesc": "Ấm nồng, độc đáo, phong phú.",
         "children": "Gợi ý: quế, tiêu, thảo mộc, hồi."
       },
       "roasted": {
         "label": "Hương rang nướng",
         "desc": "Đậm, mạnh và rõ vị cà phê, gần với gu truyền thống hoặc những ly phin đậm.",
+        "shortDesc": "Đậm đà, mạnh mẽ, truyền thống.",
         "children": "Gợi ý: khói nhẹ, bánh nướng, hạt rang, caramel đậm."
       },
       "earthy": {
         "label": "Hương đất / mộc",
         "desc": "Dày, trầm và mạnh, tạo cảm giác có chiều sâu ở hậu vị.",
+        "shortDesc": "Mộc mạc, trầm ấm, có chiều sâu.",
         "children": "Gợi ý: gỗ, đất ẩm, thảo mộc khô, khoáng."
       }
     },

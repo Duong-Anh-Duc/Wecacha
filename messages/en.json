@@ -932,19 +932,34 @@
       "copy": "The result is not just for fun. It helps you pick coffees that better match your taste."
     },
     "flavors": {
+      "sourFermented": {
+        "label": "Sour / Fermented",
+        "shortDesc": "Tangy, fermented, complex."
+      },
+      "green": {
+        "label": "Green / Vegetative",
+        "shortDesc": "Fresh, green, vegetal notes."
+      },
+      "other": {
+        "label": "Other",
+        "shortDesc": "Other distinctive, varied notes."
+      },
       "floral": {
         "label": "Floral",
         "desc": "Light, clean and elegant, often found in lighter roasts or coffees with high clarity.",
+        "shortDesc": "Elegant, gentle, fragrant.",
         "children": "Examples: white flowers, jasmine, floral tea, nectar."
       },
       "fruity": {
         "label": "Fruity",
         "desc": "Fresh, juicy and naturally sweet-sour, ideal for drinkers who enjoy layered coffee.",
+        "shortDesc": "Fresh, light acidity, vibrant.",
         "children": "Examples: apple, peach, plum, tropical fruit."
       },
       "citrus": {
         "label": "Citrus",
         "desc": "Bright acidity and a clean finish, especially pleasant as black coffee or cold brew.",
+        "shortDesc": "Bright, clean, refreshing.",
         "children": "Examples: orange, lemon, tangerine, orange peel."
       },
       "berry": {
@@ -955,6 +970,7 @@
       "sweet": {
         "label": "Sweet",
         "desc": "Smooth and approachable, with a soft finish like honey, brown sugar or caramel.",
+        "shortDesc": "Warm, pleasant, sweet aftertaste.",
         "children": "Examples: honey, caramel, brown sugar, vanilla."
       },
       "chocolate": {
@@ -965,21 +981,25 @@
       "nutty": {
         "label": "Nutty",
         "desc": "Roasted nuts, grains and baked notes that feel comfortable for daily drinking.",
+        "shortDesc": "Rich, nutty, lingering finish.",
         "children": "Examples: almond, cashew, walnut, cereal."
       },
       "spicy": {
         "label": "Spicy",
         "desc": "Deeper and more unusual, good for people who enjoy complex aromatic layers.",
+        "shortDesc": "Warm, unique, complex spices.",
         "children": "Examples: cinnamon, pepper, herbs, star anise."
       },
       "roasted": {
         "label": "Roasted",
         "desc": "Bold and coffee-forward, close to traditional strong cups and phin coffee.",
+        "shortDesc": "Bold, strong, traditional roast.",
         "children": "Examples: light smoke, toast, roasted nuts, dark caramel."
       },
       "earthy": {
         "label": "Earthy / woody",
         "desc": "Full, grounded and deep, adding weight to the aftertaste.",
+        "shortDesc": "Rustic, earthy, deep aftertaste.",
         "children": "Examples: wood, damp earth, dried herbs, mineral."
       }
     },

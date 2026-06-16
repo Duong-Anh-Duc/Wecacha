@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useMemo, useState, useTransition} from "react";
-import {App, Button, Input, Select, Space, Table, Tag, Tooltip, type TableColumnsType} from "antd";
+import {App, Button, Input, Space, Table, Tag, Tooltip, type TableColumnsType} from "antd";
 import {EditOutlined, EyeInvisibleOutlined, EyeOutlined, SearchOutlined} from "@ant-design/icons";
 import {GripVertical} from "lucide-react";
 import {useTranslations} from "next-intl";
@@ -33,7 +33,6 @@ export function ArticlesTable({
   const t = useTranslations("Admin");
   const {message} = App.useApp();
   const [query, setQuery] = useState("");
-  const [placement, setPlacement] = useState("all");
   const [orderedArticles, setOrderedArticles] = useState(articles);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -58,17 +57,10 @@ export function ArticlesTable({
     const normalized = query.trim().toLowerCase();
 
     return orderedArticles.filter((article) => {
-      const matchesPlacement = placement === "all" || article.placement === placement;
-      const haystack = [article.title_vi, article.slug, article.placement].join(" ").toLowerCase();
-      return matchesPlacement && (!normalized || haystack.includes(normalized));
+      const haystack = [article.title_vi, article.slug].join(" ").toLowerCase();
+      return !normalized || haystack.includes(normalized);
     });
-  }, [orderedArticles, placement, query]);
-
-  function placementLabel(value: ArticleRow["placement"]) {
-    if (value === "home") return t("placementHome");
-    if (value === "both") return t("placementBoth");
-    return t("placementNews");
-  }
+  }, [orderedArticles, query]);
 
   function handleDrop(targetId: string) {
     if (!draggingId || draggingId === targetId) {
@@ -117,17 +109,6 @@ export function ArticlesTable({
       )
     },
     {
-      title: t("colIndex"),
-      key: "index",
-      width: 72,
-      align: "center",
-      render: (_value, _row, index) => (
-        <span className="font-medium text-stone-500">
-          {(pagination.current - 1) * pagination.pageSize + index + 1}
-        </span>
-      )
-    },
-    {
       title: t("colTitleVI"),
       dataIndex: "title_vi",
       sorter: (a, b) => a.title_vi.localeCompare(b.title_vi),
@@ -151,17 +132,6 @@ export function ArticlesTable({
           {value ? t("visible") : t("hidden")}
         </Tag>
       )
-    },
-    {
-      title: t("placement"),
-      dataIndex: "placement",
-      filters: [
-        {text: t("placementHome"), value: "home"},
-        {text: t("placementNews"), value: "news"},
-        {text: t("placementBoth"), value: "both"}
-      ],
-      onFilter: (value, row) => row.placement === value,
-      render: (value) => <Tag color="blue">{placementLabel(value)}</Tag>
     },
     {
       title: t("sortOrder"),
@@ -212,19 +182,6 @@ export function ArticlesTable({
           onChange={(event) => setQuery(event.target.value)}
           placeholder={t("searchArticles")}
           className="max-w-xl"
-        />
-        <Select
-          id="articles-placement-filter"
-          size="large"
-          value={placement}
-          onChange={setPlacement}
-          className="min-w-52"
-          options={[
-            {label: t("allPlacements"), value: "all"},
-            {label: t("placementHome"), value: "home"},
-            {label: t("placementNews"), value: "news"},
-            {label: t("placementBoth"), value: "both"}
-          ]}
         />
       </div>
 

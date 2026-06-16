@@ -10,6 +10,7 @@ export const siteConfig = {
   phone: "0983 538 814",
   zalo: "0983538814",
   facebook: "https://facebook.com/sonlacoffee",
+  maps: "https://maps.app.goo.gl/kwuB9yFNDjCFXqB99",
   address: {
     vi: "101 D6 Trần Huy Liệu, Giảng Võ, Ba Đình, Hà Nội",
     en: "101 D6 Tran Huy Lieu, Giang Vo, Ba Dinh, Hanoi"

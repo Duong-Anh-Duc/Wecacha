@@ -81,10 +81,15 @@ export function SiteFooter() {
         <div className="text-center sm:text-left">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-ember">{footer("contactHeading")}</h2>
           <div className="mt-6 flex flex-col items-center sm:items-start gap-4 text-sm text-white/68">
-            <p className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3">
+            <a
+              className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 transition hover:text-white"
+              href={siteConfig.maps}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <MapPin className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
               <span>{siteConfig.address[locale]}</span>
-            </p>
+            </a>
             <a className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 transition hover:text-white" href={`tel:${siteConfig.phone}`}>
               <Phone className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
               <span>{siteConfig.phone}</span>
@@ -93,7 +98,12 @@ export function SiteFooter() {
               <Mail className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
               <span>{siteConfig.email}</span>
             </a>
-            <a className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 transition hover:text-white" href={siteConfig.facebook}>
+            <a
+              className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 transition hover:text-white"
+              href={siteConfig.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Facebook className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
               <span>Facebook</span>
             </a>

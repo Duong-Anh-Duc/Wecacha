@@ -1,8 +1,9 @@
 "use client";
 
 import {useMemo, useState} from "react";
-import {App, Button, Drawer, Dropdown, Input, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
+import {App, Button, DatePicker, Drawer, Dropdown, Input, Select, Space, Table, Tag, Tooltip, Typography, type TableColumnsType} from "antd";
 import {DownOutlined, EditOutlined, EyeOutlined, SearchOutlined, SaveOutlined} from "@ant-design/icons";
+import dayjs, {type Dayjs} from "dayjs";
 import Image from "next/image";
 import {useTranslations} from "next-intl";
 import {updateOrderWorkflow} from "@/actions/order-actions";
@@ -48,6 +49,7 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
   const isVi = locale === "vi";
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const [viewing, setViewing] = useState<OrderRow | null>(null);
   const [editing, setEditing] = useState<OrderRow | null>(null);
   const [draftStatus, setDraftStatus] = useState<OrderRow["status"]>("new");
@@ -69,6 +71,8 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
+    const fromTs = dateRange?.[0] ? dateRange[0].startOf("day").valueOf() : null;
+    const toTs = dateRange?.[1] ? dateRange[1].endOf("day").valueOf() : null;
 
     return orders.filter((order) => {
       const matchesStatus = statusFilter === "all" || order.status === statusFilter;
@@ -77,9 +81,13 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
         .join(" ")
         .toLowerCase();
 
-      return matchesStatus && (!normalized || haystack.includes(normalized));
+      const createdTs = new Date(order.created_at).getTime();
+      const matchesDate =
+        (fromTs === null || createdTs >= fromTs) && (toTs === null || createdTs <= toTs);
+
+      return matchesStatus && matchesDate && (!normalized || haystack.includes(normalized));
     });
-  }, [orders, query, statusFilter]);
+  }, [orders, query, statusFilter, dateRange]);
 
   function statusLabel(status: OrderRow["status"]) {
     if (status === "confirmed") return t("orderConfirmed");
@@ -303,6 +311,16 @@ export function OrdersTable({orders, locale}: {orders: OrderRow[]; locale: strin
             {label: t("orderCompleted"), value: "completed"},
             {label: t("orderCancelled"), value: "cancelled"}
           ]}
+        />
+        <DatePicker.RangePicker
+          size="large"
+          value={dateRange}
+          onChange={(dates) => setDateRange(dates as [Dayjs | null, Dayjs | null] | null)}
+          format="DD/MM/YYYY"
+          maxDate={dayjs()}
+          allowEmpty={[true, true]}
+          placeholder={[locale === "vi" ? "Từ ngày" : "From", locale === "vi" ? "Đến ngày" : "To"]}
+          className="min-w-64"
         />
       </div>
 

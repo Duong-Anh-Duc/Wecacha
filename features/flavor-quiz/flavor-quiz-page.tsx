@@ -263,12 +263,75 @@ function DecoLeaf({className, style}: {className?: string; style?: CSSProperties
   );
 }
 
+const getGroupKeyForOption = (key: string): string => {
+  if (wheelGroups.some((g) => g.key === key)) return key;
+  const groupByFamily = wheelGroups.find((g) => g.children.some((c) => c.id === key));
+  if (groupByFamily) return groupByFamily.key;
+  const groupByLeaf = wheelGroups.find((g) => g.children.some((c) => c.leaves.includes(key)));
+  if (groupByLeaf) return groupByLeaf.key;
+  return "other";
+};
+
+const PREMIUM_THEMES: Record<string, {
+  theme: string;
+  bgSelected: string;
+  borderSelected: string;
+}> = {
+  floral: {
+    theme: "#e06287",
+    bgSelected: "#fff2f6",
+    borderSelected: "#ffd1df",
+  },
+  fruity: {
+    theme: "#e56750",
+    bgSelected: "#fff5f2",
+    borderSelected: "#ffd8cf",
+  },
+  sweet: {
+    theme: "#e08b34",
+    bgSelected: "#fff8f0",
+    borderSelected: "#ffe5cb",
+  },
+  nutty: {
+    theme: "#785c4e",
+    bgSelected: "#f7f3f0",
+    borderSelected: "#ebdcd4",
+  },
+  green: {
+    theme: "#50875e",
+    bgSelected: "#f2fcf4",
+    borderSelected: "#d1ebd8",
+  },
+  sourFermented: {
+    theme: "#bfa02c",
+    bgSelected: "#fffdf0",
+    borderSelected: "#f7f0cd",
+  },
+  spicy: {
+    theme: "#ab4c5f",
+    bgSelected: "#fff3f5",
+    borderSelected: "#ffd3db",
+  },
+  roasted: {
+    theme: "#ad623b",
+    bgSelected: "#faf5f0",
+    borderSelected: "#ebd6ca",
+  },
+  other: {
+    theme: "#5f8d9c",
+    bgSelected: "#f2fafc",
+    borderSelected: "#d1ebf2",
+  }
+};
+
 export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
   const t = useTranslations("FlavorQuiz");
   const isVi = locale === "vi";
   const [selectedFlavor, setSelectedFlavor] = useState<FlavorKey>("fruity");
   const [hoverFlavor, setHoverFlavor] = useState<string | null>(null);
   const [hoverLabel, setHoverLabel] = useState<string | null>(null);
+  // The exact flavor key being hovered/picked (group / family / leaf) — used for the count.
+  const [hoverKey, setHoverKey] = useState<string | null>(null);
   const [hoverPos, setHoverPos] = useState<{x: number; y: number} | null>(null);
   const hoverHideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [quizOpen, setQuizOpen] = useState(false);
@@ -286,7 +349,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
   const flavorColor = (key: string) => wheelGroups.find((g) => g.key === key)?.color ?? "#a46131";
 
   // Clicking a flavor on the wheel shows the hovered flavor in the preview and records a click.
-  const handlePickFlavor = (groupKey: string, label?: string) => {
+  const handlePickFlavor = (groupKey: string, label?: string, flavorKey?: string) => {
     setSelectedFlavor(mapGroupKeyToFlavorKey(groupKey));
     if (hoverHideTimer.current) {
       clearTimeout(hoverHideTimer.current);
@@ -294,11 +357,12 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
     }
     setHoverFlavor(groupKey);
     setHoverLabel(label ?? null);
+    setHoverKey(flavorKey ?? groupKey);
     void recordFlavorEvent(groupKey, "click", locale);
   };
 
   // Hover → small preview that follows the cursor.
-  const handleHoverFlavor = (groupKey: string | null, label?: string) => {
+  const handleHoverFlavor = (groupKey: string | null, label?: string, flavorKey?: string) => {
     if (quizOpen) return;
     if (hoverHideTimer.current) {
       clearTimeout(hoverHideTimer.current);
@@ -307,6 +371,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
     if (groupKey) {
       setHoverFlavor(groupKey);
       setHoverLabel(label ?? null);
+      setHoverKey(flavorKey ?? groupKey);
     } else {
       hoverHideTimer.current = setTimeout(() => setHoverFlavor(null), 60);
     }
@@ -328,6 +393,8 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
 
   const currentQ = quizQueue[quizStep];
   const currentSel = currentQ ? quizSel[currentQ.id] ?? [] : [];
+  // Total flavors chosen across every question so far.
+  const totalSelected = Object.values(quizSel).reduce((sum, list) => sum + list.length, 0);
 
   const chosenFamiliesWithLeaves = () => {
     const fams = Object.entries(quizSel)
@@ -345,7 +412,9 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
 
   const finishQuiz = () => {
     const allKeys = Object.values(quizSel).flat();
-    if (allKeys.length > 0) void recordFlavorEvents(allKeys, "submit", locale);
+    // Don't submit / show the thank-you screen when nothing was chosen.
+    if (allKeys.length === 0) return;
+    void recordFlavorEvents(allKeys, "submit", locale);
     setQuizResult(true);
   };
 
@@ -402,6 +471,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
 
   const openQuiz = () => {
     setHoverFlavor(null);
+    setHoverKey(null);
     setQuizQueue(initialQuizQueue());
     setQuizPhase("r1");
     setQuizStep(0);
@@ -495,7 +565,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
               </div>
               <div className="mt-2 flex items-baseline gap-2 px-4 pb-4">
                 <span className="font-serif text-3xl font-black leading-none" style={{color}}>
-                  {(flavorCounts?.[hoverFlavor]?.submits ?? 0).toLocaleString(isVi ? "vi-VN" : "en-US")}
+                  {(flavorCounts?.[hoverKey ?? hoverFlavor]?.submits ?? 0).toLocaleString(isVi ? "vi-VN" : "en-US")}
                 </span>
                 <span className="text-xs font-bold text-forest-950/55">
                   {isVi ? "người đã chọn vị này" : "people picked this flavor"}
@@ -523,110 +593,209 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
               animate={{opacity: 1, scale: 1, y: 0}}
               exit={{opacity: 0, scale: 0.96, y: 20}}
               transition={{duration: 0.3, ease: [0.16, 1, 0.3, 1]}}
-              className="relative flex max-h-[88vh] w-full max-w-4xl flex-col overflow-hidden rounded-[2rem] bg-parchment-50 shadow-[0_40px_120px_rgba(10,24,10,0.3)]"
+              className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[2.5rem] bg-[#fbfaf7] shadow-[0_40px_120px_rgba(10,24,10,0.25)] border border-forest-950/5"
             >
               <button
                 type="button"
                 onClick={requestClose}
-                className="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-forest-950/10 bg-white text-forest-950/60 transition hover:bg-forest-950 hover:text-white"
+                className="absolute right-6 top-6 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-forest-950/10 bg-white text-forest-950/60 shadow-sm transition-all hover:bg-forest-950 hover:text-white hover:scale-105 active:scale-95"
                 aria-label={t("closeWheel")}
               >
-                <X className="h-4 w-4" aria-hidden="true" />
+                <X className="h-5 w-5" aria-hidden="true" />
               </button>
 
               {!quizResult && currentQ ? (
-                <div className="overflow-y-auto p-6 sm:p-8">
-                  <p className="text-sm font-black uppercase tracking-[0.16em] text-earth-700">
-                    {isVi ? "Khám phá gu cà phê" : "Explore your taste"}
-                  </p>
-                  <h2 className="mt-2 pr-10 font-serif text-xl leading-tight text-forest-950 sm:text-2xl">
-                    {currentQ.title}
-                  </h2>
-                  <p className="mt-1 text-xs font-semibold text-forest-950/50">
-                    {isVi ? "Có thể chọn nhiều hương vị." : "You can pick several."}
-                  </p>
-                  <div className="mt-5" />
-                  <div
-                    className={
-                      currentQ.options.length === 4
-                        ? "grid grid-cols-2 gap-2"
-                        : currentQ.options.length <= 2
-                        ? "grid grid-cols-1 gap-2 sm:grid-cols-2"
-                        : "grid grid-cols-2 gap-2 sm:grid-cols-3"
-                    }
-                  >
+                <div className="overflow-y-auto p-8 sm:p-12 relative z-10">
+                  <div className="relative z-10 flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <Coffee className="h-5 w-5 text-[#78593e]" strokeWidth={2.5} />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#78593e]">
+                        {isVi ? "Khám phá gu cà phê" : "Explore coffee taste"}
+                      </span>
+                    </div>
+
+                    <h2 className="mt-4 pr-12 font-serif text-3xl font-bold leading-tight text-forest-950 sm:text-4xl">
+                      {currentQ.title}
+                    </h2>
+                    <p className="mt-2 text-sm font-semibold text-forest-950/50">
+                      {isVi ? "Có thể chọn nhiều hương vị." : "You can select multiple."}
+                    </p>
+                    <div className="mt-4 h-1.5 w-14 rounded-full bg-[#ebdccb]" />
+                  </div>
+
+                  <div className={cn(
+                    "relative z-10 mt-8 grid gap-4",
+                    currentQ.options.length === 1 ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"
+                  )}>
                     {currentQ.options.map((opt) => {
                       const isSelected = currentSel.includes(opt.key);
+                      const groupKey = getGroupKeyForOption(opt.key);
+                      const theme = PREMIUM_THEMES[groupKey] || {
+                        theme: flavorColor(groupKey),
+                        bgSelected: `${flavorColor(groupKey)}0d`,
+                        borderSelected: `${flavorColor(groupKey)}44`
+                      };
+                      const Icon = FLAVOR_ICONS[groupKey] || Sparkles;
+
+                      let desc = "";
+                      if (quizPhase === "r1") {
+                        desc = t(`flavors.${opt.key}.shortDesc`);
+                      } else if (quizPhase === "r2") {
+                        const family = wheelGroups.flatMap((g) => g.children).find((c) => c.id === opt.key);
+                        if (family && family.leaves && family.leaves.length > 0) {
+                          desc = family.leaves.map((leaf) => t(`wheel.${leaf}`)).join(", ");
+                        }
+                      } else if (quizPhase === "r3") {
+                        const family = wheelGroups.flatMap((g) => g.children).find((c) => c.leaves.includes(opt.key));
+                        if (family) {
+                          desc = isVi ? `Họ vị: ${t(family.labelKey)}` : `Family: ${t(family.labelKey)}`;
+                        }
+                      }
+
                       return (
                         <button
                           key={`${currentQ.id}-${opt.key}`}
                           type="button"
                           onClick={() => toggleQuizOption(currentQ.id, opt.key)}
-                          className="flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-left text-[13px] font-bold leading-tight transition hover:-translate-y-0.5"
+                          className={cn(
+                            "group relative flex items-center gap-4 rounded-[1.5rem] border p-4 text-left transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]",
+                            isSelected 
+                              ? "shadow-sm" 
+                              : "border-forest-950/10 bg-white/40 hover:bg-white hover:border-forest-950/20"
+                          )}
                           style={
                             isSelected
-                              ? {backgroundColor: opt.color, borderColor: opt.color, color: "#fff"}
-                              : {backgroundColor: `${opt.color}14`, borderColor: `${opt.color}40`, color: "#142918"}
+                              ? {
+                                  backgroundColor: theme.bgSelected,
+                                  borderColor: theme.borderSelected,
+                                }
+                              : undefined
                           }
                         >
-                          <span>{opt.label}</span>
-                          {isSelected && <Check className="h-4 w-4 shrink-0" aria-hidden="true" />}
+                          {/* Flavor icon — no background */}
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                            <Icon
+                              className="h-8 w-8 transition-all"
+                              style={{ color: isSelected ? theme.theme : `${theme.theme}aa` }}
+                              strokeWidth={1.5}
+                            />
+                          </div>
+
+                          {/* Title & Description */}
+                          <div className="flex-1 pr-6">
+                            <h3 className="font-serif text-base font-bold text-forest-950">
+                              {opt.label}
+                            </h3>
+                            {desc && (
+                              <p 
+                                className="mt-1 line-clamp-2 text-xs font-semibold leading-relaxed"
+                                style={{ color: isSelected ? theme.theme : "rgba(20, 41, 24, 0.5)" }}
+                              >
+                                {desc}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Checkmark badge */}
+                          <div 
+                            className="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full border transition-all duration-300"
+                            style={
+                              isSelected
+                                ? {
+                                    backgroundColor: theme.theme,
+                                    borderColor: theme.theme,
+                                    color: "#fff",
+                                    transform: "scale(1)",
+                                    opacity: 1
+                                  }
+                                : {
+                                    borderColor: "rgba(20, 41, 24, 0.15)",
+                                    backgroundColor: "transparent",
+                                    transform: "scale(0.8)",
+                                    opacity: 0
+                                  }
+                            }
+                          >
+                            <Check className="h-3.5 w-3.5 stroke-[3]" />
+                          </div>
                         </button>
                       );
                     })}
                   </div>
-                  <div className="mt-6 flex items-center justify-between gap-3">
+
+                  <div className="relative z-10 mt-10 flex items-center justify-between border-t border-forest-950/5 pt-6">
                     {quizStep > 0 ? (
                       <button
                         type="button"
                         onClick={backQuiz}
-                        className="inline-flex items-center gap-2 rounded-full border border-forest-950/10 bg-white px-5 py-3 text-sm font-black text-forest-950 transition hover:border-earth-600/50"
+                        className="inline-flex h-12 items-center gap-2 rounded-full border border-forest-950/15 bg-transparent px-6 text-sm font-bold text-forest-950 transition-all hover:bg-forest-950/5 active:scale-95"
                       >
-                        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                        <ArrowLeft className="h-4 w-4" aria-hidden="true" strokeWidth={2} />
                         {t("back")}
                       </button>
                     ) : (
                       <span />
                     )}
+
+                    <div className="flex items-center gap-2">
+                      {Array.from({ length: quizQueue.length }).map((_, i) => (
+                        <span
+                          key={i}
+                          className={cn(
+                            "h-2 w-2 rounded-full transition-all duration-300",
+                            i === quizStep ? "bg-[#142918] scale-125" : "bg-[#e8dec9]"
+                          )}
+                        />
+                      ))}
+                    </div>
+
                     <button
                       type="button"
                       onClick={advanceQuiz}
-                      className="inline-flex items-center gap-2 rounded-full bg-forest-950 px-6 py-3 text-sm font-black text-parchment-50 transition hover:bg-forest-900"
+                      disabled={wouldBeLast() && totalSelected === 0}
+                      className="inline-flex h-12 items-center gap-2 rounded-full bg-[#1b3322] px-8 text-sm font-bold text-parchment-50 shadow-sm transition-all hover:bg-[#122417] active:scale-95 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#1b3322] disabled:active:scale-100"
                     >
                       {wouldBeLast() ? t("seeResult") : t("next")}
-                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" strokeWidth={2} />
                     </button>
                   </div>
+                  {wouldBeLast() && totalSelected === 0 ? (
+                    <p className="relative z-10 mt-3 text-center text-xs font-semibold text-[#b5703a]">
+                      {isVi
+                        ? "Hãy chọn ít nhất một hương vị để xem kết quả."
+                        : "Please pick at least one flavor to see your result."}
+                    </p>
+                  ) : null}
                 </div>
               ) : (
-                <div className="p-8 text-center sm:p-10">
-                  <div className="mx-auto inline-flex h-16 w-16 items-center justify-center rounded-full bg-earth-600 text-white">
-                    <Check className="h-8 w-8" aria-hidden="true" />
-                  </div>
-                  <h2 className="mt-6 font-serif text-3xl leading-tight text-forest-950 sm:text-4xl">
-                    {isVi ? "Cảm ơn bạn!" : "Thank you!"}
-                  </h2>
-                  <p className="mx-auto mt-4 max-w-md text-sm font-medium leading-7 text-forest-950/72">
-                    {isVi
-                      ? "Cảm ơn vì đã cho chúng tôi biết cảm nhận của bạn về cà phê. Phản hồi của bạn giúp Wecacha phục vụ bạn tốt hơn."
-                      : "Thanks for sharing your coffee taste with us. Your feedback helps Wecacha serve you better."}
-                  </p>
-                  <div className="mt-8 flex flex-wrap justify-center gap-3">
-                    <button
-                      type="button"
-                      onClick={restartQuiz}
-                      className="inline-flex items-center gap-2 rounded-full border border-forest-950/10 bg-white px-5 py-2.5 text-sm font-black text-forest-950 transition hover:border-earth-600/50"
-                    >
-                      <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                      {t("restart")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={closeQuiz}
-                      className="inline-flex items-center gap-2 rounded-full bg-forest-950 px-6 py-2.5 text-sm font-black text-parchment-50 transition hover:bg-forest-900"
-                    >
-                      {t("closeWheel")}
-                    </button>
+                <div className="overflow-y-auto p-8 sm:p-12 relative z-10 text-center flex flex-col items-center justify-center min-h-[350px]">
+                  <div className="relative z-10 flex flex-col items-center">
+                    <Check className="h-16 w-16 text-[#78593e] stroke-[2.5]" aria-hidden="true" />
+                    <h2 className="mt-6 font-serif text-3xl leading-tight text-forest-950 sm:text-4xl">
+                      {isVi ? "Cảm ơn bạn!" : "Thank you!"}
+                    </h2>
+                    <p className="mx-auto mt-4 max-w-md text-sm font-medium leading-7 text-forest-950/72">
+                      {isVi
+                        ? "Cảm ơn vì đã cho chúng tôi biết cảm nhận của bạn về cà phê. Phản hồi của bạn giúp Wecacha phục vụ bạn tốt hơn."
+                        : "Thanks for sharing your coffee taste with us. Your feedback helps Wecacha serve you better."}
+                    </p>
+                    <div className="mt-8 flex flex-wrap justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={restartQuiz}
+                        className="inline-flex h-12 items-center gap-2 rounded-full border border-forest-950/15 bg-transparent px-6 text-sm font-bold text-forest-950 transition-all hover:bg-forest-950/5 active:scale-95"
+                      >
+                        <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                        {t("restart")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={closeQuiz}
+                        className="inline-flex h-12 items-center gap-2 rounded-full bg-[#1b3322] px-8 text-sm font-bold text-parchment-50 shadow-sm transition-all hover:bg-[#122417] active:scale-95 hover:shadow-md"
+                      >
+                        {t("closeWheel")}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -644,7 +813,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
             animate={{opacity: 1}}
             exit={{opacity: 0}}
             transition={{duration: 0.2}}
-            className="fixed inset-0 z-[170] flex items-center justify-center bg-forest-950/55 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[170] flex items-center justify-center bg-white/55 p-4 backdrop-blur-sm"
             onClick={(e) => { if (e.target === e.currentTarget) setConfirmExit(false); }}
           >
             <motion.div
@@ -652,7 +821,7 @@ export function FlavorQuizPage({locale, flavorCounts}: FlavorQuizPageProps) {
               animate={{opacity: 1, scale: 1, y: 0}}
               exit={{opacity: 0, scale: 0.94, y: 14}}
               transition={{duration: 0.24, ease: [0.16, 1, 0.3, 1]}}
-              className="w-full max-w-sm rounded-3xl bg-parchment-50 p-7 text-center shadow-[0_40px_120px_rgba(10,24,10,0.3)]"
+              className="w-full max-w-sm rounded-3xl bg-[#fdfdfb] p-7 text-center shadow-[0_40px_120px_rgba(10,24,10,0.3)]"
             >
               <h3 className="font-serif text-2xl leading-tight text-forest-950">
                 {isVi ? "Bạn có chắc chắn muốn thoát?" : "Are you sure you want to leave?"}
@@ -705,8 +874,8 @@ function FlavorWheelPoster({
   selectedFlavor: FlavorKey;
   onSelect: (key: FlavorKey) => void;
   onStart: () => void;
-  onPickFlavor: (groupKey: string, label?: string) => void;
-  onHoverFlavor?: (groupKey: string | null, label?: string) => void;
+  onPickFlavor: (groupKey: string, label?: string, flavorKey?: string) => void;
+  onHoverFlavor?: (groupKey: string | null, label?: string, flavorKey?: string) => void;
   onHoverMove?: (x: number, y: number) => void;
   highlightGroups?: string[];
   quizActive?: boolean;
@@ -936,8 +1105,8 @@ export function FlavorWheel({
   onItemSelect?: (selection: WheelSelection) => void;
   selectedItem?: WheelSelection;
   onStart?: () => void;
-  onPickFlavor?: (groupKey: string, label?: string) => void;
-  onHoverFlavor?: (groupKey: string | null, label?: string) => void;
+  onPickFlavor?: (groupKey: string, label?: string, flavorKey?: string) => void;
+  onHoverFlavor?: (groupKey: string | null, label?: string, flavorKey?: string) => void;
   onHoverMove?: (x: number, y: number) => void;
   highlightGroups?: string[];
   variant?: "app" | "poster";
@@ -1143,7 +1312,7 @@ export function FlavorWheel({
                 opacity={variant === "poster" ? 0.96 : groupActive ? 0.96 : 0.38}
                 stroke={childItemSelected ? "#142918" : "#ffffff"}
                 strokeWidth={childItemSelected ? 2.5 : 0.8}
-                onMouseEnter={() => onHoverFlavor?.(group.key, t(child.labelKey))}
+                onMouseEnter={() => onHoverFlavor?.(group.key, t(child.labelKey), child.id)}
               onMouseLeave={() => onHoverFlavor?.(null)}
               className="cursor-pointer outline-none [outline:none] focus:outline-none focus-visible:outline-none transition duration-300 hover:opacity-100"
                 role="button"
@@ -1151,12 +1320,12 @@ export function FlavorWheel({
                 aria-label={t(child.labelKey)}
                 onClick={() => {
                   onSelect(mapGroupKeyToFlavorKey(group.key));
-                  onItemSelect?.(childSelection); onPickFlavor?.(group.key, t(child.labelKey));
+                  onItemSelect?.(childSelection); onPickFlavor?.(group.key, t(child.labelKey), child.id);
                 }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
                     onSelect(mapGroupKeyToFlavorKey(group.key));
-                    onItemSelect?.(childSelection); onPickFlavor?.(group.key, t(child.labelKey));
+                    onItemSelect?.(childSelection); onPickFlavor?.(group.key, t(child.labelKey), child.id);
                   }
                 }}
               />
@@ -1249,7 +1418,7 @@ export function FlavorWheel({
                     opacity={variant === "poster" ? 0.9 : groupActive ? 0.9 : 0.28}
                     stroke={leafItemSelected ? "#142918" : "#ffffff"}
                     strokeWidth={leafItemSelected ? 2.5 : 0.6}
-                    onMouseEnter={() => onHoverFlavor?.(group.key, t(`wheel.${leaf}`))}
+                    onMouseEnter={() => onHoverFlavor?.(group.key, t(`wheel.${leaf}`), leaf)}
               onMouseLeave={() => onHoverFlavor?.(null)}
               className="cursor-pointer outline-none [outline:none] focus:outline-none focus-visible:outline-none transition duration-300 hover:opacity-100"
                     role="button"
@@ -1257,12 +1426,12 @@ export function FlavorWheel({
                     aria-label={t(`wheel.${leaf}`)}
                     onClick={() => {
                       onSelect(mapGroupKeyToFlavorKey(group.key));
-                      onItemSelect?.(leafSelection); onPickFlavor?.(group.key, t(`wheel.${leaf}`));
+                      onItemSelect?.(leafSelection); onPickFlavor?.(group.key, t(`wheel.${leaf}`), leaf);
                     }}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         onSelect(mapGroupKeyToFlavorKey(group.key));
-                        onItemSelect?.(leafSelection); onPickFlavor?.(group.key, t(`wheel.${leaf}`));
+                        onItemSelect?.(leafSelection); onPickFlavor?.(group.key, t(`wheel.${leaf}`), leaf);
                       }
                     }}
                   />,

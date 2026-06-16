@@ -90,11 +90,11 @@ export default async function ContactPage({params}: Props) {
                 <Mail className="h-5 w-5 text-ember" aria-hidden="true" />
                 {siteConfig.email}
               </a>
-              <a className="flex items-center gap-3 transition hover:text-white" href={siteConfig.facebook}>
+              <a className="flex items-center gap-3 transition hover:text-white" href={siteConfig.facebook} target="_blank" rel="noopener noreferrer">
                 <Facebook className="h-5 w-5 text-ember" aria-hidden="true" />
                 Facebook
               </a>
-              <a className="flex items-center gap-3 transition hover:text-white" href={`https://zalo.me/${siteConfig.zalo.replace(/\D/g, "")}`}>
+              <a className="flex items-center gap-3 transition hover:text-white" href={`https://zalo.me/${siteConfig.zalo.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="h-5 w-5 text-ember" aria-hidden="true" />
                 Zalo
               </a>

@@ -77,7 +77,6 @@ export default async function NewsIndexPage({params}: Props) {
     .from("news_articles")
     .select("slug, title_vi, title_en, image_url")
     .eq("is_visible", true)
-    .in("placement", ["news", "both"])
     .order("sort_order", { ascending: true })
     .order("published_at", { ascending: false });
 
