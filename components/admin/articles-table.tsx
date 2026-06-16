@@ -109,6 +109,17 @@ export function ArticlesTable({
       )
     },
     {
+      title: t("colIndex"),
+      key: "index",
+      width: 72,
+      align: "center",
+      render: (_value, _row, index) => (
+        <span className="font-medium text-stone-500">
+          {(pagination.current - 1) * pagination.pageSize + index + 1}
+        </span>
+      )
+    },
+    {
       title: t("colTitleVI"),
       dataIndex: "title_vi",
       sorter: (a, b) => a.title_vi.localeCompare(b.title_vi),
@@ -131,13 +142,6 @@ export function ArticlesTable({
         <Tag icon={value ? <EyeOutlined /> : <EyeInvisibleOutlined />} color={value ? "green" : "default"}>
           {value ? t("visible") : t("hidden")}
         </Tag>
-      )
-    },
-    {
-      title: t("sortOrder"),
-      dataIndex: "sort_order",
-      render: (_value, _row, index) => (
-        <span className="font-medium text-stone-500">{index + 1}</span>
       )
     },
     {
