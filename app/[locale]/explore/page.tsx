@@ -54,9 +54,10 @@ export default async function ExplorePage({params}: Props) {
     .order("published_at", {ascending: false});
 
   // 3 thẻ "Khám phá" và magazine cùng lấy từ news_articles (1 nguồn dữ liệu).
+  // Thẻ = 3 bài đầu (highlight); magazine = toàn bộ bài (luôn có nội dung).
   const allArticles = articles ?? [];
   const cardArticles = allArticles.slice(0, 3);
-  const magazineArticles = allArticles.slice(3);
+  const magazineArticles = allArticles;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f4f0e6] pb-8 pt-28 text-[#142918]">
