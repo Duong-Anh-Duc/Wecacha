@@ -77,14 +77,17 @@ export function ArticleMagazine({
 
           {/* 4 cards per page */}
           <div className="relative overflow-hidden">
-            <AnimatePresence mode="wait" initial={false} custom={direction}>
+            <AnimatePresence mode="popLayout" initial={false} custom={direction}>
               <motion.div
                 key={current}
                 custom={direction}
-                initial={{opacity: 0, x: direction >= 0 ? 36 : -36}}
+                initial={{opacity: 0, x: direction >= 0 ? "100%" : "-100%"}}
                 animate={{opacity: 1, x: 0}}
-                exit={{opacity: 0, x: direction >= 0 ? -36 : 36}}
-                transition={{duration: 0.45, ease: [0.16, 1, 0.3, 1]}}
+                exit={{opacity: 0, x: direction >= 0 ? "-100%" : "100%"}}
+                transition={{
+                  x: {duration: 0.6, ease: [0.16, 1, 0.3, 1]},
+                  opacity: {duration: 0.35, ease: "easeOut"}
+                }}
                 className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4"
               >
                 {visible.map((article) => {
