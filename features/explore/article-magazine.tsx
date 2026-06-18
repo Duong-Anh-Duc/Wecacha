@@ -81,13 +81,10 @@ export function ArticleMagazine({
               <motion.div
                 key={current}
                 custom={direction}
-                initial={{opacity: 0, x: direction >= 0 ? "100%" : "-100%"}}
-                animate={{opacity: 1, x: 0}}
-                exit={{opacity: 0, x: direction >= 0 ? "-100%" : "100%"}}
-                transition={{
-                  x: {duration: 0.6, ease: [0.16, 1, 0.3, 1]},
-                  opacity: {duration: 0.35, ease: "easeOut"}
-                }}
+                initial={{x: direction >= 0 ? "100%" : "-100%"}}
+                animate={{x: 0}}
+                exit={{x: direction >= 0 ? "-100%" : "100%"}}
+                transition={{duration: 0.6, ease: [0.16, 1, 0.3, 1]}}
                 className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4"
               >
                 {visible.map((article) => {
