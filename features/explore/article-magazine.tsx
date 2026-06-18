@@ -1,6 +1,9 @@
+"use client";
+
+import {useState} from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {ArrowUpRight, Calendar} from "lucide-react";
+import {ArrowUpRight, ChevronLeft, ChevronRight} from "lucide-react";
 import {Reveal} from "@/components/motion/reveal";
 import {imageLibrary} from "@/lib/content";
 import type {Locale} from "@/i18n/routing";
@@ -14,6 +17,8 @@ export type NewsArticle = {
   image_url: string | null;
   published_at: string | null;
 };
+
+const PER_PAGE = 4;
 
 function formatDate(iso: string | null) {
   if (!iso) return "";
@@ -33,8 +38,11 @@ export function ArticleMagazine({
 }) {
   const isVi = locale === "vi";
   const newsLabel = isVi ? "Tin tức" : "News";
+  const [page, setPage] = useState(0);
+
   const pick = (a: NewsArticle) => ({
     title: (isVi ? a.title_vi : a.title_en) || a.title_vi,
+    intro: (isVi ? a.intro_vi : a.intro_en) || a.intro_vi || "",
     img: a.image_url || imageLibrary.coffeePour,
     href: `/${locale}/news/${a.slug}`,
     date: formatDate(a.published_at)
@@ -42,8 +50,9 @@ export function ArticleMagazine({
 
   if (articles.length === 0) return null;
 
-  const featured = articles.slice(0, 2);
-  const notable = articles.slice(0, 4);
+  const totalPages = Math.max(1, Math.ceil(articles.length / PER_PAGE));
+  const current = Math.min(page, totalPages - 1);
+  const visible = articles.slice(current * PER_PAGE, current * PER_PAGE + PER_PAGE);
 
   return (
     <section className="relative z-20 mt-10">
@@ -68,78 +77,94 @@ export function ArticleMagazine({
             </Link>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-3 lg:gap-10">
-            {/* Featured cards — 2 large */}
-            <div className="grid gap-6 sm:grid-cols-2 lg:col-span-2">
-              {featured.map((article) => {
-                const a = pick(article);
-                return (
-                  <Link
-                    key={article.slug}
-                    href={a.href}
-                    className="group flex flex-col overflow-hidden rounded-2xl border border-[#142918]/8 bg-white shadow-[0_10px_40px_rgba(20,41,24,0.06)] transition-all hover:-translate-y-1 hover:shadow-[0_18px_60px_rgba(20,41,24,0.12)]"
-                  >
-                    <div className="relative aspect-[4/3] w-full overflow-hidden">
-                      <Image
-                        src={a.img}
-                        alt={a.title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 33vw"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-3 p-5">
-                      <div className="flex items-center gap-2 text-[12px] font-semibold text-[#1c2a1c]/55">
-                        <Calendar className="h-3.5 w-3.5 text-[#4a751d]" />
-                        {a.date && <span>{a.date}</span>}
-                        <span className="text-[#142918]/20">|</span>
-                        <span className="text-[#4a751d]">{newsLabel}</span>
-                      </div>
-                      <h3 className="font-serif text-lg font-bold uppercase leading-snug tracking-tight text-[#1c2a1c] line-clamp-2 transition-colors group-hover:text-[#b5703a]">
-                        {a.title}
-                      </h3>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+          {/* 4 cards per page */}
+          <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {visible.map((article) => {
+              const a = pick(article);
+              return (
+                <Link
+                  key={article.slug}
+                  href={a.href}
+                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#142918]/8 bg-white shadow-[0_8px_30px_rgba(20,41,24,0.05)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#142918]/12 hover:shadow-[0_20px_55px_rgba(20,41,24,0.12)]"
+                >
+                  <div className="relative aspect-[16/11] w-full overflow-hidden">
+                    <Image
+                      src={a.img}
+                      alt={a.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.06]"
+                    />
+                    <span className="absolute left-3 top-3 rounded-full bg-[#142918]/85 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#f4f0e6] backdrop-blur-sm">
+                      {newsLabel}
+                    </span>
+                  </div>
 
-            {/* Notable news sidebar */}
-            <div className="lg:border-l lg:border-[#142918]/10 lg:pl-8">
-              <h3 className="mb-5 font-serif text-xl font-bold text-[#4a751d]">
-                {isVi ? "Tin tức đáng chú ý" : "Notable news"}
-              </h3>
-              <div className="flex flex-col divide-y divide-[#142918]/10">
-                {notable.map((article) => {
-                  const a = pick(article);
-                  return (
-                    <Link key={article.slug} href={a.href} className="group flex gap-3 py-4 first:pt-0">
-                      <div className="relative h-[4.5rem] w-[6.5rem] shrink-0 overflow-hidden rounded-lg">
-                        <Image
-                          src={a.img}
-                          alt={a.title}
-                          fill
-                          sizes="104px"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold text-[#1c2a1c]/50">
-                          <Calendar className="h-3 w-3 text-[#4a751d]" />
-                          {a.date && <span>{a.date}</span>}
-                          <span className="text-[#142918]/20">|</span>
-                          <span className="text-[#4a751d]">{newsLabel}</span>
-                        </div>
-                        <h4 className="text-sm font-bold uppercase leading-snug tracking-tight text-[#1c2a1c] line-clamp-2 transition-colors group-hover:text-[#b5703a]">
-                          {a.title}
-                        </h4>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
+                  <div className="flex flex-1 flex-col p-5">
+                    {a.date && (
+                      <time className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#4a751d]">
+                        {a.date}
+                      </time>
+                    )}
+                    <h3 className="mb-2 font-serif text-[1.15rem] leading-[1.28] text-[#1c2a1c] transition-colors group-hover:text-[#b5703a] line-clamp-2">
+                      {a.title}
+                    </h3>
+                    {a.intro && (
+                      <p className="mb-4 line-clamp-2 text-[12.5px] leading-[1.6] text-[#142918]/55">
+                        {a.intro}
+                      </p>
+                    )}
+                    <span className="mt-auto inline-flex items-center gap-1.5 text-[12px] font-bold text-[#142918]/70 transition-colors group-hover:text-[#b5703a]">
+                      {isVi ? "Đọc tiếp" : "Read more"}
+                      <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-9 flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={current === 0}
+                aria-label={isVi ? "Trang trước" : "Previous page"}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#142918]/12 text-[#1c2a1c] transition-colors hover:border-[#4a751d] hover:bg-[#4a751d]/5 hover:text-[#4a751d] disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-[#142918]/12 disabled:hover:bg-transparent disabled:hover:text-[#1c2a1c]"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              {Array.from({length: totalPages}).map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setPage(i)}
+                  aria-label={`${isVi ? "Trang" : "Page"} ${i + 1}`}
+                  aria-current={i === current ? "page" : undefined}
+                  className={`inline-flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-[13px] font-bold transition-colors ${
+                    i === current
+                      ? "bg-[#142918] text-[#f4f0e6] shadow-[0_6px_18px_rgba(20,41,24,0.25)]"
+                      : "border border-[#142918]/12 text-[#1c2a1c] hover:border-[#4a751d] hover:bg-[#4a751d]/5 hover:text-[#4a751d]"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                disabled={current === totalPages - 1}
+                aria-label={isVi ? "Trang sau" : "Next page"}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#142918]/12 text-[#1c2a1c] transition-colors hover:border-[#4a751d] hover:bg-[#4a751d]/5 hover:text-[#4a751d] disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-[#142918]/12 disabled:hover:bg-transparent disabled:hover:text-[#1c2a1c]"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          )}
         </div>
       </Reveal>
     </section>
