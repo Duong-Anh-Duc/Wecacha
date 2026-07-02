@@ -77,7 +77,8 @@ type CropDraft = {
 
 const defaultAttributeGroups = ["CÂN NẶNG", "MÀU", "DUNG TÍCH", "KHỐI LƯỢNG"];
 const defaultAttributeValues = ["1kg", "2kg", "5kg", "10kg", "20kg", "50kg"];
-const cropPreviewSize = 420;
+const cropPreviewWidth = 360;
+const cropPreviewHeight = 540;
 const minCropSize = 72;
 const maxCropOutputSide = 1600;
 const productImageAspectRatio = 2 / 3;
@@ -114,7 +115,7 @@ function clamp(value: number, min: number, max: number) {
 function cropGeometry(draft: CropDraft) {
   if (!draft.naturalWidth || !draft.naturalHeight) return null;
 
-  const scale = Math.min(cropPreviewSize / draft.naturalWidth, cropPreviewSize / draft.naturalHeight);
+  const scale = Math.min(cropPreviewWidth / draft.naturalWidth, cropPreviewHeight / draft.naturalHeight);
   const width = draft.naturalWidth * scale;
   const height = draft.naturalHeight * scale;
 
@@ -122,8 +123,8 @@ function cropGeometry(draft: CropDraft) {
     scale,
     width,
     height,
-    left: (cropPreviewSize - width) / 2,
-    top: (cropPreviewSize - height) / 2
+    left: (cropPreviewWidth - width) / 2,
+    top: (cropPreviewHeight - height) / 2
   };
 }
 
@@ -576,8 +577,14 @@ export function ProductForm({
 
     if (drag.action.includes("e")) nextWidth = drag.cropWidth + deltaX;
     if (drag.action.includes("w")) nextWidth = drag.cropWidth - deltaX;
-    if (drag.action.includes("s")) nextWidth = Math.max(nextWidth, (drag.cropHeight + deltaY) * productImageAspectRatio);
-    if (drag.action.includes("n")) nextWidth = Math.max(nextWidth, (drag.cropHeight - deltaY) * productImageAspectRatio);
+    if (drag.action.includes("s")) nextWidth = (drag.cropHeight + deltaY) * productImageAspectRatio;
+    if (drag.action.includes("n")) nextWidth = (drag.cropHeight - deltaY) * productImageAspectRatio;
+    if ((drag.action === "se" || drag.action === "nw") && Math.abs(deltaX) > Math.abs(deltaY)) {
+      nextWidth = drag.cropWidth + (drag.action === "se" ? deltaX : -deltaX);
+    }
+    if ((drag.action === "ne" || drag.action === "sw") && Math.abs(deltaX) > Math.abs(deltaY)) {
+      nextWidth = drag.cropWidth + (drag.action === "ne" ? deltaX : -deltaX);
+    }
 
     const maxWidth = Math.min(
       drag.action.includes("w") ? maxWidthFromRight : maxWidthFromLeft,
@@ -1163,9 +1170,6 @@ export function ProductForm({
           <Button key="skip" onClick={() => resolveImageCrop(null)}>
             {t("skipImage")}
           </Button>,
-          <Button key="original" onClick={() => cropDraft && resolveImageCrop(cropDraft.file)}>
-            {t("useOriginalImage")}
-          </Button>,
           <Button key="crop" type="primary" icon={<ScissorOutlined />} disabled={!cropPreviewGeometry} onClick={handleCropConfirm}>
             {t("cropAndUpload")}
           </Button>
@@ -1178,7 +1182,7 @@ export function ProductForm({
               <div
                 data-crop-stage
                 className="relative touch-none select-none overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 shadow-inner"
-                style={{width: cropPreviewSize, height: cropPreviewSize}}
+                style={{width: cropPreviewWidth, height: cropPreviewHeight}}
                 onPointerMove={handleCropPointerMove}
                 onPointerUp={handleCropPointerEnd}
                 onPointerCancel={handleCropPointerEnd}
@@ -1207,15 +1211,15 @@ export function ProductForm({
                   <>
                     <div
                       className="pointer-events-none absolute bg-black/50"
-                      style={{left: 0, top: 0, width: cropPreviewSize, height: cropBox.cropY}}
+                      style={{left: 0, top: 0, width: cropPreviewWidth, height: cropBox.cropY}}
                     />
                     <div
                       className="pointer-events-none absolute bg-black/50"
                       style={{
                         left: 0,
                         top: cropBox.cropY + cropBox.cropHeight,
-                        width: cropPreviewSize,
-                        height: cropPreviewSize - cropBox.cropY - cropBox.cropHeight
+                        width: cropPreviewWidth,
+                        height: cropPreviewHeight - cropBox.cropY - cropBox.cropHeight
                       }}
                     />
                     <div
@@ -1227,7 +1231,7 @@ export function ProductForm({
                       style={{
                         left: cropBox.cropX + cropBox.cropWidth,
                         top: cropBox.cropY,
-                        width: cropPreviewSize - cropBox.cropX - cropBox.cropWidth,
+                        width: cropPreviewWidth - cropBox.cropX - cropBox.cropWidth,
                         height: cropBox.cropHeight
                       }}
                     />

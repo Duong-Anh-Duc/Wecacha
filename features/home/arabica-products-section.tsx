@@ -112,7 +112,7 @@ export async function ArabicaProductsSection({
         >
           {cards.map((item, i) => (
             <Reveal key={item.key} delay={i * 0.12} className="h-full">
-              <div className="group relative flex h-full min-h-[600px] overflow-hidden rounded-[2.5rem] border border-parchment-100/20 bg-black p-6 shadow-[0_30px_60px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-2 hover:border-ember/60 hover:shadow-[0_20px_40px_rgba(181,112,58,0.2)]">
+              <div className="group relative flex h-full aspect-[2/3] overflow-hidden rounded-[2.5rem] border border-parchment-100/20 bg-black p-6 shadow-[0_30px_60px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-2 hover:border-ember/60 hover:shadow-[0_20px_40px_rgba(181,112,58,0.2)]">
                 
                 {/* Product Background Image inside Card */}
                 <div className="absolute inset-0 z-0">

@@ -46,7 +46,7 @@ export function ProductGallery({
   return (
     <div className="flex flex-col gap-4">
       {/* Main Image */}
-      <div className="relative aspect-[2/3] max-h-[calc(100vh-9rem)] overflow-hidden rounded-[24px] bg-[#f8f9f6]">
+      <div className="relative mx-auto aspect-[2/3] w-full max-w-[calc((100vh-9rem)*0.6667)] overflow-hidden rounded-[24px] bg-[#f8f9f6]">
         <Image
           src={safeImages[selectedIndex] || safeImages[0]}
           alt=""
