@@ -11,7 +11,6 @@ import {
   Clock,
   CheckCircle2,
   AlertCircle,
-  ChevronDown,
   Calendar
 } from "lucide-react";
 import {getTranslations, setRequestLocale} from "next-intl/server";
@@ -234,11 +233,9 @@ export default async function AdminDashboardPage({
           </div>
         </div>
 
-        {/* Dropdown 7 days */}
-        <div className="inline-flex h-9 items-center gap-2 self-start rounded-xl border border-stone-250/70 bg-white px-3.5 text-xs font-bold text-stone-700 shadow-sm transition-all duration-200 hover:border-stone-300 hover:bg-stone-50/50 cursor-pointer">
+        <div className="inline-flex h-9 items-center gap-2 self-start rounded-xl border border-stone-250/70 bg-white px-3.5 text-xs font-bold text-stone-700 shadow-sm">
           <Calendar className="h-3.5 w-3.5 text-stone-500" />
           <span>{t("metricLast7Days")}</span>
-          <ChevronDown className="h-3.5 w-3.5 text-stone-400" />
         </div>
       </div>
 
@@ -316,10 +313,8 @@ export default async function AdminDashboardPage({
               <h3 className="font-sans text-base font-bold text-stone-900">{t("activityTitle")}</h3>
             </div>
 
-            {/* Small Select dropdown in card header */}
-            <div className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-[11px] font-bold text-stone-600 flex items-center gap-1.5 transition hover:bg-stone-50 cursor-pointer shadow-sm">
+            <div className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-[11px] font-bold text-stone-600 flex items-center gap-1.5 shadow-sm">
               <span>{t("metricLast7Days")}</span>
-              <ChevronDown className="h-3 w-3 text-stone-400" />
             </div>
           </div>
 
@@ -647,7 +642,6 @@ export default async function AdminDashboardPage({
                 className="inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-5 py-2 text-xs font-bold text-stone-700 shadow-sm hover:bg-stone-50 hover:border-stone-300 transition-all duration-200"
               >
                 <span>{tCommon("viewAll")}</span>
-                <ChevronDown className="h-4 w-4 text-stone-400" />
               </Link>
             </div>
           </div>

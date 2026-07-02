@@ -845,7 +845,7 @@ export function ProductForm({
               mode="multiple"
               allowClear
               showSearch
-              dropdownRender={(menu) => (
+              popupRender={(menu) => (
                 <div>
                   {menu}
                   <div className="border-t border-stone-100 p-2">
