@@ -25,6 +25,18 @@ export function ProductFormModalButton({
   const isEdit = mode === "edit";
   const generatedFormId = useId();
   const formId = `product-form-${generatedFormId.replace(/:/g, "")}`;
+  function requestClose() {
+    if (isSaving) return;
+
+    Modal.confirm({
+      title: t("closeModalConfirmTitle"),
+      content: t("closeModalConfirmDesc"),
+      okText: t("closeModalConfirmOk"),
+      cancelText: t("closeModalConfirmCancel"),
+      okButtonProps: {danger: true},
+      onOk: () => setOpen(false)
+    });
+  }
 
   return (
     <>
@@ -50,10 +62,10 @@ export function ProductFormModalButton({
       <Modal
         title={isEdit ? t("editProductTitle") : t("newProductTitle")}
         open={open}
-        onCancel={() => setOpen(false)}
+        onCancel={requestClose}
         footer={(
           <div className="flex items-center justify-end gap-2">
-            <Button size="large" onClick={() => setOpen(false)}>
+            <Button size="large" onClick={requestClose}>
               {t("skip")}
             </Button>
             <Button
@@ -87,7 +99,7 @@ export function ProductFormModalButton({
             showActions={false}
             redirectOnSave={false}
             onSavingChange={setIsSaving}
-            onCancel={() => setOpen(false)}
+            onCancel={requestClose}
             onSaved={() => setOpen(false)}
           />
         </div>

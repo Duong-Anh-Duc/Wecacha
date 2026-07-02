@@ -545,13 +545,46 @@ export async function deleteProduct(id: string) {
     return {success: false, error: "Unauthorized"};
   }
 
-  const {data: product} = await supabase
+  const {data: product, error: productError} = await supabase
     .from("products")
     .select("slug, category, category_slugs")
     .eq("id", id)
     .maybeSingle();
 
-  const {error} = await supabase.from("products").delete().eq("id", id);
+  if (productError) {
+    return {success: false, error: productError.message};
+  }
+
+  if (!product?.slug) {
+    return {success: false, error: "Không tìm thấy sản phẩm"};
+  }
+
+  const {data: orderItems, error: orderItemsError} = await supabase
+    .from("order_items")
+    .select("orders(status)")
+    .eq("product_slug", product.slug);
+
+  if (orderItemsError) {
+    return {success: false, error: orderItemsError.message};
+  }
+
+  const hasActiveOrder = ((orderItems ?? []) as {orders?: {status?: string} | {status?: string}[] | null}[])
+    .some((item) => {
+      const order = Array.isArray(item.orders) ? item.orders[0] : item.orders;
+      return order?.status && !["completed", "cancelled"].includes(order.status);
+    });
+
+  if (hasActiveOrder) {
+    return {
+      success: false,
+      error: "Sản phẩm đang có đơn hàng chưa hoàn tất hoặc chưa huỷ. Vui lòng hoàn tất/huỷ đơn trước khi xoá."
+    };
+  }
+
+  const {error} = await supabase
+    .from("products")
+    .update({is_visible: false, sort_order: -1, updated_at: new Date().toISOString()})
+    .eq("id", id);
 
   if (error) {
     return {success: false, error: error.message};

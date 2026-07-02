@@ -34,7 +34,7 @@ export function ProductCard({
       whileInView={{opacity: 1, y: 0}}
       viewport={{once: true, margin: "-40px"}}
       transition={{duration: 0.6, ease: [0.22, 1, 0.36, 1]}}
-      className="group relative flex h-full min-h-[430px] flex-col overflow-hidden rounded-[2rem] border border-[#142918]/60 bg-[#0a180a] shadow-[0_12px_44px_rgba(4,14,4,0.38)] transition-all duration-700 ease-out hover:-translate-y-2 hover:shadow-[0_24px_88px_rgba(251,191,36,0.22)] sm:min-h-[460px]"
+      className="group relative flex h-full aspect-[2/3] flex-col overflow-hidden rounded-[2rem] border border-[#142918]/60 bg-[#0a180a] shadow-[0_12px_44px_rgba(4,14,4,0.38)] transition-all duration-700 ease-out hover:-translate-y-2 hover:shadow-[0_24px_88px_rgba(251,191,36,0.22)]"
     >
       <div className="absolute inset-0 z-0 h-full w-full opacity-60 mix-blend-screen transition duration-1000 ease-in-out group-hover:scale-105 group-hover:opacity-100">
         <div className="absolute -inset-px rounded-[26px] bg-[radial-gradient(circle_at_50%_0%,rgba(243,167,52,0.22),transparent_42%),radial-gradient(circle_at_18%_80%,rgba(65,122,0,0.22),transparent_42%)]" />

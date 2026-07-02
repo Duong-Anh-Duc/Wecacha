@@ -53,6 +53,19 @@ export function ProductAttributesManager({attributes}: {attributes: ProductAttri
     form.resetFields();
   }
 
+  function requestCloseModal() {
+    if (isPending) return;
+
+    Modal.confirm({
+      title: t("closeModalConfirmTitle"),
+      content: t("closeModalConfirmDesc"),
+      okText: t("closeModalConfirmOk"),
+      cancelText: t("closeModalConfirmCancel"),
+      okButtonProps: {danger: true},
+      onOk: closeModal
+    });
+  }
+
   function save(values: Draft) {
     if (!draft) return;
 
@@ -154,7 +167,7 @@ export function ProductAttributesManager({attributes}: {attributes: ProductAttri
       <Modal
         title={draft?.id ? t("editAttribute") : t("newAttributeTitle")}
         open={isModalOpen}
-        onCancel={closeModal}
+        onCancel={requestCloseModal}
         onOk={() => form.submit()}
         okText={t("save")}
         cancelText={t("cancel")}

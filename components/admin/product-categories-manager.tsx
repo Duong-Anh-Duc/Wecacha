@@ -54,6 +54,19 @@ export function ProductCategoriesManager({categories}: {categories: ProductCateg
     form.resetFields();
   }
 
+  function requestCloseModal() {
+    if (isPending) return;
+
+    Modal.confirm({
+      title: t("closeModalConfirmTitle"),
+      content: t("closeModalConfirmDesc"),
+      okText: t("closeModalConfirmOk"),
+      cancelText: t("closeModalConfirmCancel"),
+      okButtonProps: {danger: true},
+      onOk: closeModal
+    });
+  }
+
   function save(values: Draft) {
     if (!draft) return;
 
@@ -161,7 +174,7 @@ export function ProductCategoriesManager({categories}: {categories: ProductCateg
       <Modal
         title={draft?.slug ? t("editCategoryTitle") : t("newCategoryTitle")}
         open={isModalOpen}
-        onCancel={closeModal}
+        onCancel={requestCloseModal}
         onOk={() => form.submit()}
         okText={t("save")}
         cancelText={t("cancel")}

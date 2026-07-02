@@ -367,6 +367,17 @@ export function ProductForm({
     setNewAttributeName("");
   }
 
+  function requestCloseAttributeModal() {
+    Modal.confirm({
+      title: t("closeModalConfirmTitle"),
+      content: t("closeModalConfirmDesc"),
+      okText: t("closeModalConfirmOk"),
+      cancelText: t("closeModalConfirmCancel"),
+      okButtonProps: {danger: true},
+      onOk: closeAttributeModal
+    });
+  }
+
   function openCreateCategoryModal() {
     setNewCategoryNameVi("");
     setNewCategoryNameEn("");
@@ -377,6 +388,19 @@ export function ProductForm({
     setCategoryModalOpen(false);
     setNewCategoryNameVi("");
     setNewCategoryNameEn("");
+  }
+
+  function requestCloseCategoryModal() {
+    if (isSavingCategory) return;
+
+    Modal.confirm({
+      title: t("closeModalConfirmTitle"),
+      content: t("closeModalConfirmDesc"),
+      okText: t("closeModalConfirmOk"),
+      cancelText: t("closeModalConfirmCancel"),
+      okButtonProps: {danger: true},
+      onOk: closeCategoryModal
+    });
   }
 
   async function handleSaveCategory() {
@@ -1285,7 +1309,7 @@ export function ProductForm({
         open={attributeModalOpen}
         okText={t("saveAttribute")}
         cancelText={t("cancel")}
-        onCancel={closeAttributeModal}
+        onCancel={requestCloseAttributeModal}
         onOk={handleSaveAttribute}
         destroyOnHidden
       >
@@ -1307,7 +1331,7 @@ export function ProductForm({
         okText={t("save")}
         cancelText={t("cancel")}
         confirmLoading={isSavingCategory}
-        onCancel={closeCategoryModal}
+        onCancel={requestCloseCategoryModal}
         onOk={handleSaveCategory}
         destroyOnHidden
       >

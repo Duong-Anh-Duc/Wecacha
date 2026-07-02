@@ -21,6 +21,7 @@ export default async function ProductsAdminPage({
     supabase
       .from("products")
       .select("*")
+      .gte("sort_order", 0)
       .order("sort_order", {ascending: true})
       .order("created_at", {ascending: false}),
     supabase
