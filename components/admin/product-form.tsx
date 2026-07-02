@@ -1,11 +1,19 @@
 "use client";
 
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import Image from "next/image";
-import {App, Button, Card, Form, Input, InputNumber, Modal, Select, Space, Switch} from "antd";
-import {DeleteOutlined, EditOutlined, PlusOutlined, SaveOutlined, UploadOutlined} from "@ant-design/icons";
+import {App, Button, Card, Form, Input, InputNumber, Modal, Select, Space, Switch, Tooltip} from "antd";
+import {
+  DeleteOutlined,
+  DragOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SaveOutlined,
+  ScissorOutlined,
+  UploadOutlined
+} from "@ant-design/icons";
 import {useLocale, useTranslations} from "next-intl";
-import {uploadProductImage, upsertProduct, upsertProductAttribute} from "@/actions/product-actions";
+import {uploadProductImage, upsertProduct, upsertProductAttribute, upsertProductCategory} from "@/actions/product-actions";
 import {useRouter} from "@/i18n/navigation";
 
 export type ProductFormData = {
@@ -54,8 +62,25 @@ type BulkPriceTier = {
   price?: number;
 };
 
+type CropDraft = {
+  file: File;
+  url: string;
+  index: number;
+  total: number;
+  naturalWidth: number;
+  naturalHeight: number;
+  cropX: number;
+  cropY: number;
+  cropWidth: number;
+  cropHeight: number;
+};
+
 const defaultAttributeGroups = ["CÂN NẶNG", "MÀU", "DUNG TÍCH", "KHỐI LƯỢNG"];
 const defaultAttributeValues = ["1kg", "2kg", "5kg", "10kg", "20kg", "50kg"];
+const cropPreviewSize = 420;
+const minCropSize = 72;
+const maxCropOutputSide = 1600;
+const productImageAspectRatio = 2 / 3;
 
 export type ProductAttributeOption = {
   id?: string;
@@ -80,6 +105,43 @@ function formatNumber(value: string | number | undefined) {
 
 function parseNumber(value: string | undefined) {
   return value?.replace(/,/g, "") ?? "";
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function cropGeometry(draft: CropDraft) {
+  if (!draft.naturalWidth || !draft.naturalHeight) return null;
+
+  const scale = Math.min(cropPreviewSize / draft.naturalWidth, cropPreviewSize / draft.naturalHeight);
+  const width = draft.naturalWidth * scale;
+  const height = draft.naturalHeight * scale;
+
+  return {
+    scale,
+    width,
+    height,
+    left: (cropPreviewSize - width) / 2,
+    top: (cropPreviewSize - height) / 2
+  };
+}
+
+function normalizeCropBox(draft: CropDraft) {
+  const geometry = cropGeometry(draft);
+  if (!geometry) return null;
+
+  const maxWidth = Math.max(minCropSize, geometry.width);
+  const maxHeight = Math.max(minCropSize / productImageAspectRatio, geometry.height);
+  const widthFromImageHeight = maxHeight * productImageAspectRatio;
+  const maxCropWidth = Math.min(maxWidth, widthFromImageHeight);
+  const minCropWidth = Math.min(minCropSize, maxCropWidth);
+  const cropWidth = clamp(draft.cropWidth || maxCropWidth, minCropWidth, maxCropWidth);
+  const cropHeight = cropWidth / productImageAspectRatio;
+  const cropX = clamp(draft.cropX || geometry.left, geometry.left, geometry.left + geometry.width - cropWidth);
+  const cropY = clamp(draft.cropY || geometry.top, geometry.top, geometry.top + geometry.height - cropHeight);
+
+  return {cropX, cropY, cropWidth, cropHeight};
 }
 
 async function compressImageFile(file: File) {
@@ -189,8 +251,14 @@ export function ProductForm({
   const [images, setImages] = useState<string[]>(initialData.images ?? []);
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [draggingImageIndex, setDraggingImageIndex] = useState<number | null>(null);
+  const [cropDraft, setCropDraft] = useState<CropDraft | null>(null);
   const [isVisible, setIsVisible] = useState(initialData.is_visible ?? true);
   const [attributeModalOpen, setAttributeModalOpen] = useState(false);
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [isSavingCategory, setIsSavingCategory] = useState(false);
+  const [newCategoryNameVi, setNewCategoryNameVi] = useState("");
+  const [newCategoryNameEn, setNewCategoryNameEn] = useState("");
   const [bulkPriceDraft, setBulkPriceDraft] = useState<BulkPriceTier[]>(initialBulkPriceTiers);
   const [showAttributeEditor, setShowAttributeEditor] = useState(true);
   const [newAttributeName, setNewAttributeName] = useState("");
@@ -206,14 +274,42 @@ export function ProductForm({
     attributes[0]?.name ?? defaultAttributeGroups[0]
   );
   const [attributeValues, setAttributeValues] = useState<string[]>(initialAttributeValues);
-  const categoryOptions = categories.length > 0
-    ? categories
-    : [
-        {slug: "beans", name_vi: "beans", name_en: "beans"},
-        {slug: "ground", name_vi: "ground", name_en: "ground"},
-        {slug: "phin", name_vi: "phin", name_en: "phin"},
-        {slug: "gifts", name_vi: "gifts", name_en: "gifts"}
-      ];
+  const [categoryOptions, setCategoryOptions] = useState<ProductCategoryOption[]>(() => (
+    categories.length > 0
+      ? categories
+      : [
+          {slug: "beans", name_vi: "beans", name_en: "beans"},
+          {slug: "ground", name_vi: "ground", name_en: "ground"},
+          {slug: "phin", name_vi: "phin", name_en: "phin"},
+          {slug: "gifts", name_vi: "gifts", name_en: "gifts"}
+        ]
+  ));
+  const cropResolverRef = useRef<((file: File | null) => void) | null>(null);
+  const cropImageRef = useRef<HTMLImageElement | null>(null);
+  const cropDragRef = useRef<{
+    x: number;
+    y: number;
+    cropX: number;
+    cropY: number;
+    cropWidth: number;
+    cropHeight: number;
+    action: "move" | "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
+  } | null>(null);
+  const cropPreviewGeometry = cropDraft ? cropGeometry(cropDraft) : null;
+  const cropBox = cropDraft ? normalizeCropBox(cropDraft) : null;
+  useEffect(() => {
+    return () => {
+      if (cropDraft?.url) {
+        URL.revokeObjectURL(cropDraft.url);
+      }
+    };
+  }, [cropDraft?.url]);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      setCategoryOptions(categories);
+    }
+  }, [categories]);
 
   function openCreateAttributeModal() {
     setEditingAttribute(null);
@@ -270,6 +366,58 @@ export function ProductForm({
     setNewAttributeName("");
   }
 
+  function openCreateCategoryModal() {
+    setNewCategoryNameVi("");
+    setNewCategoryNameEn("");
+    setCategoryModalOpen(true);
+  }
+
+  function closeCategoryModal() {
+    setCategoryModalOpen(false);
+    setNewCategoryNameVi("");
+    setNewCategoryNameEn("");
+  }
+
+  async function handleSaveCategory() {
+    const nameVi = newCategoryNameVi.trim();
+    const nameEn = newCategoryNameEn.trim();
+
+    if (!nameVi) {
+      message.error(t("categoryNameRequired"));
+      return;
+    }
+
+    setIsSavingCategory(true);
+    const formData = new FormData();
+    formData.set("name_vi", nameVi);
+    formData.set("name_en", nameEn);
+    formData.set("is_visible", "true");
+
+    try {
+      const result = await upsertProductCategory(formData);
+      if (!result.success) {
+        message.error(`${t("saveError")}${result.error}`);
+        return;
+      }
+
+      if (result.category) {
+        const nextCategory = result.category;
+        setCategoryOptions((current) =>
+          current.some((category) => category.slug === nextCategory.slug)
+            ? current
+            : [...current, nextCategory]
+        );
+        const currentValues = (form.getFieldValue("category_slugs") as string[] | undefined) ?? [];
+        form.setFieldValue("category_slugs", Array.from(new Set([...currentValues, nextCategory.slug])));
+      }
+      message.success(t("saveSuccess"));
+      closeCategoryModal();
+      router.refresh();
+    } finally {
+      setIsSavingCategory(false);
+    }
+  }
+
   function startAttributeEditor() {
     setShowAttributeEditor(true);
     if (!selectedAttributeGroup && attributeOptions.length) {
@@ -290,6 +438,219 @@ export function ProductForm({
     );
   }
 
+  function moveImage(fromIndex: number, toIndex: number) {
+    setImages((current) => {
+      if (toIndex < 0 || toIndex >= current.length || fromIndex === toIndex) return current;
+
+      const nextImages = [...current];
+      const [movedImage] = nextImages.splice(fromIndex, 1);
+      nextImages.splice(toIndex, 0, movedImage);
+      return nextImages;
+    });
+  }
+
+  function handleImageDrop(targetIndex: number) {
+    if (draggingImageIndex === null || draggingImageIndex === targetIndex) {
+      setDraggingImageIndex(null);
+      return;
+    }
+
+    moveImage(draggingImageIndex, targetIndex);
+    setDraggingImageIndex(null);
+  }
+
+  function requestImageCrop(file: File, index: number, total: number) {
+    return new Promise<File | null>((resolve) => {
+      cropResolverRef.current = resolve;
+      cropImageRef.current = null;
+      setCropDraft({
+        file,
+        url: URL.createObjectURL(file),
+        index,
+        total,
+        naturalWidth: 0,
+        naturalHeight: 0,
+        cropX: 0,
+        cropY: 0,
+        cropWidth: 0,
+        cropHeight: 0
+      });
+    });
+  }
+
+  function resolveImageCrop(file: File | null) {
+    cropResolverRef.current?.(file);
+    cropResolverRef.current = null;
+    cropImageRef.current = null;
+    cropDragRef.current = null;
+    setCropDraft(null);
+  }
+
+  function updateCropDraft(nextDraft: CropDraft) {
+    const box = normalizeCropBox(nextDraft);
+    if (!box) {
+      setCropDraft(nextDraft);
+      return;
+    }
+
+    setCropDraft({
+      ...nextDraft,
+      ...box
+    });
+  }
+
+  function handleCropImageLoad(event: React.SyntheticEvent<HTMLImageElement>) {
+    const image = event.currentTarget;
+    cropImageRef.current = image;
+    if (!cropDraft) return;
+
+    const nextDraft = {
+      ...cropDraft,
+      naturalWidth: image.naturalWidth,
+      naturalHeight: image.naturalHeight
+    };
+    const geometry = cropGeometry(nextDraft);
+    if (!geometry) {
+      setCropDraft(nextDraft);
+      return;
+    }
+
+    const cropWidth = Math.min(geometry.width, geometry.height * productImageAspectRatio) * 0.9;
+    const cropHeight = cropWidth / productImageAspectRatio;
+    setCropDraft({
+      ...nextDraft,
+      cropX: geometry.left + (geometry.width - cropWidth) / 2,
+      cropY: geometry.top + (geometry.height - cropHeight) / 2,
+      cropWidth,
+      cropHeight
+    });
+  }
+
+  function handleCropPointerDown(
+    event: React.PointerEvent<HTMLElement>,
+    action: "move" | "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw"
+  ) {
+    if (!cropDraft || !cropBox) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const cropStage = event.currentTarget.closest("[data-crop-stage]") as HTMLDivElement | null;
+    cropStage?.setPointerCapture(event.pointerId);
+    cropDragRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      ...cropBox,
+      action
+    };
+  }
+
+  function handleCropPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!cropDraft || !cropDragRef.current || !cropPreviewGeometry) return;
+
+    const drag = cropDragRef.current;
+    const deltaX = event.clientX - drag.x;
+    const deltaY = event.clientY - drag.y;
+    const imageLeft = cropPreviewGeometry.left;
+    const imageTop = cropPreviewGeometry.top;
+    const imageRight = cropPreviewGeometry.left + cropPreviewGeometry.width;
+    const imageBottom = cropPreviewGeometry.top + cropPreviewGeometry.height;
+    let cropX = drag.cropX;
+    let cropY = drag.cropY;
+    let cropWidth = drag.cropWidth;
+    let cropHeight = drag.cropHeight;
+
+    if (drag.action === "move") {
+      cropX = clamp(drag.cropX + deltaX, imageLeft, imageRight - cropWidth);
+      cropY = clamp(drag.cropY + deltaY, imageTop, imageBottom - cropHeight);
+      setCropDraft({...cropDraft, cropX, cropY, cropWidth, cropHeight});
+      return;
+    }
+
+    const anchorRight = drag.cropX + drag.cropWidth;
+    const anchorBottom = drag.cropY + drag.cropHeight;
+    const maxWidthFromLeft = imageRight - drag.cropX;
+    const maxWidthFromRight = anchorRight - imageLeft;
+    const maxWidthFromTop = (imageBottom - drag.cropY) * productImageAspectRatio;
+    const maxWidthFromBottom = (anchorBottom - imageTop) * productImageAspectRatio;
+    const minWidth = Math.min(minCropSize, drag.cropWidth);
+    let nextWidth = drag.cropWidth;
+
+    if (drag.action.includes("e")) nextWidth = drag.cropWidth + deltaX;
+    if (drag.action.includes("w")) nextWidth = drag.cropWidth - deltaX;
+    if (drag.action.includes("s")) nextWidth = Math.max(nextWidth, (drag.cropHeight + deltaY) * productImageAspectRatio);
+    if (drag.action.includes("n")) nextWidth = Math.max(nextWidth, (drag.cropHeight - deltaY) * productImageAspectRatio);
+
+    const maxWidth = Math.min(
+      drag.action.includes("w") ? maxWidthFromRight : maxWidthFromLeft,
+      drag.action.includes("n") ? maxWidthFromBottom : maxWidthFromTop
+    );
+    cropWidth = clamp(nextWidth, minWidth, maxWidth);
+    cropHeight = cropWidth / productImageAspectRatio;
+    cropX = drag.action.includes("w") ? anchorRight - cropWidth : drag.cropX;
+    cropY = drag.action.includes("n") ? anchorBottom - cropHeight : drag.cropY;
+
+    updateCropDraft({
+      ...cropDraft,
+      cropX,
+      cropY,
+      cropWidth,
+      cropHeight
+    });
+  }
+
+  function handleCropPointerEnd(event: React.PointerEvent<HTMLDivElement>) {
+    cropDragRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  async function createCroppedImageFile() {
+    if (!cropDraft || !cropPreviewGeometry || !cropBox || !cropImageRef.current) return cropDraft?.file ?? null;
+
+    const sourceX = Math.max(0, (cropBox.cropX - cropPreviewGeometry.left) / cropPreviewGeometry.scale);
+    const sourceY = Math.max(0, (cropBox.cropY - cropPreviewGeometry.top) / cropPreviewGeometry.scale);
+    const sourceWidth = Math.min(cropDraft.naturalWidth - sourceX, cropBox.cropWidth / cropPreviewGeometry.scale);
+    const sourceHeight = Math.min(cropDraft.naturalHeight - sourceY, cropBox.cropHeight / cropPreviewGeometry.scale);
+    const outputScale = Math.min(1, maxCropOutputSide / Math.max(sourceWidth, sourceHeight));
+    const outputWidth = Math.max(1, Math.round(sourceWidth * outputScale));
+    const outputHeight = Math.max(1, Math.round(sourceHeight * outputScale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = outputWidth;
+    canvas.height = outputHeight;
+    const context = canvas.getContext("2d");
+    if (!context) return cropDraft.file;
+
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, outputWidth, outputHeight);
+    context.drawImage(
+      cropImageRef.current,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      0,
+      0,
+      outputWidth,
+      outputHeight
+    );
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob((result) => resolve(result), "image/jpeg", 0.9);
+    });
+    if (!blob) return cropDraft.file;
+
+    const baseName = cropDraft.file.name.replace(/\.[^.]+$/, "") || "product-image";
+    return new File([blob], `${baseName}-crop.jpg`, {
+      type: "image/jpeg",
+      lastModified: Date.now()
+    });
+  }
+
+  async function handleCropConfirm() {
+    resolveImageCrop(await createCroppedImageFile());
+  }
+
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
     if (!files.length) return;
@@ -297,9 +658,12 @@ export function ProductForm({
     setIsUploading(true);
     try {
       let uploadedCount = 0;
-      for (const file of files) {
+      for (const [index, file] of files.entries()) {
+        const preparedFile = await requestImageCrop(file, index, files.length);
+        if (!preparedFile) continue;
+
         const formData = new FormData();
-        formData.append("file", await compressImageFile(file));
+        formData.append("file", await compressImageFile(preparedFile));
         const result = await uploadProductImage(formData);
 
         if (result.url) {
@@ -315,6 +679,39 @@ export function ProductForm({
     } finally {
       setIsUploading(false);
       event.target.value = "";
+    }
+  }
+
+  async function handleCropExistingImage(image: string, index: number) {
+    setIsUploading(true);
+    try {
+      const response = await fetch(image);
+      if (!response.ok) {
+        message.error(t("cropExistingImageError"));
+        return;
+      }
+
+      const blob = await response.blob();
+      const type = blob.type || "image/jpeg";
+      const extension = type.split("/")[1] || "jpg";
+      const file = new File([blob], `product-image-${index + 1}.${extension}`, {type});
+      const croppedFile = await requestImageCrop(file, 0, 1);
+      if (!croppedFile) return;
+
+      const formData = new FormData();
+      formData.append("file", await compressImageFile(croppedFile));
+      const result = await uploadProductImage(formData);
+
+      if (result.url) {
+        setImages((current) => current.map((currentImage, imageIndex) => imageIndex === index ? result.url! : currentImage));
+        message.success(t("uploadSuccess"));
+      } else {
+        message.error(`${t("uploadError")}${result.error ?? ""}`);
+      }
+    } catch {
+      message.error(t("cropExistingImageError"));
+    } finally {
+      setIsUploading(false);
     }
   }
 
@@ -440,6 +837,23 @@ export function ProductForm({
             <Select
               mode="multiple"
               allowClear
+              showSearch
+              dropdownRender={(menu) => (
+                <div>
+                  {menu}
+                  <div className="border-t border-stone-100 p-2">
+                    <Button
+                      type="text"
+                      icon={<PlusOutlined />}
+                      className="flex w-full items-center justify-start text-forest-800"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={openCreateCategoryModal}
+                    >
+                      {t("addCategory")}
+                    </Button>
+                  </div>
+                </div>
+              )}
               options={categoryOptions.map((category) => ({
                 value: category.slug,
                 label: locale === "en" ? category.name_en : category.name_vi
@@ -678,8 +1092,30 @@ export function ProductForm({
           {images.length ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {images.map((image, index) => (
-                <div key={`${image}-${index}`} className="relative aspect-square overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
+                <div
+                  key={`${image}-${index}`}
+                  draggable={!isSaving}
+                  className={`group relative aspect-square overflow-hidden rounded-2xl border bg-stone-100 transition ${
+                    draggingImageIndex === index
+                      ? "border-amber-400 opacity-60"
+                      : "border-stone-200 hover:border-amber-300"
+                  }`}
+                  onDragStart={() => setDraggingImageIndex(index)}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={() => handleImageDrop(index)}
+                  onDragEnd={() => setDraggingImageIndex(null)}
+                >
                   <Image src={image} alt="" fill sizes="160px" className="object-cover" />
+                  <div className="absolute left-2 top-2 rounded-lg bg-black/45 px-2 py-1 text-xs font-medium text-white shadow-sm backdrop-blur">
+                    {index + 1}
+                  </div>
+                  <Tooltip title={t("dragImageToReorder")}>
+                    <Button
+                      size="small"
+                      icon={<DragOutlined />}
+                      className="absolute left-2 bottom-2 cursor-grab border-white/70 bg-white/90"
+                    />
+                  </Tooltip>
                   <Button
                     danger
                     size="small"
@@ -688,6 +1124,16 @@ export function ProductForm({
                     className="absolute right-2 top-2"
                     onClick={() => setImages((current) => current.filter((_, imageIndex) => imageIndex !== index))}
                   />
+                  <Tooltip title={t("cropExistingImage")}>
+                    <Button
+                      size="small"
+                      icon={<ScissorOutlined />}
+                      loading={isUploading}
+                      disabled={isUploading}
+                      className="absolute right-2 bottom-2 border-white/70 bg-white/90"
+                      onClick={() => handleCropExistingImage(image, index)}
+                    />
+                  </Tooltip>
                 </div>
               ))}
             </div>
@@ -708,6 +1154,129 @@ export function ProductForm({
       </Form>
 
       <Modal
+        title={cropDraft ? `${t("cropImageTitle")} (${cropDraft.index + 1}/${cropDraft.total})` : t("cropImageTitle")}
+        open={Boolean(cropDraft)}
+        width={620}
+        onCancel={() => resolveImageCrop(null)}
+        destroyOnHidden
+        footer={[
+          <Button key="skip" onClick={() => resolveImageCrop(null)}>
+            {t("skipImage")}
+          </Button>,
+          <Button key="original" onClick={() => cropDraft && resolveImageCrop(cropDraft.file)}>
+            {t("useOriginalImage")}
+          </Button>,
+          <Button key="crop" type="primary" icon={<ScissorOutlined />} disabled={!cropPreviewGeometry} onClick={handleCropConfirm}>
+            {t("cropAndUpload")}
+          </Button>
+        ]}
+      >
+        {cropDraft ? (
+          <div className="space-y-4 pt-2">
+            <p className="text-sm text-stone-500">{t("cropImageInstruction")}</p>
+            <div className="flex justify-center">
+              <div
+                data-crop-stage
+                className="relative touch-none select-none overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 shadow-inner"
+                style={{width: cropPreviewSize, height: cropPreviewSize}}
+                onPointerMove={handleCropPointerMove}
+                onPointerUp={handleCropPointerEnd}
+                onPointerCancel={handleCropPointerEnd}
+              >
+                {/* Local blob URL for canvas cropping; next/image optimization is not useful here. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  ref={cropImageRef}
+                  src={cropDraft.url}
+                  alt=""
+                  draggable={false}
+                  className="absolute max-w-none"
+                  style={
+                    cropPreviewGeometry
+                      ? {
+                          width: cropPreviewGeometry.width,
+                          height: cropPreviewGeometry.height,
+                          left: cropPreviewGeometry.left,
+                          top: cropPreviewGeometry.top
+                        }
+                      : {inset: 0, width: "100%", height: "100%", objectFit: "cover"}
+                  }
+                  onLoad={handleCropImageLoad}
+                />
+                {cropPreviewGeometry && cropBox ? (
+                  <>
+                    <div
+                      className="pointer-events-none absolute bg-black/50"
+                      style={{left: 0, top: 0, width: cropPreviewSize, height: cropBox.cropY}}
+                    />
+                    <div
+                      className="pointer-events-none absolute bg-black/50"
+                      style={{
+                        left: 0,
+                        top: cropBox.cropY + cropBox.cropHeight,
+                        width: cropPreviewSize,
+                        height: cropPreviewSize - cropBox.cropY - cropBox.cropHeight
+                      }}
+                    />
+                    <div
+                      className="pointer-events-none absolute bg-black/50"
+                      style={{left: 0, top: cropBox.cropY, width: cropBox.cropX, height: cropBox.cropHeight}}
+                    />
+                    <div
+                      className="pointer-events-none absolute bg-black/50"
+                      style={{
+                        left: cropBox.cropX + cropBox.cropWidth,
+                        top: cropBox.cropY,
+                        width: cropPreviewSize - cropBox.cropX - cropBox.cropWidth,
+                        height: cropBox.cropHeight
+                      }}
+                    />
+                    <div
+                      className="absolute cursor-move border border-dashed border-white shadow-[0_0_0_1px_rgba(0,0,0,0.25)]"
+                      style={{
+                        left: cropBox.cropX,
+                        top: cropBox.cropY,
+                        width: cropBox.cropWidth,
+                        height: cropBox.cropHeight,
+                        backgroundImage:
+                          "linear-gradient(to right, rgba(255,255,255,.55) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.55) 1px, transparent 1px)",
+                        backgroundSize: `${cropBox.cropWidth / 3}px ${cropBox.cropHeight / 3}px`
+                      }}
+                      onPointerDown={(event) => handleCropPointerDown(event, "move")}
+                    >
+                      {[
+                        ["nw", "left-0 top-0 -translate-x-1/2 -translate-y-1/2 cursor-nwse-resize"],
+                        ["n", "left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 cursor-ns-resize"],
+                        ["ne", "right-0 top-0 translate-x-1/2 -translate-y-1/2 cursor-nesw-resize"],
+                        ["e", "right-0 top-1/2 translate-x-1/2 -translate-y-1/2 cursor-ew-resize"],
+                        ["se", "right-0 bottom-0 translate-x-1/2 translate-y-1/2 cursor-nwse-resize"],
+                        ["s", "left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2 cursor-ns-resize"],
+                        ["sw", "left-0 bottom-0 -translate-x-1/2 translate-y-1/2 cursor-nesw-resize"],
+                        ["w", "left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize"]
+                      ].map(([action, className]) => (
+                        <button
+                          key={action}
+                          type="button"
+                          aria-label={t("resizeCropArea")}
+                          className={`absolute h-5 w-5 rounded-full border-2 border-stone-300 bg-white shadow-sm ${className}`}
+                          onPointerDown={(event) =>
+                            handleCropPointerDown(
+                              event,
+                              action as "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw"
+                            )
+                          }
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
+
+      <Modal
         title={editingAttribute ? t("editAttribute") : t("createAttribute")}
         open={attributeModalOpen}
         okText={t("saveAttribute")}
@@ -725,6 +1294,37 @@ export function ProductForm({
             onPressEnter={handleSaveAttribute}
             autoFocus
           />
+        </div>
+      </Modal>
+
+      <Modal
+        title={t("newCategoryTitle")}
+        open={categoryModalOpen}
+        okText={t("save")}
+        cancelText={t("cancel")}
+        confirmLoading={isSavingCategory}
+        onCancel={closeCategoryModal}
+        onOk={handleSaveCategory}
+        destroyOnHidden
+      >
+        <div className="space-y-4 pt-2">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-stone-700">{t("categoryNameVI")}</label>
+            <Input
+              value={newCategoryNameVi}
+              onChange={(event) => setNewCategoryNameVi(event.target.value)}
+              onPressEnter={handleSaveCategory}
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-stone-700">{t("categoryNameEN")}</label>
+            <Input
+              value={newCategoryNameEn}
+              onChange={(event) => setNewCategoryNameEn(event.target.value)}
+              onPressEnter={handleSaveCategory}
+            />
+          </div>
         </div>
       </Modal>
 

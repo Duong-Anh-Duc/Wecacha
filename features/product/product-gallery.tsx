@@ -46,7 +46,15 @@ export function ProductGallery({
   return (
     <div className="flex flex-col gap-4">
       {/* Main Image */}
-      <div className="relative aspect-[4/3.35] max-h-[calc(100vh-9rem)] overflow-hidden rounded-[24px] bg-[#f8f9f6]">
+      <div className="relative aspect-[2/3] max-h-[calc(100vh-9rem)] overflow-hidden rounded-[24px] bg-[#f8f9f6]">
+        <Image
+          src={safeImages[selectedIndex] || safeImages[0]}
+          alt=""
+          fill
+          aria-hidden="true"
+          className="object-cover opacity-20 blur-2xl scale-110"
+          sizes="(min-width: 1024px) 52vw, 100vw"
+        />
         <Image
           src={safeImages[selectedIndex] || safeImages[0]}
           alt={`${alt} ${selectedIndex + 1}`}

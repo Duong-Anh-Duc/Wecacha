@@ -104,45 +104,59 @@ export async function ArabicaProductsSection({
           />
         </Reveal>
 
-        <div className="grid gap-6 sm:grid-cols-2 sm:gap-7 md:gap-8">
+        <div
+          className={cn(
+            "grid items-stretch gap-6 sm:grid-cols-2 sm:gap-7 md:gap-8",
+            cards.length <= 3 ? "lg:grid-cols-3" : "lg:grid-cols-4"
+          )}
+        >
           {cards.map((item, i) => (
-            <Reveal key={item.key} delay={i * 0.12}>
-              <div className="relative overflow-hidden rounded-[2.5rem] border border-parchment-100/20 p-10 shadow-[0_30px_60px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-2 hover:border-ember/60 hover:shadow-[0_20px_40px_rgba(181,112,58,0.2)] group bg-black">
+            <Reveal key={item.key} delay={i * 0.12} className="h-full">
+              <div className="group relative flex h-full min-h-[600px] overflow-hidden rounded-[2.5rem] border border-parchment-100/20 bg-black p-6 shadow-[0_30px_60px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-2 hover:border-ember/60 hover:shadow-[0_20px_40px_rgba(181,112,58,0.2)]">
                 
                 {/* Product Background Image inside Card */}
                 <div className="absolute inset-0 z-0">
                   <Image 
                     src={item.image} 
-                    alt={item.title} 
+                    alt="" 
                     fill 
-                    className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                    aria-hidden="true"
+                    className="scale-110 object-cover opacity-55 blur-xl transition-transform duration-700 group-hover:scale-[1.14]"
                     sizes="(max-width: 768px) 100vw, 50vw" 
                     quality={80} 
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1412]/95 via-[#1a1412]/70 to-[#1a1412]/30 group-hover:from-[#1a1412]/90 transition-colors duration-500" />
+                  <Image 
+                    src={item.image} 
+                    alt={item.title} 
+                    fill 
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.03]" 
+                    sizes="(max-width: 768px) 100vw, 50vw" 
+                    quality={80} 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1412]/82 via-[#1a1412]/22 to-[#1a1412]/10 group-hover:from-[#1a1412]/76 transition-colors duration-500" />
                 </div>
 
                 {/* Content Overlay */}
-                <div className="relative z-10">
+                <div className="relative z-10 flex w-full flex-col">
                   <span className="absolute right-0 top-0 rounded-full bg-ember px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
                     {item.label}
                   </span>
 
-                  <div className="mb-8 pr-20">
+                  <div className="pr-14 drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)]">
                   <p className="text-xs font-bold uppercase tracking-widest text-ember">
                     {item.subtitle}
                   </p>
-                  <h3 className="mt-3 font-serif text-3xl text-parchment-50">
+                  <h3 className="mt-3 font-serif text-3xl leading-tight text-parchment-50">
                     {item.title}
                   </h3>
                 </div>
 
-                <div className="space-y-6">
+                <div className="mt-auto space-y-4 rounded-2xl border border-white/10 bg-[#120f0c]/54 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.28)] backdrop-blur-[2px]">
                   <div>
                     <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-white/50">
                       {localizedValue(section?.settings?.profileLabel, locale, t("prodProfileLabel"))}
                     </p>
-                    <p className="flex items-start gap-2 text-base leading-relaxed text-white/80">
+                    <p className="line-clamp-2 flex items-start gap-2 text-sm leading-relaxed text-white/86">
                       <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
                       {item.profile}
                     </p>
@@ -152,16 +166,16 @@ export async function ArabicaProductsSection({
                     <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-white/50">
                       {localizedValue(section?.settings?.storyLabel, locale, t("prodStoryLabel"))}
                     </p>
-                    <p className="text-base leading-relaxed text-white/70">
+                    <p className="line-clamp-3 text-sm leading-relaxed text-white/74">
                       {item.body}
                     </p>
                   </div>
                 </div>
 
-                  <div className="mt-10">
+                  <div className="pt-4">
                     <Link
                       href={localeHref(locale, item.href)}
-                      className="inline-flex h-12 items-center gap-2 rounded-xl bg-ember px-8 text-sm font-semibold tracking-wide text-white transition hover:bg-ember/90 hover:scale-105"
+                      className="inline-flex h-12 items-center gap-2 rounded-xl bg-ember px-8 text-sm font-semibold tracking-wide text-white shadow-[0_14px_34px_rgba(181,112,58,0.32)] transition hover:bg-ember/90 hover:scale-105"
                     >
                       {localizedValue(section?.settings?.cta, locale, t("prodCta"))}
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />

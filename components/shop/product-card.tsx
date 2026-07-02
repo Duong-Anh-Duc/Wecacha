@@ -46,11 +46,21 @@ export function ProductCard({
       >
         <Image
           src={image}
+          alt=""
+          fill
+          aria-hidden="true"
+          quality={80}
+          loading="lazy"
+          className="scale-110 object-cover object-center opacity-55 blur-xl transition duration-[1600ms] ease-out group-hover:scale-[1.13] group-hover:opacity-70"
+          sizes="(min-width: 1536px) 34vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+        />
+        <Image
+          src={image}
           alt={productName}
           fill
           quality={95}
           loading="lazy"
-          className="object-cover object-center contrast-110 saturate-115 transition duration-[1600ms] ease-out group-hover:scale-[1.035]"
+          className="object-cover object-center contrast-110 saturate-115 transition duration-[1600ms] ease-out group-hover:scale-[1.02]"
           sizes="(min-width: 1536px) 34vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         />
       </div>

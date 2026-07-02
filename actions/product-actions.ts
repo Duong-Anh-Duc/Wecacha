@@ -385,6 +385,16 @@ export async function upsertProductCategory(formData: FormData) {
     if (error) {
       return {success: false, error: error.message};
     }
+
+    revalidateShopPaths();
+    return {
+      success: true,
+      category: {
+        slug,
+        name_vi: nameVi,
+        name_en: nameEn || nameVi
+      }
+    };
   } else {
     const {data: lastCategory, error: orderError} = await supabase
       .from("product_categories")
@@ -409,10 +419,17 @@ export async function upsertProductCategory(formData: FormData) {
     if (error) {
       return {success: false, error: error.message};
     }
-  }
 
-  revalidateShopPaths();
-  return {success: true};
+    revalidateShopPaths();
+    return {
+      success: true,
+      category: {
+        slug: categorySlug,
+        name_vi: nameVi,
+        name_en: nameEn || nameVi
+      }
+    };
+  }
 }
 
 export async function deleteProductCategory(slug: string) {
