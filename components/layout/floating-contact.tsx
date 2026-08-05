@@ -6,12 +6,13 @@ import {MessageCircle, X} from "lucide-react";
 import {useTranslations} from "next-intl";
 import Image from "next/image";
 import {usePathname} from "next/navigation";
+import {siteConfig} from "@/lib/site";
 import {cn} from "@/lib/utils";
 
 const contacts = [
   {
     label: "Zalo",
-    href: "https://zalo.me/0962083608",
+    href: `https://zalo.me/${siteConfig.zalo.replace(/\D/g, "")}`,
     bg: "#0068FF",
     icon: (
       <Image src="/Icon_of_Zalo.svg.png" alt="Zalo" width={20} height={20} className="h-5 w-5 object-contain" />

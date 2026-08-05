@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type {Metadata} from "next";
-import {Facebook, Mail, MessageCircle, Phone} from "lucide-react";
+import {Clock, Facebook, Mail, MessageCircle, Phone} from "lucide-react";
 import {getTranslations, setRequestLocale} from "next-intl/server";
 import {Reveal} from "@/components/motion/reveal";
 import {SectionHeading} from "@/components/sections/section-heading";
@@ -82,10 +82,14 @@ export default async function ContactPage({params}: Props) {
               copy={localizedField(hero, "copy", locale) || t("intro")}
             />
             <div className="mt-9 grid gap-4 text-sm text-white/72 sm:grid-cols-2">
-              <a className="flex items-center gap-3 transition hover:text-white" href={`tel:${siteConfig.phone}`}>
+              <a className="flex items-center gap-3 transition hover:text-white" href={`tel:${siteConfig.phone.replace(/\D/g, "")}`}>
                 <Phone className="h-5 w-5 text-ember" aria-hidden="true" />
                 {siteConfig.phone}
               </a>
+              <span className="flex items-center gap-3">
+                <Clock className="h-5 w-5 text-ember" aria-hidden="true" />
+                {siteConfig.openingHours[locale]}
+              </span>
               <a className="flex items-center gap-3 transition hover:text-white" href={`mailto:${siteConfig.email}`}>
                 <Mail className="h-5 w-5 text-ember" aria-hidden="true" />
                 {siteConfig.email}

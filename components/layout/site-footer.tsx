@@ -1,6 +1,6 @@
 "use client";
 
-import {Facebook, Mail, MapPin, Mountain, Phone} from "lucide-react";
+import {Clock, Facebook, Mail, MapPin, Mountain, Phone} from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
 import {Link, usePathname} from "@/i18n/navigation";
 import {cn} from "@/lib/utils";
@@ -90,10 +90,14 @@ export function SiteFooter() {
               <MapPin className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
               <span>{siteConfig.address[locale]}</span>
             </a>
-            <a className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 transition hover:text-white" href={`tel:${siteConfig.phone}`}>
+            <a className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 transition hover:text-white" href={`tel:${siteConfig.phone.replace(/\D/g, "")}`}>
               <Phone className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
               <span>{siteConfig.phone}</span>
             </a>
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3">
+              <Clock className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
+              <span>{siteConfig.openingHours[locale]}</span>
+            </div>
             <a className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 transition hover:text-white" href={`mailto:${siteConfig.email}`}>
               <Mail className="h-4 w-4 shrink-0 text-ember" aria-hidden="true" />
               <span>{siteConfig.email}</span>

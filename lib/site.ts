@@ -7,10 +7,15 @@ export const siteUrl = (configuredSiteUrl || "https://sonlaspecialtycoffee.vn").
 export const siteConfig = {
   name: "Sơn La Coffee",
   email: "hello@sonlacoffee.vn",
-  phone: "0983 538 814",
-  zalo: "0983538814",
+  phone: "0987 627 806",
+  zalo: "0987627806",
   facebook: "https://facebook.com/sonlacoffee",
   maps: "https://maps.app.goo.gl/kwuB9yFNDjCFXqB99",
+  openingHours: {
+    vi: "Mở cửa: 7:00 - 22:00",
+    en: "Open: 7:00 - 22:00",
+    schema: "Mo-Su 07:00-22:00"
+  },
   address: {
     vi: "101 D6 Trần Huy Liệu, Giảng Võ, Ba Đình, Hà Nội",
     en: "101 D6 Tran Huy Lieu, Giang Vo, Ba Dinh, Hanoi"

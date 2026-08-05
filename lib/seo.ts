@@ -44,6 +44,7 @@ export function organizationJsonLd(locale: Locale) {
     url: siteUrl,
     email: siteConfig.email,
     telephone: siteConfig.phone,
+    openingHours: siteConfig.openingHours.schema,
     priceRange: "₫₫",
     logo: {
       "@type": "ImageObject",
